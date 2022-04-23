@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:     #测试服务器地址101.35.185.82
-    url: jdbc:mysql://localhost:3306/happy_mail?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/qcy_mail?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
     druid:

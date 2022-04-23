@@ -69,7 +69,7 @@ class CodeGenerator {
 
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setUrl("jdbc:mysql://localhost:3306/happy_mail?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC");
+        dsc.setUrl("jdbc:mysql://localhost:3306/qcy_mail?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC");
         /*// dsc.setSchemaName("public");*/
         dsc.setDriverName("com.mysql.cj.jdbc.Driver");
         dsc.setUsername("root");

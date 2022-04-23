@@ -2,7 +2,7 @@ spring:
   application:
     name: mail-portal
   profiles:
-    active: common,test #默认为开发环境,每次上传代码的时候改成prod为生产环境,开发环境dev,测试环境test
+    active: common,dev #默认为开发环境,每次上传代码的时候改成prod为生产环境,开发环境dev,测试环境test
   servlet:
     multipart:
       enabled: true  #开启文件上传
