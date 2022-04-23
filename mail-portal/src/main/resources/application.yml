@@ -13,7 +13,7 @@ spring:
     image:
       height: 25
       width: 60
-      location: banner-fox.png
+      location: banner.png
 #  main:
 #    banner-mode: off # 可以关闭自定义Banner图
 
