@@ -4,6 +4,7 @@ import com.ys.mail.entity.SmsFlashPromotion;
 import com.ys.mail.entity.SmsFlashPromotionProduct;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,11 +14,12 @@ import java.util.List;
  * @version 1.0
  * @date 2021-11-25 18:08
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class SecondProductDTO extends SmsFlashPromotion implements Serializable {
 
-    @ApiModelProperty(value = "限时秒杀中的商品")
-    private List<FlashPromotionProductDTO> promotionProductDTOList;
+//    @ApiModelProperty(value = "限时秒杀中的商品")
+//    private List<FlashPromotionProductDTO> promotionProductDTOList;
 
     @ApiModelProperty(value = "公司秒杀中的商品")
     private List<FlashPromotionProductDTO> cpyProducts;

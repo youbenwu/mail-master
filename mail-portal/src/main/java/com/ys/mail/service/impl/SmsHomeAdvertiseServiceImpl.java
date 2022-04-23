@@ -77,26 +77,28 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
             // 分为0->轻创营和1->卖乐吧
             homePageVO = getHomePage(sb.append("Zero"), NumberUtils.INTEGER_ZERO, cpyType);
         } else {
-            /**
-             * 需求:->现在高级用户查看的信息是这样,轻创营显示用户自营的,卖乐吧显示的是
-             * 有两种情况,
-             */
             homePageVO = getHomePage(cpyType.equals(NumberUtils.BYTE_ZERO) ? sb.append("ZeroZero") : sb.append("OneOne"), NumberUtils.INTEGER_ONE, cpyType);
         }
         return homePageVO;
     }
 
+    /**
+     *   .homeGroupBuyVO(HomeGroupBuyVO.builder()
+     *   .groupSum(userService.count() * 1000)
+     *     // 团购商品
+     *    .groupBuyDTOList(groupBuyService.getNewestGroupBuy())
+     *   .build()
+     *   )
+     * @param sb 拼接字符串
+     * @param ite 是否高级用户
+     * @param cpyType 轻创营还是卖了吧
+     * @return 返回值
+     */
     private HomePageVO getHomePage(StringBuilder sb, Integer ite, Byte cpyType) {
         String key = sb.toString();
         HomePageVO homePageVO = (HomePageVO) redisTemplate.opsForValue().get(key);
         if (BlankUtil.isEmpty(homePageVO)) {
             homePageVO = HomePageVO.builder()
-                    .homeGroupBuyVO(HomeGroupBuyVO.builder()
-                            .groupSum(userService.count() * 1000)
-                            // 团购商品
-                            .groupBuyDTOList(groupBuyService.getNewestGroupBuy())
-                            .build()
-                    )
                     // 轮播图
                     .homeAdvertises(homeAdvertiseService.getAllAdvertise())
                     // 秒杀商品

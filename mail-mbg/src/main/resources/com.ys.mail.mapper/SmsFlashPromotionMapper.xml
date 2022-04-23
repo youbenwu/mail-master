@@ -40,10 +40,10 @@
         <result column="update_time" property="updateTime" />
         <result column="is_home_status" property="homeStatus"/>
 
-        <collection property="promotionProductDTOList" ofType="com.ys.mail.model.dto.FlashPromotionProductDTO"
-                    column="flash_promotion_id"
-                    select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.selectNewestSecond"
-        />
+<!--        <collection property="promotionProductDTOList" ofType="com.ys.mail.model.dto.FlashPromotionProductDTO"-->
+<!--                    column="flash_promotion_id"-->
+<!--                    select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.selectNewestSecond"-->
+<!--        />    用户秒杀的数量去掉-->
 
         <collection property="cpyProducts" ofType="com.ys.mail.model.dto.FlashPromotionProductDTO"
                     column="flash_promotion_id"

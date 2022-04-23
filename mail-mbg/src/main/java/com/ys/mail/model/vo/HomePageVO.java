@@ -15,6 +15,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ *  @ApiModelProperty(value = "首页拼团商品") 拼团商品去掉
+ *  private HomeGroupBuyVO homeGroupBuyVO;
  * @author DT
  * @version 1.0
  * @date 2021-11-25 16:16
@@ -26,9 +28,6 @@ import java.util.List;
 public class HomePageVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(value = "首页拼团商品")
-    private HomeGroupBuyVO homeGroupBuyVO;
 
     @ApiModelProperty(value = "首页轮播图")
     private List<SmsHomeAdvertise> homeAdvertises;

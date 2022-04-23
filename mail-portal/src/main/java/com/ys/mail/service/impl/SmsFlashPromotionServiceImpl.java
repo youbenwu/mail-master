@@ -139,10 +139,7 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
 
     @Override
     public SecondProductDTO getSecondProduct(Integer ite,Byte cpyType) {
-        if(ite.equals(NumberUtils.INTEGER_ONE)){
-            return flashPromotionMapper.selectSecondProduct(cpyType);
-        }
-        return null;
+        return ite.equals(NumberUtils.INTEGER_ONE) ? flashPromotionMapper.selectSecondProduct(cpyType): null;
     }
 
     @Override
