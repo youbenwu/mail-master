@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.SysDistrictMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.SysDistrict">
+        <id column="dis_id" property="disId" />
+        <result column="dis_name" property="disName" />
+        <result column="parent_id" property="parentId" />
+        <result column="initial" property="initial" />
+        <result column="initials" property="initials" />
+        <result column="pinyin" property="pinyin" />
+        <result column="extra" property="extra" />
+        <result column="suffix" property="suffix" />
+        <result column="code" property="code" />
+        <result column="area_code" property="areaCode" />
+        <result column="order" property="sort" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        dis_id, dis_name, parent_id, initial, initials, pinyin, extra, suffix, code, area_code,sort
+    </sql>
+
+    <select id="trees" resultType="com.ys.mail.model.tree.SysDistrictTree">
+        select <include refid="Base_Column_List"/>
+        from sys_district
+        order by sort asc;
+    </select>
+
+</mapper>

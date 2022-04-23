@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsSkuStockMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsSkuStock">
+        <id column="sku_stock_id" property="skuStockId" />
+        <result column="product_id" property="productId" />
+        <result column="sku_code" property="skuCode" />
+        <result column="price" property="price" />
+        <result column="stock" property="stock" />
+        <result column="low_stock" property="lowStock" />
+        <result column="pic" property="pic" />
+        <result column="sale" property="sale" />
+        <result column="promotion_price" property="promotionPrice" />
+        <result column="lock_stock" property="lockStock" />
+        <result column="sp_data" property="spData" />
+        <result column="create_time" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+        <result column="group_price" property="groupPrice"/>
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.PmsSkuStockVO">
+        <id column="sku_stock_id" property="skuStockId" />
+        <result column="product_id" property="productId" />
+        <result column="sku_code" property="skuCode" />
+        <result column="price" property="price" />
+        <result column="stock" property="stock" />
+        <result column="low_stock" property="lowStock" />
+        <result column="pic" property="pic" />
+        <result column="sale" property="sale" />
+        <result column="promotion_price" property="promotionPrice" />
+        <result column="lock_stock" property="lockStock" />
+        <result column="sp_data" property="spData" />
+        <result column="create_time" property="createTime"/>
+        <result column="group_price" property="groupPrice"/>
+        <result column="product_name" property="productName"/>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        sku_stock_id, product_id, sku_code, price, stock,
+        low_stock, pic, sale, promotion_price, lock_stock,
+        sp_data,create_time,group_price
+    </sql>
+
+    <select id="selectBySku" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from pms_sku_stock
+        <where>
+            product_id = #{productId}
+            and sp_data like concat(#{spData}, '%')
+        </where>
+    </select>
+
+    <select id="get" resultMap="BaseResultMapVO">
+        select a.*,b.product_name from pms_sku_stock a
+        inner join pms_product b on a.product_id=b.product_id
+        where 1=1 and b.product_name like  concat(#{productName}, '%')
+order by a.create_time desc
+    </select>
+
+    <select id="closestExchangePrice" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        FROM `pms_sku_stock`
+        WHERE  `price` &gt;=  #{exchangePrice} AND `price` &lt; 2000000
+        ORDER BY price ASC LIMIT 1
+    </select>
+
+    <update id="updateSale">
+        update pms_sku_stock
+        set sale = sale + #{quantity},
+            stock = stock - #{quantity}
+        where sku_stock_id = #{skuStockId};
+    </update>
+
+    <resultMap id="skuResultMap" type="com.ys.mail.model.po.MebSkuPO" extends="BaseResultMap">
+        <association property="disCount" javaType="java.math.BigDecimal" column="product_id"
+        select="com.ys.mail.mapper.PmsSkuStockMapper.selectDisCount"
+        />
+    </resultMap>
+
+    <select id="selectBySkuId" resultMap="skuResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_sku_stock where sku_stock_id = #{skuStockId}
+    </select>
+
+    <select id="selectDisCount" resultType="java.math.BigDecimal">
+        select dis_count from pms_product
+        where product_id = #{productId}
+    </select>
+</mapper>

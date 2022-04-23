@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.UmsUserInviteMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.model.vo.UmsUserInviteVO">
+        <id column="user_invite_id" property="userInviteId" />
+        <result column="user_id" property="userId" />
+        <result column="parent_id" property="parentId" />
+        <result column="commission_reward" property="commissionReward" />
+        <result column="community_reward" property="communityReward" />
+        <result column="associations_nums" property="associationsNums" />
+        <result column="nickname" property="nickName" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 自定义结果 -->
+    <resultMap id="UserInviterMap" type="com.ys.mail.model.po.UmsUserInviterPO">
+        <result column="user_id" property="userId" />
+        <result column="top_invite_id" property="topInviteId" />
+        <result column="parent_invite_id" property="parentInviteId" />
+    </resultMap>
+
+    <resultMap id="UserInviterNumberMap" type="com.ys.mail.model.po.UmsUserInviteNumberPO">
+        <result column="top_invite_number" property="topInviteNumber" />
+        <result column="parent_invite_number" property="parentInviteNumber" />
+    </resultMap>
+
+    <resultMap id="UserInviterItemMap" type="com.ys.mail.model.vo.UserInviteItemVO">
+        <id column="user_invite_id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="create_time" property="createTime" />
+        <result column="head_portrait" property="head" />
+        <result column="phone" property="phone" />
+        <result column="associations_nums" property="teamNum" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_invite_id, user_id, parent_id, commission_reward, community_reward, associations_nums, create_time
+    </sql>
+
+    <select id="selectBySub" resultMap="BaseResultMap">
+        SELECT a.*,b.nickname
+        FROM
+            ums_user_invite a
+        inner join ums_user b on a.user_id=b.user_id
+    </select>
+
+    <!-- 二级代理使用 -->
+<!--    <select id="getParents" resultMap="UserInviterMap">-->
+<!--        SELECT-->
+<!--            uui.user_id,uui.parent_id top_invite_id,uui2.parent_id parent_invite_id-->
+<!--        FROM ums_user_invite uui-->
+<!--        LEFT JOIN ums_user_invite uui2 ON uui.parent_id = uui2.user_id-->
+<!--        WHERE uui.user_id = #{userId}-->
+<!--    </select>-->
+
+    <select id="getParents" resultMap="UserInviterMap">
+        SELECT
+            uui.user_id,uui.parent_id top_invite_id
+        FROM ums_user_invite uui
+        WHERE uui.user_id = #{userId}
+    </select>
+
+    <select id="getInviteNumber" resultMap="UserInviterNumberMap">
+        SELECT
+            SUM(a) top_invite_number,SUM(b) parent_invite_number
+        FROM
+            (
+                SELECT COUNT(user_invite_id) a,0 b FROM ums_user_invite uui WHERE uui.parent_id = #{inviterPO.topInviteId}
+                UNION
+                SELECT 0 a,COUNT(user_invite_id) b FROM ums_user_invite uui WHERE uui.parent_id = #{inviterPO.parentInviteId}
+            ) t
+    </select>
+
+    <select id="getInviteUser" resultMap="UserInviterItemMap">
+        select uui.user_invite_id,uui.user_id,uui.create_time,uu.phone,uu.head_portrait
+        from ums_user_invite uui
+        INNER JOIN ums_user uu on uu.user_id=uui.user_id
+        <where>
+            uui.parent_id =#{userId}
+            <if test="userInviteId!=0 and userInviteId!=null">
+                and uui.user_invite_id <![CDATA[ > ]]> #{userInviteId}
+            </if>
+        </where>
+        GROUP BY uui.user_id
+        LIMIT #{pageSize}
+    </select>
+
+    <select id="getPcInviteUser" resultMap="UserInviterItemMap">
+        select uui.user_invite_id,uui.user_id,uui.create_time,uu.phone,uu.head_portrait
+        from ums_user_invite uui
+        INNER JOIN ums_user uu on uu.user_id=uui.user_id
+        <where>
+            uui.parent_id =#{userId}
+            <if test="userInviteId!=0 and userInviteId!=null">
+                and uui.user_invite_id <![CDATA[ > ]]> #{userInviteId}
+            </if>
+        </where>
+        GROUP BY uui.user_id
+        LIMIT #{pageSize}
+    </select>
+
+
+    <resultMap id="userIdsByParentId" type="com.ys.mail.model.dto.TemporaryWorkers" >
+        <result column="parent_id" property="parentId"/>
+        <result column="user_ids" property="userIds"/>
+    </resultMap>
+
+    <select id="findUserIdsByParentId" resultMap="userIdsByParentId">
+        SELECT uui.`parent_id`,GROUP_CONCAT(uui.`user_id`) AS user_ids  FROM `ums_user_invite` AS uui  GROUP BY uui.`parent_id`
+    </select>
+
+
+</mapper>

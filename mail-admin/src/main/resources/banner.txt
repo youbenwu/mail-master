@@ -1,0 +1,8 @@
+${AnsiColor.YELLOW}${AnsiStyle.BOLD}        Mail-Admin   :: Spring Boot ::  ${spring-boot.formatted-version}
+${AnsiColor.RED}  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+${AnsiColor.BLUE}                  年少太轻狂，误入IT行。
+${AnsiColor.GREEN}                  白发森森立，两眼直茫茫。
+${AnsiColor.WHITE}                  语言上百种，无一称擅长。
+${AnsiColor.BLACK}                  三十而立时，无房单身郎。
+${AnsiColor.YELLOW}                                 -- 独孤剑客
+${AnsiColor.RED}  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

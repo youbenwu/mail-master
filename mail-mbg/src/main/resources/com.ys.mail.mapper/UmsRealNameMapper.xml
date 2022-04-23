@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.UmsRealNameMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.UmsRealName">
+        <id column="real_name_id" property="realNameId" />
+        <result column="user_id" property="userId" />
+        <result column="real_name" property="realName" />
+        <result column="card_number" property="cardNumber" />
+        <result column="card_back_img" property="cardBackImg" />
+        <result column="card_positive_img" property="cardPositiveImg" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        real_name_id, user_id, real_name, card_number, card_back_img, card_positive_img, create_time
+    </sql>
+
+</mapper>

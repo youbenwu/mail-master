@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsIntegralProductMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsIntegralProduct">
+        <id column="integral_pdt_id" property="integralPdtId" />
+        <result column="freight_template_id" property="freightTemplateId" />
+        <result column="product_name" property="productName" />
+        <result column="pic" property="pic" />
+        <result column="product_sn" property="productSn" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="is_verify_status" property="verifyStatus" />
+        <result column="sort" property="sort" />
+        <result column="sale" property="sale" />
+        <result column="price" property="price" />
+        <result column="sub_title" property="subTitle" />
+        <result column="description" property="description" />
+        <result column="stock" property="stock" />
+        <result column="low_stock" property="lowStock" />
+        <result column="unit" property="unit" />
+        <result column="weight" property="weight" />
+        <result column="service_ids" property="serviceIds" />
+        <result column="album_pics" property="albumPics" />
+        <result column="detail_title" property="detailTitle" />
+        <result column="detail_desc" property="detailDesc" />
+        <result column="promotion_start_time" property="promotionStartTime" />
+        <result column="promotion_end_time" property="promotionEndTime" />
+        <result column="promotion_per_limit" property="promotionPerLimit" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="cost" property="cost"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        integral_pdt_id, freight_template_id, product_name, pic, product_sn, is_publish_status,
+        is_verify_status, sort, sale, price, sub_title, description, stock, low_stock, unit,
+        weight, service_ids, album_pics, detail_title, detail_desc, promotion_start_time,
+        promotion_end_time, promotion_per_limit, create_time, update_time, deleted,cost
+    </sql>
+    <update id="updateSaleById">
+        update pms_integral_product
+        set sale = sale + #{quantity}
+        where integral_pdt_id = #{integralPdtId};
+    </update>
+
+    <select id="selectAllIntegralPdt" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from pms_integral_product
+        <where>
+            <if test="integralPdtId != 0">
+                integral_pdt_id <![CDATA[ < ]]>  #{integralPdtId}
+            </if>
+            and deleted = 0
+        </where>
+        order by integral_pdt_id desc
+        limit 6;
+    </select>
+
+</mapper>

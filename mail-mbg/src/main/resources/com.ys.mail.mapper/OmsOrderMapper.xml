@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.OmsOrderMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.OmsOrder">
+        <id column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="coupon_id" property="couponId"/>
+        <result column="order_sn" property="orderSn"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="pay_amount" property="payAmount"/>
+        <result column="freight_amount" property="freightAmount"/>
+        <result column="promotion_amount" property="promotionAmount"/>
+        <result column="coupon_amount" property="couponAmount"/>
+        <result column="discount_amount" property="discountAmount"/>
+        <result column="pay_type" property="payType"/>
+        <result column="source_type" property="sourceType"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="order_type" property="orderType"/>
+        <result column="delivery_company" property="deliveryCompany"/>
+        <result column="delivery_sn" property="deliverySn"/>
+        <result column="auto_confirm_day" property="autoConfirmDay"/>
+        <result column="integration" property="integration"/>
+        <result column="promotion_info" property="promotionInfo"/>
+        <result column="bill_type" property="billType"/>
+        <result column="bill_header" property="billHeader"/>
+        <result column="bill_content" property="billContent"/>
+        <result column="bill_phone" property="billPhone"/>
+        <result column="bill_email" property="billEmail"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="receiver_phone" property="receiverPhone"/>
+        <result column="receiver_code" property="receiverCode"/>
+        <result column="receiver_province" property="receiverProvince"/>
+        <result column="receiver_city" property="receiverCity"/>
+        <result column="receiver_region" property="receiverRegion"/>
+        <result column="receiver_address" property="receiverAddress"/>
+        <result column="order_note" property="orderNote"/>
+        <result column="is_confirm_status" property="isConfirmStatus"/>
+        <result column="delete_status" property="deleteStatus"/>
+        <result column="payment_time" property="paymentTime"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="receive_time" property="receiveTime"/>
+        <result column="comment_time" property="commentTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="order_select" property="orderSelect"/>
+        <result column="is_appraise" property="appraise"/>
+        <result column="trans_id" property="transId"/>
+        <result column="cpy_type" property="cpyType"/>
+        <result column="partner_id" property="partnerId"/>
+        <result column="buyer_logon_id" property="buyerLogonId"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.OmsOrderVO">
+        <id column="orderId" property="orderId"/>
+        <result column="order_sn" property="orderSn"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="pay_amount" property="payAmount"/>
+        <result column="order_type" property="orderType"/>
+        <result column="delivery_sn" property="deliverySn"/>
+
+        <!--一对多，方式一-->
+        <collection property="omsOrderItem" ofType="com.ys.mail.model.vo.OmsOrderItemVO" column="order_item_id">
+            <id column="orderItemId" jdbcType="BIGINT" property="orderItemId"/>
+            <result column="order_item_id" jdbcType="BIGINT" property="orderId"/>
+            <result column="product_attr" jdbcType="VARCHAR" property="spData"/>
+            <result column="product_price" property="productPrice"/>
+            <result column="is_appraise" property="appraise"/>
+            <result column="product_quantity" property="productQuantity"/>
+            <result column="kd_code" property="kdCode"/>
+            <result column="kd_name" property="kdName"/>
+            <result column="product_name" property="productName"/>
+            <result column="product_id" property="productId"/>
+            <result column="product_pic" property="productPic"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="infoDtoResultMap" type="com.ys.mail.model.dto.OrderInfoDTO">
+        <id column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_sn" property="orderSn"/>
+        <result column="pay_type" property="payType"/>
+        <result column="order_type" property="orderType"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="receiver_phone" property="receiverPhone"/>
+        <result column="receiver_code" property="receiverCode"/>
+        <result column="receiver_province" property="receiverProvince"/>
+        <result column="receiver_city" property="receiverCity"/>
+        <result column="receiver_region" property="receiverRegion"/>
+        <result column="receiver_address" property="receiverAddress"/>
+        <result column="order_note" property="orderNote"/>
+        <result column="payment_time" property="paymentTime"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="kd_name" property="kdName"/>
+        <result column="partner_price" property="partnerPrice"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="delivery_company" property="deliveryCompany"/>
+        <result column="delivery_sn" property="deliverySn"/>
+        <result column="cpy_type" property="cpyType"/>
+
+        <!--一对多，方式一-->
+        <collection property="omsOrderItem" ofType="com.ys.mail.model.vo.OrderItemDetailsVO" column="order_item_id">
+            <id column="order_item_id" jdbcType="BIGINT" property="orderItemId"/>
+            <result column="orderId" jdbcType="BIGINT" property="orderId"/>
+            <result column="product_attr" jdbcType="VARCHAR" property="spData"/>
+            <result column="product_price" property="productPrice"/>
+            <result column="product_pic" property="productPic"/>
+            <result column="is_appraise" property="appraise"/>
+            <result column="product_quantity" property="productQuantity"/>
+            <result column="product_name" property="productName"/>
+            <result column="product_id" property="productId"/>
+        </collection>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        order_id, user_id, coupon_id, order_sn, total_amount, pay_amount, freight_amount, promotion_amount,
+        coupon_amount, discount_amount, pay_type, source_type, order_status, order_type, delivery_company,
+        delivery_sn, auto_confirm_day, integration, promotion_info, bill_type, bill_header, bill_content,
+        bill_phone, bill_email, receiver_name, receiver_phone, receiver_code, receiver_province, receiver_city,
+        receiver_region, receiver_address, order_note, is_confirm_status, delete_status, is_appraise,payment_time,
+        delivery_time,
+        receive_time, comment_time, create_time, update_time,order_select,trans_id,cpy_type,partner_price
+    </sql>
+
+    <select id="selectOrderList" resultMap="BaseResultMapVO">
+        select pp.order_id orderId,a.order_id order_item_id,a.order_item_id orderItemId,pp.order_sn,
+        IFNULL(pp.total_amount,0) total_amount,pp.order_status,a.product_attr,
+        IFNULL(a.product_price,0) product_price,a.product_quantity,pp.order_type,
+        a.product_id,pp.delivery_sn,bb.kd_code,bb.kd_name,a.product_name,pp.pay_amount,a.is_appraise,a.product_pic
+        from oms_order pp
+        left join sys_kd_code bb on bb.kd_code=pp.delivery_company
+        left join oms_order_item a on pp.order_id= a.order_id
+        <where>
+            and pp.user_id = #{omsOrderDTO.userId}
+            and pp.cpy_type = #{omsOrderDTO.cpyType}
+            and pp.order_type in(0,3)
+            <if test="omsOrderDTO.orderStatus != -1">
+                and pp.order_status = #{omsOrderDTO.orderStatus}
+            </if>
+
+            <if test="omsOrderDTO.orderStatus != -1 and omsOrderDTO.orderStatus == 7 ">
+                and pp.is_appraise = 0
+            </if>
+
+            <if test="omsOrderDTO.productName != '' and omsOrderDTO.productName != null">
+                and instr(a.product_name, #{omsOrderDTO.productName}) > 0
+            </if>
+
+            <if test="omsOrderDTO.orderId != 0">
+                and pp.order_id <![CDATA[ < ]]> #{omsOrderDTO.orderId}
+            </if>
+        </where>
+        order by pp.create_time desc
+        limit 20;
+    </select>
+
+    <select id="getUserOrderList" resultType="com.ys.mail.model.vo.UserOrderVO">
+        SELECT
+            oo.order_id,
+            oo.payment_time,
+            oo.pay_amount,
+            ooi.product_name
+        FROM
+            oms_order oo LEFT JOIN oms_order_item ooi ON oo.order_id = ooi.order_id
+        <where>
+            oo.order_type = 1
+            AND oo.trans_id > 0
+            AND oo.user_id = #{userId}
+            AND DATE(oo.payment_time) IN (<include refid="com.ys.mail.mapper.UmsUserMapper.FindParentDay"/>)
+            <if test="orderId != null and orderId != '' ">
+                AND oo.order_id <![CDATA[ < ]]> #{orderId}
+            </if>
+        </where>
+        ORDER BY oo.order_id DESC
+        LIMIT #{pageSize}
+    </select>
+
+    <update id="updateOrder">
+        update oms_order
+        set pay_amount   = #{build.payAmount},
+            trans_id     = #{build.transId},
+            pay_type     = #{build.payType},
+            order_status = #{build.orderStatus},
+            payment_time = #{build.paymentTime}
+        where order_sn = #{build.orderSn};
+    </update>
+
+    <update id="updateByCpyType">
+        update oms_order
+        set cpy_type = #{cpyType}
+        where order_sn = #{orderSn};
+    </update>
+    <update id="updateByOrderType">
+        update `oms_order`
+        set is_appraise = 0,
+        is_confirm_status = 1,
+        order_status = 3
+        WHERE order_id = #{orderId};
+        <!--AND order_status = #{orderStatusOne}-->
+    </update>
+    <update id="updateByOrderTypeEight">
+        update `oms_order`
+        set is_appraise = 0,
+        is_confirm_status = 1,
+        order_status = 8
+        WHERE order_id = #{orderId};
+        <!--AND order_status = #{orderStatusOne}-->
+    </update>
+
+    <select id="selectOrderInfo" resultMap="infoDtoResultMap">
+        select oo.order_id,
+               ooi.order_id orderId,
+               ooi.order_item_id,
+               oo.user_id,
+               oo.order_sn,
+               oo.pay_type,
+               oo.order_type,
+               oo.receiver_name,
+               oo.receiver_phone,
+               oo.receiver_code,
+               oo.receiver_province,
+               oo.receiver_city,
+               oo.receiver_region,
+               oo.receiver_address,
+               oo.order_note,
+               oo.payment_time,
+               oo.partner_price,
+               ooi.product_pic,
+               ooi.product_price,
+               ooi.is_appraise,
+               ooi.product_id,
+               ooi.product_attr,
+               ooi.product_quantity,
+               ooi.product_name,
+               oo.order_status,
+               oo.total_amount,
+               oo.delivery_company,
+               ooa.kd_name,
+               oo.delivery_sn,
+               oo.`cpy_type`,
+               pvc.`code`,
+               pvc.`is_status`
+        from oms_order oo
+                     left join oms_order_item ooi on oo.order_id = ooi.order_id
+                     left join sys_kd_code ooa on ooa.kd_code = oo.delivery_company
+                     LEFT JOIN `oms_verification_order` ovo ON ovo.`order_id` = #{orderSn}
+                     LEFT JOIN `pms_verification_code` pvc ON pvc.`verification_id` = ovo.`verification_id`
+        where oo.order_sn = #{orderSn};
+    </select>
+    <select id="findByParentIds" resultMap="BaseResultMap">
+        SELECT oo.`user_id`,oo.`total_amount` FROM `oms_order` AS oo WHERE oo.`create_time` BETWEEN
+        DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00') AND DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59')
+        AND order_type = 1
+        AND oo.`user_id` IN(
+        <foreach collection="parentIds" item="pid" separator=",">
+            #{pid}
+        </foreach>
+        )
+        AND order_status IN(1,2,3,6,7)
+    </select>
+
+    <select id="selectAllQuickOrder" resultType="com.ys.mail.model.dto.QuickOrderDTO">
+        <!-- orderId,图片,商品名称,收货状态,价格,件数,sku属性,状态,订单编号,用户id  -->
+        select oo.order_id,
+        oo.user_id,
+        oo.order_sn,
+        oo.total_amount,
+        oo.pay_type,
+        oo.order_status,
+        oo.order_type,
+        oo.cpy_type,
+        oo.`partner_id`,
+        ooi.product_pic,
+        ooi.product_name,
+        ooi.product_quantity,
+        ooi.product_attr ,
+        pvc.`is_status`,
+        pvc.`code`
+        from oms_order oo left join oms_order_item ooi
+        on oo.order_id = ooi.order_id
+        LEFT JOIN `oms_verification_order` AS ovo ON ovo.`order_id` = oo.`order_sn`
+        LEFT JOIN `pms_verification_code` AS pvc ON pvc.`verification_id` = ovo.`verification_id` AND pvc.`partner_id` =
+        oo.`partner_id`
+        <where>
+            oo.order_type = 1 and oo.user_id = #{userId} and oo.cpy_type = #{query.cpyType}
+            <if test="query.orderId != 0">
+                and oo.order_id <![CDATA[ < ]]>  #{query.orderId}
+            </if>
+            <if test="query.keyword != null and query.keyword != '' ">
+                and ooi.product_name like CONCAT('%',#{query.keyword},'%')
+            </if>
+            <if test="query.type != -1">
+                and
+                <choose>
+                    <when test="query.type == 0">
+                        oo.order_status = 0
+                    </when>
+                    <when test="query.type == 1">
+                        oo.order_status = 1
+                    </when>
+                    <when test="query.type == 2">
+                        oo.order_status = 2
+                    </when>
+                    <when test="query.type == 3">
+                        oo.order_status = 3
+                    </when>
+                    <when test="query.type == 8">
+                        pvc.`is_status` = 1
+                    </when>
+                    <otherwise>
+                        oo.is_appraise = 0 and is_confirm_status = 1
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        order by oo.order_id desc
+        limit #{query.pageSize};
+    </select>
+    <select id="queryMoney" resultType="java.lang.Long">
+        SELECT SUM(total_amount) FROM `oms_order` AS oo WHERE oo.`user_id` IN (
+        <foreach collection="userIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        AND oo.`order_type` = 1 AND oo.`order_status` IN(2,3)
+        AND oo.`trans_id` IS NOT NULL
+        AND DATE_FORMAT(oo.`create_time`,'%Y%m%d') = #{yyyyMMdd}
+    </select>
+
+    <select id="getExportOrderList" resultType="com.ys.mail.model.admin.dto.ExportOrderDTO">
+        SELECT
+        uu.nickname,
+        oo.order_id,
+        oo.order_sn,
+        oo.pay_amount,
+        oo.pay_type,
+        oo.order_status,
+        oo.order_type,
+        oo.create_time,
+        oo.payment_time,
+        oo.trans_id,
+        oo.cpy_type,
+        ooi.product_name,
+        ooi.product_price,
+        ooi.product_quantity
+        FROM
+        oms_order oo
+        LEFT JOIN oms_order_item ooi ON oo.order_id = ooi.order_id
+        LEFT JOIN ums_user uu ON oo.user_id = uu.user_id
+        <where>
+            <if test="params.deleteStatus!=null">
+                AND oo.delete_status = #{params.deleteStatus}
+            </if>
+            <if test="params.deleteStatus!=null and params.deleteStatus !=0 ">
+                AND DATE_FORMAT(oo.create_time,'%Y-%m-%d %T') >= #{params.beginTime}
+            </if>
+            <if test="params.deleteStatus!=null and params.deleteStatus ==0 ">
+                AND DATE_FORMAT(oo.create_time,'%Y-%m-%d %T') BETWEEN #{params.beginTime} and #{params.endTime}
+            </if>
+        </where>
+    </select>
+    <select id="selectTodayScore" resultType="com.ys.mail.model.vo.PartnerTodayResultsVO">
+        SELECT SUM(total_amount) AS `total_amount`,
+               COUNT(order_id)   AS `order_number`,
+               COUNT(order_id)   AS `visitors`
+        FROM `oms_order`
+        WHERE `partner_id` = #{partnerId}
+          AND trans_id IS NOT NULL
+          AND DATE_FORMAT(`payment_time`, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d')
+    </select>
+    <select id="selectElectronic" resultType="com.ys.mail.model.vo.ElectronicVo">
+        SELECT oo.`order_id`,
+               oo.`create_time`,
+               oo.`order_status`,
+               ooi.`product_pic`,
+               ooi.`product_name`,
+               oo.`total_amount`,
+               ooi.`product_quantity`,
+               oo.`create_time`
+        FROM `oms_order` oo
+                     LEFT JOIN
+                     `oms_order_item` ooi ON oo.`order_id` = ooi.`order_id`
+        WHERE oo.`partner_id` = #{partnerId}
+    </select>
+
+    <select id="getPage" resultType="com.ys.mail.model.admin.vo.PcUserOrderVO">
+        SELECT oo.*, uu.nickname, uu.phone
+        FROM oms_order oo
+                     LEFT JOIN ums_user uu ON oo.user_id = uu.user_id ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectByPrPdtOrder" resultType="com.ys.mail.model.admin.vo.PrPdtOrderVO">
+        <!--期数分开,用户id,订单id,商品主键id,用户id,订单id,保证金,期数,总金额,-->
+        select oo.order_id,oo.user_id,oo.total_amount,ooi.product_quantity,
+        ppp.partner_pdt_id,ppp.partner_name,ppp.partner_price,ppp.earnest_money,ppp.total_price,
+        ppp.re_periods
+        from oms_order oo
+        left join oms_order_item ooi on oo.order_id = ooi.order_id
+        left join pms_partner_product ppp on ooi.partner_pdt_id = ppp.partner_pdt_id
+        where oo.order_type = 4 and oo.trans_id <![CDATA[ > ]]> 0 and
+        TO_DAYS( NOW( ) ) - TO_DAYS(oo.payment_time) <![CDATA[ <= ]]> 1
+        and ppp.is_publish_status = 1;
+    </select>
+
+    <select id="selectAllMakerOrder" resultType="com.ys.mail.model.dto.QuickOrderDTO">
+        select oo.order_id,
+        oo.user_id,
+        oo.order_sn,
+        oo.total_amount,
+        oo.pay_type,
+        oo.order_status,
+        oo.order_type,
+        oo.cpy_type,
+        oo.`partner_id`,
+        ooi.product_pic,
+        ooi.product_name,
+        ooi.product_quantity,
+        ooi.product_attr
+        from oms_order oo left join oms_order_item ooi
+        on oo.order_id = ooi.order_id
+        <where>
+            oo.order_type = 4 and oo.user_id = #{userId} and oo.cpy_type = #{query.cpyType}
+            <if test="query.orderId != 0">
+                and oo.order_id <![CDATA[ < ]]>  #{query.orderId}
+            </if>
+            <if test="query.keyword != null and query.keyword != '' ">
+                and ooi.product_name like CONCAT('%',#{query.keyword},'%')
+            </if>
+            <if test="query.type != -1">
+                and
+                <choose>
+                    <when test="query.type == 0">
+                        oo.order_status = 0
+                    </when>
+                    <when test="query.type == 1">
+                        oo.order_status = 1
+                    </when>
+                    <when test="query.type == 2">
+                        oo.order_status = 2
+                    </when>
+                    <when test="query.type == 3">
+                        oo.order_status = 3
+                    </when>
+                    <when test="query.type == 6">
+                        oo.order_status = 6
+                    </when>
+                </choose>
+            </if>
+        </where>
+        order by oo.order_id desc
+        limit #{query.pageSize};
+    </select>
+
+    <!--查询订单汇总数据-->
+    <select id="getOrderCollect" resultType="com.ys.mail.model.admin.dto.excel.OrderCollectDTO">
+        SELECT user_id,
+               GROUP_CONCAT(DISTINCT buyer_logon_id)                                      pay_list,
+               ROUND(SUM(pay_amount) / 100, 2)                                            sum_consume,
+               MAX(payment_time)                                                          latest_payment_time,
+               ROUND(SUM(CASE WHEN order_type = '0' THEN pay_amount ELSE 0 END) / 100, 2) general_consume,
+               ROUND(SUM(CASE WHEN order_type = '1' THEN pay_amount ELSE 0 END) / 100, 2) sec_kill_consume,
+               ROUND(SUM(CASE WHEN order_type = '3' THEN pay_amount ELSE 0 END) / 100, 2) member_consume,
+               ROUND(SUM(CASE WHEN order_type = '4' THEN pay_amount ELSE 0 END) / 100, 2) maker_consume,
+               ROUND(SUM(CASE WHEN order_type = '0' AND order_status = '5' THEN pay_amount ELSE 0 END) / 100,
+                     2)                                                                   refunded,
+               ROUND(SUM(CASE WHEN order_type = '1' AND order_status = '2' THEN pay_amount ELSE 0 END) / 100,
+                     2)                                                                   wait_take,
+               0                                                                          not_refund
+        FROM oms_order
+        WHERE trans_id > 0
+        GROUP BY user_id
+    </select>
+
+    <select id="getUserOrderDetailsData" resultType="com.ys.mail.model.admin.dto.excel.UserOrderDetailsDTO">
+        SELECT user_id,
+               oo.order_id,
+               ROUND(oo.pay_amount / 100, 2) money,
+               oo.pay_type,
+               oo.order_status,
+               oo.order_type,
+               oo.create_time,
+               oo.payment_time,
+               oo.is_confirm_status          confirm_status,
+               oo.trans_id,
+               oo.cpy_type,
+               oo.order_note,
+               ooi.product_name
+        FROM oms_order oo
+                     LEFT JOIN oms_order_item ooi ON oo.order_id = ooi.order_id
+        WHERE oo.user_id = #{userId}
+    </select>
+</mapper>

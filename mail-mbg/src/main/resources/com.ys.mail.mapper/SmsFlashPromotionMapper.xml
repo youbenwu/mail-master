@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.SmsFlashPromotionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.SmsFlashPromotion">
+        <id column="flash_promotion_id" property="flashPromotionId" />
+        <result column="flash_promotion_title" property="flashPromotionTitle" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_home_status" property="homeStatus"/>
+        <result column="cpy_type" property="cpyType"/>
+    </resultMap>
+
+    <resultMap id="VoBaseResultMap" type="com.ys.mail.model.vo.FlashPromotionProductVO">
+        <id column="flash_promotion_id" property="flashPromotionId" />
+        <result column="flash_promotion_title" property="flashPromotionTitle" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+
+        <collection property="dtoList" ofType="com.ys.mail.model.dto.FlashPromotionProductDTO" column="flash_promotion_id"
+                    select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.getNewestSecondByFpId"
+        />
+
+    </resultMap>
+
+    <resultMap id="SecondProductDTOResultMap" type="com.ys.mail.model.dto.SecondProductDTO">
+        <id column="flash_promotion_id" property="flashPromotionId" />
+        <result column="flash_promotion_title" property="flashPromotionTitle" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_home_status" property="homeStatus"/>
+
+        <collection property="promotionProductDTOList" ofType="com.ys.mail.model.dto.FlashPromotionProductDTO"
+                    column="flash_promotion_id"
+                    select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.selectNewestSecond"
+        />
+
+        <collection property="cpyProducts" ofType="com.ys.mail.model.dto.FlashPromotionProductDTO"
+                    column="flash_promotion_id"
+                    select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.selectCpyNewestSecond"
+        />
+    </resultMap>
+
+    <resultMap id="PoResultMap" type="com.ys.mail.model.po.FlashPromotionProductPO">
+        <id column="flash_promotion_id" property="flashPromotionId" />
+        <result column="flash_promotion_title" property="flashPromotionTitle" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="partner_id" property="partnerId" />
+
+        <collection property="bos" ofType="com.ys.mail.model.bo.FlashPromotionProductBO" columnPrefix="fpp_">
+            <id column="flash_promotion_pdt_id" property="flashPromotionPdtId"/>
+            <result column="flash_promotion_id" property="flashPromotionId"/>
+            <result column="flash_promotion_sn_id" property="flashPromotionSnId"/>
+            <result column="flash_promotion_price" property="flashPromotionPrice"/>
+            <result column="flash_promotion_count" property="flashPromotionCount"/>
+            <result column="flash_promotion_limit" property="flashPromotionLimit"/>
+            <result column="sort" property="sort"/>
+            <result column="product_id" property="productId"/>
+            <result column="product_name" property="productName"/>
+            <result column="pic" property="pic"/>
+            <result column="price" property="price"/>
+            <result column="create_time" property="createTime" />
+            <result column="update_time" property="updateTime" />
+            <result column="partner_id" property="partnerId"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="BoResultMap" type="com.ys.mail.model.bo.FlashPromotionProductBO">
+        <id column="flash_promotion_pdt_id" property="flashPromotionPdtId"/>
+        <result column="flash_promotion_id" property="flashPromotionId"/>
+        <result column="flash_promotion_sn_id" property="flashPromotionSnId"/>
+        <result column="flash_promotion_price" property="flashPromotionPrice"/>
+        <result column="flash_promotion_count" property="flashPromotionCount"/>
+        <result column="flash_promotion_limit" property="flashPromotionLimit"/>
+        <result column="sort" property="sort"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_name" property="productName"/>
+        <result column="pic" property="pic"/>
+        <result column="price" property="price"/>
+        <result column="partner_id" property="partnerId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        flash_promotion_id, flash_promotion_title, start_time,
+        end_time, is_publish_status, create_time, update_time,is_home_status,cpy_type
+    </sql>
+
+
+    <select id="selectAllNewestSecond" resultMap="PoResultMap">
+        <!-- 实现思路,使用mybatis映射-->
+        select sfp.flash_promotion_id,
+        sfp.flash_promotion_title,
+        sfp.start_time,
+        sfp.end_time,
+        sfp.is_publish_status,
+        sfp.create_time,
+        sfp.update_time,
+        sfp.is_home_status,
+        fpp.flash_promotion_pdt_id fpp_flash_promotion_pdt_id,
+        fpp.flash_promotion_id fpp_flash_promotion_id,
+        fpp.flash_promotion_sn_id fpp_flash_promotion_sn_id,
+        fpp.flash_promotion_price fpp_flash_promotion_price,
+        SUM(fpp.flash_promotion_count) fpp_flash_promotion_count,
+        fpp.flash_promotion_limit fpp_flash_promotion_limit,
+        fpp.sort fpp_sort,
+        fpp.create_time fpp_create_time,
+        fpp.update_time fpp_update_time,
+        pp.product_id fpp_product_id,
+        pp.product_name fpp_product_name,
+        pp.partner_id fpp_partner_id,
+        pp.pic fpp_pic,
+        pp.price fpp_price,
+        pp.partner_id
+        from sms_flash_promotion sfp left join sms_flash_promotion_product fpp
+        on sfp.flash_promotion_id = fpp.flash_promotion_id
+        left join pms_product pp on pp.product_id = fpp.product_id
+        <where>
+            sfp.is_publish_status = 1 and fpp.flash_product_status = 2
+            <choose>
+                <when test="robBuyType == 0">
+                    and fpp.user_id is null
+                </when>
+                <when test="robBuyType == 1">
+                    and fpp.user_id <![CDATA[ > ]]> 0
+                </when>
+            </choose>
+        </where>
+        GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
+        order by fpp.flash_promotion_pdt_id desc
+        limit 20;
+    </select>
+
+    <select id="selectSecondProduct" resultMap="SecondProductDTOResultMap">
+        select <include refid="Base_Column_List"/>
+        from sms_flash_promotion
+        where is_publish_status = 1
+        and is_home_status = 1  and cpy_type = #{cpyType}
+        limit 1;
+    </select>
+    <select id="selectAllNewestSecondPage" resultMap="BoResultMap">
+        <!-- 实现思路,使用mybatis映射-->
+        SELECT fpp.flash_promotion_pdt_id,
+        fpp.flash_promotion_id,
+        fpp.flash_promotion_sn_id,
+        fpp.flash_promotion_price,
+        SUM(fpp.flash_promotion_count) flash_promotion_count ,
+        fpp.flash_promotion_limit,
+        fpp.sort,
+        pp.product_id,
+        pp.product_name,
+        pp.pic,
+        pp.price,
+        pp.partner_id
+        from  sms_flash_promotion_product fpp
+        left join pms_product pp on pp.product_id = fpp.product_id
+        <where>
+            fpp.flash_promotion_id = #{flashPromotionId}
+            <choose>
+                <when test="robBuyType == 0">
+                    and fpp.user_id is null
+                </when>
+                <when test="robBuyType == 1">
+                    and fpp.user_id <![CDATA[ > ]]> 0
+                </when>
+            </choose>
+            and fpp.flash_promotion_pdt_id <![CDATA[ < ]]>  #{flashPromotionPdtId}
+            and fpp.flash_product_status = 2
+        </where>
+        GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
+        order by fpp.flash_promotion_pdt_id desc
+        limit 20;
+    </select>
+
+    <select id="selectByEndTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(
+                       end_time,
+                       '%Y-%m-%d %T'
+                   ) end_time
+        from sms_flash_promotion
+        where flash_promotion_id = #{flashPromotionId};
+    </select>
+    <select id="selectCpyTypeOne" resultMap="SecondProductDTOResultMap">
+        select <include refid="Base_Column_List"/>
+        from sms_flash_promotion AS sfp
+        WHERE sfp.`cpy_type` = #{cpyType}
+        AND sfp.`start_time` &gt;= NOW()
+        AND sfp.`is_publish_status` = 1
+        ORDER BY sfp.`start_time` ASC
+        LIMIT 1
+    </select>
+    <select id="selectTime" resultMap="BaseResultMap">
+        SELECT * FROM `sms_flash_promotion` AS sfp WHERE #{timeStr} BETWEEN sfp.`start_time` AND sfp.`end_time` LIMIT 1
+    </select>
+    <select id="currentPlatformPromotionId" resultType="com.ys.mail.model.dto.SmsFlashPromotionDTO">
+        SELECT
+        sfp.`flash_promotion_id`,
+        sfp.`flash_promotion_title`,
+        sfp.`start_time`,
+        sfp.`end_time`,
+        sfp.`is_publish_status` AS publishStatus,
+        sfp.`is_home_status` AS homeStatus,
+        sfp.`cpy_type`
+        FROM `sms_flash_promotion` AS sfp
+        WHERE sfp.`cpy_type` = #{cpyType}
+        AND NOW() &lt; sfp.`end_time`
+        AND sfp.`is_publish_status` = 1
+        ORDER BY sfp.`end_time` ASC LIMIT 1;
+    </select>
+    <select id="selectToDayPromotionIds" resultType="java.lang.Long">
+        SELECT sfp.`flash_promotion_id` FROM `sms_flash_promotion` AS sfp WHERE sfp.`end_time` BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00') AND DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59')
+    </select>
+    <select id="findFlashPromotionId" resultType="com.ys.mail.model.dto.TemporaryWorkerMasters">
+       SELECT GROUP_CONCAT(sfp.`flash_promotion_id`) AS `flashPromotionId` ,sfp.`end_time` AS `date` FROM `sms_flash_promotion` AS sfp WHERE sfp.`end_time` > NOW() AND sfp.`is_publish_status` = 1 GROUP BY DATE_FORMAT(sfp.`end_time`,"%Y-%m-%d") ORDER BY sfp.`end_time` DESC
+    </select>
+
+
+    <select id="findFlashPromotionIds" resultType="com.ys.mail.model.dto.TemporaryWorkerMasters">
+        SELECT GROUP_CONCAT(sfp.`flash_promotion_id`) AS `flashPromotionId` ,sfp.`end_time` AS `date` FROM `sms_flash_promotion` AS sfp WHERE DATE_FORMAT(sfp.`end_time`,"%Y%m%d") = #{date} AND sfp.`is_publish_status` = 1 GROUP BY DATE_FORMAT(sfp.`end_time`,"%Y-%m-%d") ORDER BY sfp.`end_time` DESC LIMIT 1
+    </select>
+    <select id="findNewestFlashPromotion" resultMap="BaseResultMap">
+        SELECT sfp.`flash_promotion_id`,sfp.`start_time` FROM `sms_flash_promotion` AS sfp WHERE sfp.`flash_promotion_id` != #{flashPromotionId}
+        AND sfp.`is_publish_status` = 1 AND sfp.`cpy_type` = #{cpyType} AND sfp.`start_time` &gt; NOW()
+        ORDER BY sfp.`start_time` ASC
+        LIMIT 1
+    </select>
+
+
+    <update id="updateHome">
+        update sms_flash_promotion
+        set is_home_status = 0
+    </update>
+
+    <select id="selectHasSoldProductInfo" resultType="com.ys.mail.model.dto.HasSoldProductDTO">
+        select oo.order_id,
+               oo.total_amount * 1.005 as total_amount, <!--后面再改sfpp.total_amount -->
+               ooi.product_pic,
+               ooi.product_name,
+               sfpp.flash_promotion_price,
+               oo.receiver_name,
+               oo.receiver_phone,
+               oo.receiver_address,
+               oo.order_sn,
+               oo.pay_type,
+               oo.payment_time,
+               oo.delivery_company,
+               oo.order_status,
+               oo.pay_amount
+               from oms_order oo left join oms_order_item ooi on oo.order_id = ooi.order_id
+               left join sms_flash_promotion_product sfpp on oo.order_id = sfpp.order_id
+               WHERE oo.order_id = #{orderId};
+    </select>
+</mapper>

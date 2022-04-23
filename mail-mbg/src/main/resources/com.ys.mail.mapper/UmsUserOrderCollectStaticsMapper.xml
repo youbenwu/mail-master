@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.UmsUserOrderCollectStaticsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.model.vo.UmsUserOrderCollectStaticsVO">
+        <result column="product_collect_count" property="productCollectCount"/>
+        <result column="product_log_count" property="productLogCount"/>
+        <result column="sms_coupon_count" property="smsCouponCount"/>
+        <result column="orderStatus_noPay_count" property="orderStatusNoPayCount"/>
+        <result column="orderStatus_noDeliver_count" property="orderStatusNoDeliverCount"/>
+        <result column="orderStatus_noCharged_count" property="orderStatusNoChargedCount"/>
+        <result column="orderStatus_noAppraise_count" property="orderStatusNoAppraiseCount"/>
+    </resultMap>
+
+
+    <select id="getProductCollectStaticsInfo" resultMap="BaseResultMap">
+        SELECT
+            SUM(a) product_collect_count,sum(b) product_log_count ,SUM(c) sms_coupon_count
+        FROM
+            (
+                select count(user_id) a, 0 b,0 c from ums_product_collect WHERE user_id = #{userId}
+                UNION
+                select 0 a,count(user_id) b, 0 c from sys_product_log WHERE user_id = #{userId}
+                UNION
+                select 0 a,0 b,count(user_id) c from sms_coupon_history WHERE user_id = #{userId}
+            ) t
+    </select>
+
+    <select id="getOrderStatusStaticsInfo" resultMap="BaseResultMap">
+        SELECT
+            COALESCE ( sum( CASE WHEN oo.order_status = '0' THEN 1 ELSE 0 END ), 0 ) orderStatus_noPay_count,
+            COALESCE ( sum( CASE WHEN oo.order_status = '1' THEN 1 ELSE 0 END ), 0 ) orderStatus_noDeliver_count,
+            COALESCE ( sum( CASE WHEN oo.order_status = '2' THEN 1 ELSE 0 END ), 0 ) orderStatus_noCharged_count,
+            COALESCE ( sum( CASE WHEN oo.is_appraise = '0' THEN 1 ELSE 0 END ), 0 ) orderStatus_noAppraise_count
+        FROM
+            oms_order oo
+        WHERE
+              oo.user_id = #{userId}
+            <if test="cpyType!=null">
+                AND oo.cpy_type = #{cpyType}
+            </if>
+    </select>
+</mapper>

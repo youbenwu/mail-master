@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PcUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PcUser">
+        <id column="pc_user_id" property="pcUserId" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="nickname" property="nickname" />
+        <result column="head_portrait" property="headPortrait" />
+        <result column="is_user_status" property="userStatus" />
+        <result column="is_allow_delete" property="allowDelete" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        pc_user_id, username, password ,nickname,head_portrait, is_user_status, is_allow_delete, create_time, update_time
+    </sql>
+
+    <delete id="delUserRoleByUserId">
+        delete from pc_user_role where pc_user_id = #{pcUserId}
+    </delete>
+    <select id="selectAllUserIdByRoleId" resultType="java.lang.String">
+        select pc_user_id from pc_user_role
+        where role_id = #{roleId}
+    </select>
+    <select id="getUserOwnRole" resultType="java.lang.String">
+        select role_id from pc_user_role
+        where pc_user_id = #{pcUserId};
+    </select>
+
+    <insert id="insertUserRole">
+        INSERT INTO pc_user_role(
+        user_role_id,role_id, pc_user_id,create_time
+        )VALUES
+        <foreach collection="mapList" item="map" index="index" separator="," close=";">
+            (
+            #{map.userRoleId}
+            ,#{map.roleId}
+            ,#{pcUserId}
+            ,now()
+            )
+        </foreach>
+    </insert>
+
+    <select id="getStaff" resultType="com.ys.mail.model.admin.vo.UserImInfoVO">
+        SELECT
+               pu.pc_user_id userId,pu.nickname,pu.head_portrait
+        FROM
+                pc_user pu LEFT JOIN pc_user_role pur ON pu.pc_user_id = pur.pc_user_id
+        WHERE
+            pur.role_id = #{roleId} AND  pu.is_user_status = 1
+        LIMIT 1
+    </select>
+
+</mapper>

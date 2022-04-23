@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PcMenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PcMenu">
+        <id column="menu_id" property="menuId" />
+        <result column="parent_id" property="parentId" />
+        <result column="menu_name" property="menuName" />
+        <result column="menu_url" property="menuUrl" />
+        <result column="http_method" property="httpMethod" />
+        <result column="perms" property="perms" />
+        <result column="order_num" property="orderNum" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <resultMap id="TreeResultMap" type="com.ys.mail.model.admin.tree.PcMenuTree">
+        <id column="menu_id" property="menuId" />
+        <result column="parent_id" property="parentId" />
+        <result column="menu_name" property="menuName" />
+        <result column="menu_url" property="menuUrl" />
+        <result column="http_method" property="httpMethod" />
+        <result column="perms" property="perms" />
+        <result column="order_num" property="orderNum" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <collection property="children" ofType="com.ys.mail.entity.PcMenu" select="selectAllTreePcMenu"
+                    column="{parent_id = menu_id}"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        menu_id, parent_id, menu_name, menu_url, http_method, perms, order_num, create_time, update_time
+    </sql>
+    <delete id="delRoleMenuByMenuId">
+        delete from pc_role_menu where menu_id = #{menuId}
+    </delete>
+
+    <select id="selectMenuList" resultMap="BaseResultMap">
+        SELECT pm.menu_id,
+               pm.parent_id,
+               pm.menu_name,
+               pm.menu_url,
+               pm.http_method,
+               pm.perms,
+               pm.order_num,
+               pm.create_time,
+               pm.update_time from pc_menu pm
+                                       LEFT JOIN pc_role_menu prm on pm.menu_id = prm.menu_id
+                                       LEFT JOIN pc_user_role pur on pur.role_id = prm.role_id
+        where pur.pc_user_id = #{pcUserId}
+    </select>
+
+    <select id="listByUserId" resultType="com.ys.mail.model.admin.tree.PcMenuTree">
+        SELECT distinct pm.menu_id,
+        pm.parent_id,
+        pm.menu_name,
+        pm.menu_url,
+        pm.http_method,
+        pm.perms,
+        pm.order_num,
+        pm.create_time,
+        pm.update_time from pc_menu pm
+        LEFT JOIN pc_role_menu prm on pm.menu_id = prm.menu_id
+        LEFT JOIN pc_user_role pur on pur.role_id = prm.role_id
+        <where>
+            <if test="username != 'super'"> <!-- 防止意外取消授权-->
+                pur.pc_user_id = #{pcUserId}
+            </if>
+            and pm.level != 2    <!-- 只返回二级菜单 -->
+        </where>
+        order by pm.menu_id desc
+    </select>
+
+    <select id="selectAllTreePcMenu" resultMap="TreeResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_menu
+        <where>
+            <choose>
+                <when test="parent_id != null">
+                    and parent_id = #{parent_id}
+                </when>
+                <otherwise>
+                    and parent_id = 0
+                </otherwise>
+            </choose>
+        </where>
+        order by menu_id desc
+    </select>
+
+    <select id="selectByUserId" resultType="java.lang.String">
+        SELECT pur.pc_user_id from pc_role_menu prm LEFT JOIN pc_user_role pur
+                                                              on prm.role_id = pur.role_id
+        where prm.menu_id = #{menuId}
+    </select>
+    <select id="listAllMenu" resultType="com.ys.mail.model.admin.tree.PcMenuTree">
+        select <include refid="Base_Column_List"/> from pc_menu
+    </select>
+
+</mapper>

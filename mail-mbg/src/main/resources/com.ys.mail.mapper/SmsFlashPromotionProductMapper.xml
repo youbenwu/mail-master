@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.SmsFlashPromotionProductMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.SmsFlashPromotionProduct">
+        <id column="flash_promotion_pdt_id" property="flashPromotionPdtId"/>
+        <result column="flash_promotion_id" property="flashPromotionId" />
+        <result column="flash_promotion_sn_id" property="flashPromotionSnId"/>
+        <result column="product_id" property="productId" />
+        <result column="flash_promotion_price" property="flashPromotionPrice"/>
+        <result column="partner_price" property="partnerPrice"/>
+        <result column="flash_promotion_count" property="flashPromotionCount" />
+        <result column="flash_promotion_origin_count" property="flashPromotionOriginCount" />
+        <result column="flash_promotion_limit" property="flashPromotionLimit" />
+        <result column="sort" property="sort" />
+        <result column="publisher_id" property="publisherId" />
+        <result column="cpy_type" property="cpyType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="flash_promotion_origin_price" property="flashPromotionOriginPrice" />
+        <result column="order_id" property="orderId"/>
+        <result column="total_amount" property="totalAmount"/>
+    </resultMap>
+
+    <resultMap id="DtoBaseResultMap" type="com.ys.mail.model.admin.dto.PcFlashPromotionProductDTO">
+        <id column="flash_promotion_pdt_id" property="flashPromotionPdtId" />
+        <result column="flash_promotion_sn_id" property="flashPromotionSnId" />
+        <result column="flash_promotion_price" property="flashPromotionPrice" />
+        <result column="flash_promotion_count" property="flashPromotionCount" />
+        <result column="flash_promotion_limit" property="flashPromotionLimit" />
+        <result column="sort" property="sort" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+
+        <association property="product" javaType="com.ys.mail.entity.PmsProduct" columnPrefix="pp_">
+            <id column="product_id" property="productId"/>
+            <result column="product_name" property="productName"/>
+        </association>
+
+        <association property="flashPromotion" javaType="com.ys.mail.entity.SmsFlashPromotion" columnPrefix="sfp_">
+            <id column="flash_promotion_id" property="flashPromotionId"/>
+            <result column="flash_promotion_title" property="flashPromotionTitle"/>
+        </association>
+    </resultMap>
+
+
+    <resultMap id="AppDtoBaseResultMap" type="com.ys.mail.model.dto.FlashPromotionProductDTO">
+        <id column="flash_promotion_pdt_id" property="flashPromotionPdtId" />
+        <result column="flash_promotion_sn_id" property="flashPromotionSnId" />
+        <result column="flash_promotion_price" property="flashPromotionPrice" />
+        <result column="flash_promotion_count" property="flashPromotionCount" />
+        <result column="flash_promotion_limit" property="flashPromotionLimit" />
+        <result column="sort" property="sort" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="flash_promotion_id" property="flashPromotionId"/>
+        <result column="order_id" property="orderId"/>
+
+
+        <result column="sub_title" property="subTitle" />
+        <result column="price" property="price" />
+        <result column="sp_data" property="spData" />
+        <result column="pic" property="pic" />
+        <result column="flash_promotion_round" property="flashPromotionRound" />
+        <result column="merchant_order" property="merchantOrder" />
+        <result column="system_order" property="systemOrder" />
+        <result column="start_time" property="startTime" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="flash_product_status" property="flashProductStatus"/>
+        <result column="publisherName" property="publisherName"/>
+        <result column="nickname" property="nickname"/>
+        <result column="publisher_pic" property="publisherPic"/>
+        <result column="nick_pic" property="nickPic"/>
+        <result column="is_status" property="isStatus"/>
+        <result column="partner_id" property="partnerId"/>
+
+        <association property="product" javaType="com.ys.mail.entity.PmsProduct" columnPrefix="pp_">
+            <id column="product_id" property="productId"/>
+            <result column="product_name" property="productName"/>
+            <result column="pic" property="pic"/>
+        </association>
+
+    </resultMap>
+
+    <resultMap id="quickResultMap" type="com.ys.mail.model.dto.QuickBuyProductInfoDTO">
+        <id column="flash_promotion_pdt_id" property="flashPromotionPdtId" />
+        <result column="flash_promotion_id" property="flashPromotionId" />
+        <result column="flash_promotion_sn_id" property="flashPromotionSnId" />
+        <result column="flash_promotion_price" property="flashPromotionPrice" />
+        <result column="flash_promotion_count" property="flashPromotionCount" />
+        <result column="flash_promotion_limit" property="flashPromotionLimit" />
+        <result column="sort" property="sort" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="flash_promotion_round" property="flashPromotionRound"/>
+        <result column="user_id" property="userId"/>
+        <result column="publisher_id" property="publisherId"/>
+        <result column="sku_stock_id" property="skuStockId"/>
+        <result column="is_publish_status" property="publishStatus"/>
+        <result column="flash_product_status" property="flashProductStatus"/>
+        <result column="order_id" property="orderId"/>
+        <result column="product_id" property="productId"/>
+        <result column="brand_id" property="brandId"/>
+        <result column="pdt_cgy_id" property="pdtCgyId"/>
+        <result column="product_name" property="productName"/>
+        <result column="pic" property="pic"/>
+        <result column="sale" property="sale"/>
+        <result column="description" property="description"/>
+        <result column="sub_title" property="subTitle"/>
+        <result column="album_pics" property="albumPics"/>
+        <result column="detail_desc" property="detailDesc"/>
+        <result column="partner_id" property="partnerId"/>
+
+        <association property="flashPromotion" javaType="com.ys.mail.entity.SmsFlashPromotion" columnPrefix="sfp_">
+            <result column="start_time" property="startTime"/>
+            <result column="end_time" property="endTime"/>
+        </association>
+
+        <collection property="pmsProductAttributes" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="pdt_attribute_cgy_id"
+                    select="com.ys.mail.mapper.PmsProductAttributeMapper.selectByPdtAttributeCgyId"
+        />
+
+        <collection property="productComments" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="product_id"
+                    select="com.ys.mail.mapper.PmsProductCommentMapper.selectOneProductId"
+        />
+
+    </resultMap>
+
+    <resultMap id="sessionOrPdtResultMap" type="com.ys.mail.model.admin.dto.SessionOrPdtDTO">
+        <id column="flash_promotion_id" property="flashPromotionId"/>
+        <result column="flash_promotion_title" property="flashPromotionTitle"/>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        flash_promotion_pdt_id, flash_promotion_id, flash_promotion_sn_id, product_id, flash_promotion_price,
+        flash_promotion_count, flash_promotion_limit, sort, create_time, update_time,flash_promotion_round,
+        user_id,publisher_id,sku_stock_id,is_publish_status,flash_product_status,order_id,flash_promotion_origin_price,partner_price
+    </sql>
+
+    <select id="selectInfoById" resultMap="DtoBaseResultMap">
+        SELECT sfpp.flash_promotion_pdt_id,
+               sfpp.flash_promotion_sn_id,
+               sfpp.flash_promotion_price,
+               sfpp.flash_promotion_count,
+               sfpp.flash_promotion_limit,
+               sfpp.sort,
+               sfpp.create_time,
+               sfpp.update_time,
+               pp.product_id pp_product_id,
+               pp.product_name pp_product_name,
+               sfp.flash_promotion_id sfp_flash_promotion_id,
+               sfp.flash_promotion_title sfp_flash_promotion_title
+               FROM sms_flash_promotion_product sfpp
+               left join pms_product pp  ON  sfpp.product_id = pp.product_id
+               left join sms_flash_promotion sfp ON sfpp.flash_promotion_id = sfp.flash_promotion_id
+               where flash_promotion_pdt_id = #{flashPromotionPdtId}
+    </select>
+
+
+    <select id="listAll" resultType="com.ys.mail.model.admin.dto.PcFlashPdtDTO">
+        select pp.product_id,
+               pp.product_name,
+               pp.pic,
+               sfp.flash_promotion_id,
+               sfp.flash_promotion_title,
+               sfp.start_time,
+               sfp.end_time,
+               sfp.is_home_status as home_status,
+               sfp.cpy_type,
+               sfpp.flash_promotion_pdt_id,
+               sfpp.flash_promotion_price,
+               sfpp.flash_promotion_count,
+               sfpp.user_id,
+               sfpp.is_publish_status as publish_status,
+               sfpp.flash_product_status,
+               sfpp.flash_promotion_origin_price,
+               sfpp.create_time,
+               sfpp.flash_promotion_limit,
+               sfpp.partner_price
+        FROM sms_flash_promotion_product sfpp
+            LEFT JOIN pms_product pp on pp.product_id = sfpp.product_id
+            LEFT JOIN sms_flash_promotion sfp on sfp.flash_promotion_id = sfpp.flash_promotion_id
+            order by sfpp.flash_promotion_pdt_id desc
+    </select>
+
+
+    <select id="selectNewestSecond" resultMap="AppDtoBaseResultMap">
+        SELECT sfpp.flash_promotion_pdt_id,
+               sfpp.flash_promotion_sn_id,
+               sfpp.flash_promotion_price,
+               SUM(sfpp.flash_promotion_count) flash_promotion_count,
+               sfpp.flash_promotion_limit,
+               sfpp.flash_promotion_id,
+               sfpp.sort,
+               sfpp.create_time,
+               sfpp.update_time,
+               pp.product_id pp_product_id,
+               pp.product_name pp_product_name,
+               pp.pic pp_pic
+        FROM sms_flash_promotion_product sfpp
+        left join pms_product pp  ON  sfpp.product_id = pp.product_id
+        where sfpp.flash_promotion_id = #{flashPromotionPdtId} and user_id > 0
+        GROUP BY sfpp.`product_id`,sfpp.`flash_promotion_price`,sfpp.`cpy_type`
+        order by sfpp.flash_promotion_pdt_id desc
+        limit 6;
+    </select>
+
+    <select id="getNewestSecondByFpId" resultMap="AppDtoBaseResultMap">
+        SELECT sfpp.flash_promotion_pdt_id,
+               sfpp.flash_promotion_sn_id,
+               sfpp.flash_promotion_price,
+               sfpp.flash_promotion_count,
+               sfpp.flash_promotion_limit,
+               sfpp.sort,
+               sfpp.create_time,
+               sfpp.update_time,
+               pp.product_id pp_product_id,
+               pp.product_name pp_product_name
+        FROM sms_flash_promotion_product sfpp
+                 left join pms_product pp  ON  sfpp.product_id = pp.product_id
+        where sfpp.flash_promotion_id = #{flashPromotionId}
+    </select>
+
+
+    <select id="getFlashMessage" resultMap="AppDtoBaseResultMap">
+        select flash_promotion_pdt_id,d.sub_title,a.flash_promotion_price,d.pic,b.nickname publisherName,b.head_portrait publisher_pic,
+        c.nickname,c.head_portrait  nick_pic
+        from sms_flash_promotion_product a
+        inner join ums_user b on b.user_id=a.user_id
+        inner join ums_user c on c.user_id=a.publisher_id
+        inner join pms_product d on d.product_id=a.product_id
+        inner join pms_sku_stock e on e.sku_stock_id=a.sku_stock_id
+        where 1=1
+        <if test="more==true">
+            <if test="integralId != 0">
+              and  flash_promotion_pdt_id <![CDATA[ < ]]>  #{integralId}
+            </if>
+        </if>
+        order by a.create_time desc
+        <if test="more!=true">
+            limit 1;
+        </if>
+
+    </select>
+
+    <select id="getFlashPublishMessage" resultMap="AppDtoBaseResultMap">
+        select flash_promotion_pdt_id,sub_title,price,flash_promotion_count,sp_data,flash_promotion_round,merchant_order,system_order,start_time from (
+        select a.flash_promotion_pdt_id,b.sub_title,c.price,a.flash_promotion_count,c.sp_data,a.flash_promotion_round,0.0 merchant_order,0.0 system_order,e.start_time from sms_flash_promotion_product a
+        inner join pms_product b on b.product_id=a.product_id
+        inner join pms_sku_stock c on c.sku_stock_id=a.sku_stock_id
+        inner join pms_brand d on d.brand_id=b.brand_id
+        inner join sms_flash_promotion e on e.flash_promotion_id=a.flash_promotion_sn_id and #{nowDate} between end_time and start_time
+        union
+        select 0 flash_promotion_pdt_id,'' sub_title,0 price,0 flash_promotion_count,'' sp_data,0 flash_promotion_round,a.merchant_order,a.system_order,'' start_time from sys_tem_setting a where a.tem_setting_id='1') a
+        where  a.flash_promotion_pdt_id <![CDATA[ <> ]]>0 and flash_promotion_pdt_id=#{integralId}
+    </select>
+
+    <select id="getUserFlashProduct" resultMap="AppDtoBaseResultMap">
+        select a.*,
+        d.sub_title,
+        d.pic,
+        e.price,
+        pvc.`is_status`,
+        d.`partner_id`
+        from sms_flash_promotion_product a
+        LEFT JOIN pms_product d on d.product_id=a.product_id
+        LEFT JOIN pms_sku_stock e on e.sku_stock_id=a.sku_stock_id
+        LEFT JOIN pms_verification_code pvc
+        ON d.`partner_id` =pvc.`partner_id`
+        where a.user_id=#{userId}  and a.`cpy_type` = #{cpyType}
+        <if test="more==true">
+            <if test="integralId != 0">
+               and a.flash_promotion_pdt_id <![CDATA[ < ]]>  #{integralId}
+            </if>
+        </if>
+        order by a.flash_promotion_pdt_id desc
+        <if test="more!=true">
+            limit 6;
+        </if>
+
+    </select>
+
+
+    <select id="getFlashProductMesg" resultMap="AppDtoBaseResultMap">
+        select a.*,
+        d.sub_title,
+        d.pic ,
+        (SELECT sfp.`start_time` FROM `sms_flash_promotion` AS sfp
+        WHERE sfp.`cpy_type` = a.`cpy_type`
+        AND NOW() &lt; sfp.`start_time`
+        AND sfp.`is_publish_status` = 1
+        ORDER BY sfp.`start_time` ASC
+        LIMIT 1 ) AS `start_time`,
+        a.flash_promotion_price as `price`
+        FROM sms_flash_promotion_product a
+        INNER JOIN pms_product d ON d.product_id=a.product_id
+        <where>
+        and flash_promotion_pdt_id =  #{integralId}
+        and user_id=#{userId}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="quickBuyProductInfo" resultMap="quickResultMap">
+        select sfpp.flash_promotion_pdt_id,
+               sfpp.flash_promotion_id,
+               sfpp.flash_promotion_sn_id,
+               sfpp.product_id,
+               sfpp.flash_promotion_price,
+               sfpp.flash_promotion_count,
+               sfpp.sort,
+               sfpp.create_time,
+               sfpp.update_time,
+               sfpp.flash_promotion_round,
+               sfpp.user_id,
+               sfpp.publisher_id,
+               sfpp.sku_stock_id,
+               sfpp.is_publish_status,
+               sfpp.flash_product_status,
+               sfpp.flash_promotion_limit,
+               sfpp.order_id,
+               pp.product_id,
+               pp.brand_id,
+               pp.pdt_cgy_id,
+               pp.pdt_attribute_cgy_id,
+               pp.product_name,
+               pp.pic,
+               pp.sale,
+               pp.description,
+               pp.sub_title,
+               pp.album_pics,
+               sfp.start_time sfp_start_time,
+               sfp.end_time sfp_end_time,
+               pp.detail_desc,
+               pp.partner_id
+        from pms_product pp left join sms_flash_promotion_product sfpp
+        on pp.product_id = sfpp.product_id
+        left join sms_flash_promotion sfp
+        on sfp.flash_promotion_id = sfpp.flash_promotion_id
+        where sfpp.is_publish_status = 1  and deleted=0
+          and sfpp.product_id = #{qo.productId}
+          and sfpp.flash_promotion_id = #{qo.flashPromotionId}
+          and sfpp.flash_promotion_price = #{qo.flashPromotionPrice}
+          limit 1;
+        <!-- and sfpp.`flash_product_status` != 1 -->
+    </select>
+
+    <select id="selectQuickBuy" resultType="com.ys.mail.model.po.QuickProductPO">
+        select sfpp.product_id,
+               pp.pdt_cgy_id,
+               pp.product_name,
+               pss.pic,
+               pss.sku_stock_id,
+               pss.sp_data,
+               sfpp.flash_promotion_price * #{qo.quantity} price
+        from pms_product pp left join sms_flash_promotion_product sfpp
+        on pp.product_id = sfpp.product_id
+        left join pms_sku_stock pss on pp.product_id = pss.product_id
+        where sfpp.product_id = #{qo.productId} and pss.sku_stock_id = #{qo.skuStockId}
+        and sfpp.is_publish_status = 1  and   sfpp.flash_promotion_id = #{qo.flashPromotionId}
+        and sfpp.flash_promotion_price = #{qo.flashPromotionPrice}
+        limit 1;
+    </select>
+    <select id="selectGroupFlashPromotionCount" resultMap="BaseResultMap">
+        SELECT
+        sfpp.`flash_promotion_pdt_id`,
+        SUM(sfpp.`flash_promotion_count`) AS flash_promotion_count,
+        sfpp.`flash_promotion_price`
+        FROM `sms_flash_promotion_product` AS sfpp
+        LEFT JOIN `sms_flash_promotion` AS sfp  ON sfp.`flash_promotion_id` = sfpp.`flash_promotion_id`
+        WHERE sfpp.`product_id` = #{productId}
+        AND sfpp.`flash_promotion_count` > 0
+        AND sfpp.`is_publish_status` = 1
+        AND sfpp.`flash_product_status` = 2
+        AND sfpp.`flash_promotion_price` = #{price}
+        AND sfpp.`flash_promotion_id` = #{flashPromotionId}
+        AND sfp.`flash_promotion_id` = #{flashPromotionId}
+        AND NOW() BETWEEN sfp.`start_time` and sfp.`end_time`
+        AND sfpp.`cpy_type`  = #{cpyType}
+        GROUP BY sfpp.`product_id` , sfpp.`flash_promotion_price`
+        ORDER BY sfpp.`flash_promotion_pdt_id` ASC
+    </select>
+    <select id="selectGroupFlashPromotionCountList" resultMap="BaseResultMap">
+        SELECT
+        sfpp.`flash_promotion_pdt_id`,
+        sfpp.`flash_promotion_count`,
+        sfpp.`partner_price`,
+        sfpp.`flash_promotion_price`
+        FROM `sms_flash_promotion_product` AS sfpp
+        WHERE sfpp.`product_id` = #{productId}
+        AND sfpp.`flash_promotion_count` > 0
+        AND sfpp.`flash_promotion_price` = #{price}
+        AND sfpp.`flash_promotion_id` = #{flashPromotionId}
+        GROUP BY sfpp.`flash_promotion_pdt_id`
+        ORDER BY sfpp.`flash_promotion_pdt_id` ASC
+    </select>
+    <select id="selectUserIncomeSQL" resultMap="BaseResultMap">
+        SELECT
+        sfpp.`flash_promotion_pdt_id`,
+        sfpp.`product_id`,
+        sfpp.`flash_promotion_origin_count`,
+        sfpp.`flash_promotion_count`,
+        sfpp.`flash_promotion_price`,
+        sfpp.`publisher_id`,
+        sfpp.`flash_promotion_origin_price`,
+        sfpp.`cpy_type`
+        FROM `sms_flash_promotion_product` AS sfpp
+        WHERE sfpp.`flash_promotion_id`  = #{flashPromotionId}
+        AND sfpp.`is_publish_status` = 1
+    </select>
+    <select id="selectUserIncomeOneSQL" resultMap="BaseResultMap">
+        SELECT
+        sfpp.`flash_promotion_pdt_id`,
+        sfpp.`flash_promotion_id`,
+        sfpp.`product_id`,
+        sfpp.`flash_promotion_origin_count`,
+        sfpp.`flash_promotion_count`,
+        sfpp.`flash_promotion_price`,
+        sfpp.`publisher_id`,
+        sfpp.`flash_promotion_origin_price`,
+        sfpp.`cpy_type`,
+        sfpp.`flash_product_status`
+        FROM `sms_flash_promotion_product` AS sfpp
+        WHERE sfpp.`flash_promotion_pdt_id`  = #{flashPromotionPdtId}
+        AND sfpp.`is_publish_status` = 1
+    </select>
+    <select id="selectToDayUserPrice" resultType="java.lang.Long">
+        SELECT SUM(flash_promotion_origin_price) FROM `sms_flash_promotion_product` AS sfpp WHERE sfpp.`flash_promotion_id` IN(
+            <foreach collection="promotionIds" item="prId" separator=",">
+                #{prId}
+            </foreach>
+        )
+        AND sfpp.`user_id` IN (
+        <foreach collection="userids" item="uid" separator=",">
+            #{uid}
+        </foreach>
+        )
+    </select>
+
+    <update id="updateSale" parameterType="Map">
+        update sms_flash_promotion_product
+        set  flash_promotion_count =
+        CASE
+        <foreach collection="map" index="key" item="value" separator=" ">
+            when flash_promotion_pdt_id = #{key} then flash_promotion_count - #{value}
+        </foreach>
+        END
+        where flash_promotion_pdt_id IN(
+        <foreach collection="map" index="key" item="value" separator=" ,">
+            #{key}
+        </foreach>
+        )
+    </update>
+    <update id="restoreInventory">
+        update sms_flash_promotion_product
+        set  flash_promotion_count =
+        CASE
+        <foreach collection="map" index="key" item="value" separator=" ">
+            when flash_promotion_pdt_id = #{key} then flash_promotion_count + #{value}
+        </foreach>
+        END
+        where flash_promotion_pdt_id IN(
+        <foreach collection="map" index="key" item="value" separator=" ,">
+            #{key}
+        </foreach>
+        )
+    </update>
+    <update id="updateFlashPromotionPdtId">
+        update sms_flash_promotion_product
+        SET flash_promotion_count = 0 , flash_product_status = 1
+        where flash_promotion_pdt_id = #{flashPromotionPdtId}
+    </update>
+    <update id="updateFlashPromotionId">
+        update sms_flash_promotion_product
+        SET  flash_product_status = 4
+        where flash_promotion_id = #{flashPromotionId}
+    </update>
+    <update id="replaceFlashPromotionId">
+        UPDATE sms_flash_promotion_product SET flash_promotion_id = #{flashPromotionId}
+        WHERE flash_promotion_id = #{replacedFlashPromotionId} AND is_publish_status = 1
+    </update>
+
+    <select id="selectUserIncomeSQLQ" resultType="com.ys.mail.entity.SmsFlashPromotionProduct">
+        SELECT
+        sfpp.`flash_promotion_pdt_id`,
+        sfpp.`product_id`,
+        sfpp.`flash_promotion_origin_count`,
+        sfpp.`flash_promotion_price`,
+        sfpp.`publisher_id`,
+        sfpp.`flash_promotion_origin_price`,
+        sfpp.`cpy_type`
+        FROM `sms_flash_promotion_product` AS sfpp
+        WHERE sfpp.`flash_promotion_pdt_id`  IN (
+        <foreach collection="map" index="key" separator=",">
+            #{key}
+        </foreach>
+        )
+        AND sfpp.`is_publish_status` = 1
+    </select>
+
+    <select id="selectSessionOrPdt" resultMap="sessionOrPdtResultMap">
+        select flash_promotion_id,flash_promotion_title,cpy_type
+        from sms_flash_promotion
+        WHERE
+            `start_time` &gt;= NOW()
+          AND `is_publish_status` = 1
+          AND is_home_status = 1
+          ORDER BY `start_time` ASC
+          LIMIT 1;
+    </select>
+    <select id="selectCpyNewestSecond" resultMap="AppDtoBaseResultMap">
+        SELECT sfpp.flash_promotion_pdt_id,
+               sfpp.flash_promotion_sn_id,
+               sfpp.flash_promotion_price,
+               SUM(sfpp.flash_promotion_count) flash_promotion_count,
+               sfpp.flash_promotion_limit,
+               sfpp.flash_promotion_id,
+               sfpp.sort,
+               sfpp.create_time,
+               sfpp.update_time,
+               pp.product_id pp_product_id,
+               pp.product_name pp_product_name,
+               pp.pic pp_pic
+        FROM sms_flash_promotion_product sfpp
+                 left join pms_product pp  ON  sfpp.product_id = pp.product_id
+        where sfpp.flash_promotion_id = #{flashPromotionPdtId} and user_id is null
+        GROUP BY sfpp.`product_id`,sfpp.`flash_promotion_price`,sfpp.`cpy_type`
+        order by sfpp.flash_promotion_pdt_id desc
+            limit 6;
+    </select>
+    <select id="selectByPromotionId" resultType="java.lang.Long">
+        select flash_promotion_pdt_id flashPromotionPdtId
+        from sms_flash_promotion_product
+        where flash_promotion_id = #{flashPromotionId}
+          and flash_promotion_count <![CDATA[ > ]]> 0
+          and flash_product_status = 2
+    </select>
+
+
+    <update id="updateByPromotionId">
+        <foreach collection="promotionProducts" item="item" index="index" separator=";">
+            update sms_flash_promotion_product
+            <trim prefix="set" suffixOverrides=",">
+                <if test="item.flashProductStatus == 2">
+                    <choose>
+                        <when test="item.flashPromotionCount == 0">
+                            flash_product_status = 1,
+                        </when>
+                        <otherwise>
+                            flash_product_status = 4,
+                        </otherwise>
+                    </choose>
+                </if>
+                update_time = now()
+            </trim>
+            <where>
+                <if test="item.flashPromotionPdtId != null">
+                    flash_promotion_pdt_id = #{item.flashPromotionPdtId}
+                </if>
+            </where>
+        </foreach>
+    </update>
+
+    <resultMap id="storeDtoResultMap" type="com.ys.mail.model.dto.MyStoreDTO">
+            <id column="flash_promotion_pdt_id" property="flashPromotionPdtId"/>
+            <result column="flash_promotion_price" property="flashPromotionPrice"/>
+            <result column="cpy_type" property="cpyType"/>
+            <result column="is_publish_status" property="publishStatus"/>
+            <result column="flash_product_status" property="flashProductStatus"/>
+            <result column="product_id" property="productId"/>
+            <result column="user_id" property="userId"/>
+            <result column="order_id" property="orderId"/>
+
+            <association property="storeProduct" javaType="com.ys.mail.model.dto.MyStoreDTO$StoreProduct"
+            column="product_id" select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.selectStorePdt"
+            />
+    </resultMap>
+
+    <select id="selectMyStore" resultMap="storeDtoResultMap">
+        SELECT
+                flash_promotion_pdt_id,
+                flash_promotion_price,
+                cpy_type,
+                is_publish_status,
+                flash_product_status,
+                product_id,
+                user_id,
+                order_id
+        FROM
+                sms_flash_promotion_product
+        WHERE
+                user_id = #{userId}
+
+          AND cpy_type = #{cpyType}
+
+        ORDER BY
+                flash_promotion_pdt_id DESC
+                LIMIT #{pageSize};
+    </select>
+
+    <select id="selectStorePdt" resultType="com.ys.mail.model.dto.MyStoreDTO$StoreProduct">
+        SELECT
+                pic,
+                product_name
+        FROM
+                pms_product
+        WHERE
+                product_id = #{productId};
+    </select>
+
+    <select id="selectAllProduct" resultMap="storeDtoResultMap">
+        SELECT
+                flash_promotion_pdt_id,
+                flash_promotion_price,
+                cpy_type,
+                is_publish_status,
+                flash_product_status,
+                product_id,
+                user_id,
+                order_id
+        FROM
+                sms_flash_promotion_product
+            <where>
+                <if test="flashPromotionPdtId != null">
+                    flash_promotion_pdt_id <![CDATA[ < ]]>  #{flashPromotionPdtId}
+                </if>
+                AND user_id = #{userId}
+                AND cpy_type = #{cpyType}
+            </where>
+        ORDER BY
+        flash_promotion_pdt_id DESC
+        LIMIT 20;
+    </select>
+
+    <!-- 查询秒杀汇总数据 -->
+    <select id="getSecKillCollect" resultType="com.ys.mail.model.admin.dto.excel.SecKillCollectDTO">
+        SELECT user_id,
+               ROUND(SUM(CASE WHEN flash_product_status = '2' THEN flash_promotion_origin_price ELSE 0 END) / 100,
+                     2)                                                                                      wait_sec_kill,
+               ROUND(SUM(CASE WHEN flash_product_status = '3' THEN flash_promotion_origin_price ELSE 0 END) / 100,
+                     2)                                                                                      wait_put_away,
+               ROUND(SUM(CASE WHEN flash_product_status = '4' THEN flash_promotion_origin_price ELSE 0 END) / 100,
+                     2)                                                                                      wait_sell,
+               ROUND(SUM(CASE WHEN flash_product_status IN (2, 3, 4) THEN flash_promotion_origin_price ELSE 0 END) /
+                     100, 2)                                                                                 sum_sell,
+               ROUND(SUM(CASE WHEN flash_product_status IN (2, 3, 4) THEN total_amount ELSE 0 END) / 100, 2) sum_income
+        FROM sms_flash_promotion_product
+        WHERE user_id IS NOT NULL
+        GROUP BY user_id
+    </select>
+
+    <select id="getUserFlashDetailsData" resultType="com.ys.mail.model.admin.dto.excel.UserSecKillDetailsDTO">
+        SELECT sfpp.flash_promotion_pdt_id,
+               sfp.flash_promotion_title,
+               pp.product_name,
+               ROUND(sfpp.flash_promotion_price / 100, 2)        release_price,
+               ROUND(sfpp.flash_promotion_origin_price / 100, 2) original_price,
+               ROUND(sfpp.total_amount / 100, 2)                 total_amount,
+               sfpp.flash_promotion_count,
+               sfpp.create_time,
+               sfpp.update_time,
+               sfpp.flash_product_status,
+               sfpp.cpy_type
+        FROM sms_flash_promotion_product sfpp
+                     LEFT JOIN sms_flash_promotion sfp ON sfpp.flash_promotion_id = sfp.flash_promotion_id
+                     LEFT JOIN pms_product pp ON sfpp.product_id = pp.product_id
+        WHERE user_id = #{userId}
+    </select>
+</mapper>

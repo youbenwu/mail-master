@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsProductCategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsProductCategory">
+        <id column="pdt_cgy_id" property="pdtCgyId" />
+        <result column="parent_id" property="parentId" />
+        <result column="pdt_cgy_name" property="pdtCgyName" />
+        <result column="level" property="level" />
+        <result column="product_count" property="productCount" />
+        <result column="is_nav_status" property="navStatus" />
+        <result column="is_show_status" property="showStatus" />
+        <result column="sort" property="sort" />
+        <result column="icon" property="icon" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <resultMap id="treeResultMap" type="com.ys.mail.model.tree.ProductCategoryTree">
+        <id column="pdt_cgy_id" property="pdtCgyId" />
+        <result column="parent_id" property="parentId" />
+        <result column="pdt_cgy_name" property="pdtCgyName" />
+        <result column="level" property="level" />
+        <result column="is_nav_status" property="navStatus" />
+        <result column="is_show_status" property="showStatus" />
+        <result column="sort" property="sort" />
+        <result column="icon" property="icon" />
+        <result column="description" property="description" />
+    </resultMap>
+
+    <resultMap id="SearchResultMap" type="com.ys.mail.model.dto.SearchProductDTO">
+        <id column="pdt_cgy_id" property="pdtCgyId"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_name" property="productName"/>
+        <result column="pic" property="pic"/>
+        <result column="price" property="price"/>
+    </resultMap>
+
+    <resultMap id="SearchTreeMap" type="com.ys.mail.model.admin.tree.PcProductCategoryTree">
+        <id column="pdt_cgy_id" property="pdtCgyId" />
+        <result column="parent_id" property="parentId" />
+        <result column="pdt_cgy_name" property="pdtCgyName" />
+        <result column="level" property="level" />
+        <result column="product_count" property="productCount" />
+        <result column="is_nav_status" property="navStatus" />
+        <result column="is_show_status" property="showStatus" />
+        <result column="sort" property="sort" />
+        <result column="icon" property="icon" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        pdt_cgy_id, parent_id, pdt_cgy_name, `level`, product_count,
+        is_nav_status, is_show_status, sort, icon, description, create_time, update_time,deleted
+    </sql>
+
+    <select id="selectTree" resultMap="SearchTreeMap">
+        select <include refid="Base_Column_List"/>
+        from pms_product_category WHERE deleted = 0
+    </select>
+
+    <select id="selectCategoryTree" resultMap="treeResultMap">
+        select pdt_cgy_id,
+               parent_id,
+               pdt_cgy_name,
+               `level`,
+               sort,
+               icon,
+               description
+        from pms_product_category  where deleted = 0;
+    </select>
+
+    <select id="selectSearch" resultMap="SearchResultMap">
+        select pp.pdt_cgy_id,
+               pp.product_id,
+               pp.product_name,
+               pp.sale,
+               pp.pic,
+               pp.price
+        from pms_product pp left join pms_product_category ppc ON pp.pdt_cgy_id = ppc.pdt_cgy_id
+        <where>
+            pp.deleted = 0 and pp.is_publish_status = 1
+            <if test="query.keyword != null and query.keyword != ''">
+                and pp.product_name like CONCAT('%',#{query.keyword},'%')
+            </if>
+            <if test="query.newStatus != null">
+                and pp.is_new_status = #{query.newStatus}
+            </if>
+            <if test="query.pdtCgyId != null and query.pdtCgyId != ''">
+                and pp.pdt_cgy_id = #{query.pdtCgyId}
+            </if>
+        </where>
+        order by
+        <choose>
+            <when test="query.saleType != null">
+                pp.sale
+                <choose>
+                    <when test="query.saleType == 0">
+                        asc
+                    </when>
+                    <otherwise>
+                        desc
+                    </otherwise>
+                </choose>
+            </when>
+            <when test="query.priceType != null">
+                pp.price
+                <choose>
+                    <when test="query.priceType == 0">
+                        asc
+                    </when>
+                    <otherwise>
+                        desc
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                pp.product_id desc
+            </otherwise>
+        </choose>
+
+    </select>
+
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsPartnerProductMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsPartnerProduct">
+        <id column="partner_pdt_id" property="partnerPdtId" />
+        <result column="product_id" property="productId" />
+        <result column="partner_name" property="partnerName" />
+        <result column="partner_price" property="partnerPrice" />
+        <result column="earnest_money" property="earnestMoney" />
+        <result column="total_price" property="totalPrice" />
+        <result column="serve_desc" property="serveDesc" />
+        <result column="re_periods" property="rePeriods" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <resultMap id="DtoResultMap" type="com.ys.mail.model.dto.PartnerProductDTO">
+        <id column="partner_pdt_id" property="partnerPdtId" />
+        <result column="product_id" property="productId" />
+        <result column="partner_name" property="partnerName" />
+        <result column="total_price" property="totalPrice" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="sale" property="sale"/>
+        <result column="pic" property="pic"/>
+        <result column="partner_price" property="partnerPrice"/>
+        <result column="earnest_money" property="earnestMoney"/>
+    </resultMap>
+
+    <resultMap id="PoResultMap" type="com.ys.mail.model.po.PartnerProductPO">
+        <id column="partner_pdt_id" property="partnerPdtId" />
+        <result column="sale" property="sale"/>
+        <result column="detail_desc" property="detailDesc"/>
+        <result column="total_price" property="totalPrice" />
+        <result column="album_pics" property="albumPics" />
+        <result column="sub_title" property="subTitle" />
+        <result column="description" property="description" />
+        <result column="detail_title" property="detailTitle"/>
+        <result column="partner_name" property="partnerName"/>
+        <result column="serve_desc" property="serveDesc"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        partner_pdt_id, product_id, partner_name, partner_price, earnest_money, total_price, serve_desc, re_periods, is_publish_status, create_time, update_time
+    </sql>
+
+    <select id="selectList" resultMap="DtoResultMap">
+        select ppp.partner_pdt_id,ppp.product_id,ppp.partner_name,ppp.total_price,
+        ppp.is_publish_status,ppp.create_time,pp.sale,pp.pic
+        from pms_product pp left join pms_partner_product ppp  on pp.product_id = ppp.product_id
+        <where>
+            ppp.is_publish_status = 1
+            <if test="partnerPdtId != 0">
+                and ppp.partner_pdt_id <![CDATA[ < ]]>  #{partnerPdtId}
+            </if>
+            and pp.deleted = 0
+            and ppp.total_price <![CDATA[ < ]]> #{totalPriceMax}
+        </where>
+        order by ppp.partner_pdt_id desc
+        limit
+        <choose>
+            <when test="more == 0">
+                2
+            </when>
+            <otherwise>
+                20
+            </otherwise>
+        </choose>;
+    </select>
+
+    <select id="selectByPrPdtId" resultMap="PoResultMap">
+        select pp.detail_desc,pp.sale,ppp.total_price,ppp.partner_pdt_id,
+               pp.album_pics,pp.sub_title,pp.description,pp.detail_title,ppp.partner_name,
+               ppp.serve_desc
+        from pms_product pp left join pms_partner_product ppp  on pp.product_id = ppp.product_id
+        where ppp.partner_pdt_id = #{partnerPdtId}  and pp.deleted = 0;
+    </select>
+
+    <select id="selectBuy" resultMap="DtoResultMap">
+        select ppp.partner_pdt_id,ppp.product_id,ppp.partner_name,ppp.total_price,
+               ppp.is_publish_status,ppp.create_time,pp.sale,pp.pic,ppp.partner_price,ppp.earnest_money
+        from pms_product pp left join pms_partner_product ppp  on pp.product_id = ppp.product_id
+        where ppp.partner_pdt_id = #{partnerPdtId};
+    </select>
+
+    <insert id="insertOrder" useGeneratedKeys="true">
+        insert into oms_order(order_id,order_sn,user_id,total_amount,pay_amount,order_type,order_note,create_time,receiver_name,receiver_phone,cpy_type)
+        values (#{order.orderId},#{order.orderSn},#{order.userId},#{order.totalAmount},#{order.payAmount},
+                #{order.orderType},#{order.orderNote},now(),#{order.receiverName},#{order.receiverPhone},#{order.cpyType});
+        insert into oms_order_item(order_item_id,order_id,order_sn,product_id,product_pic,product_name,product_price,product_quantity,create_time,partner_pdt_id)
+        values (#{orderItem.orderItemId},#{orderItem.orderId},#{orderItem.orderSn},#{orderItem.productId},#{orderItem.productPic},#{orderItem.productName},
+                #{orderItem.productPrice},#{orderItem.productQuantity},now(),#{orderItem.partnerPdtId});
+    </insert>
+
+</mapper>

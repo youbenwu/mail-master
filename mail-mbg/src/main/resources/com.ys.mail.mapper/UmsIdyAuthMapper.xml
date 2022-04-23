@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.UmsIdyAuthMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.UmsIdyAuth">
+        <id column="idy_auth_id" property="idyAuthId" />
+        <result column="user_id" property="userId" />
+        <result column="real_name" property="realName" />
+        <result column="idy_card" property="idyCard" />
+        <result column="idy_front" property="idyFront" />
+        <result column="idy_reverse" property="idyReverse" />
+        <result column="auth_status" property="authStatus" />
+        <result column="auth_word" property="authWord" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        idy_auth_id, user_id, real_name, idy_card, idy_front, idy_reverse, auth_status, auth_word, create_time, update_time
+    </sql>
+
+</mapper>

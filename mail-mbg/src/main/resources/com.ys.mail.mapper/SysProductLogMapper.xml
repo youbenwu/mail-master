@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.SysProductLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.SysProductLog">
+        <id column="product_log_id" property="productLogId" />
+        <result column="user_id" property="userId" />
+        <result column="product_id" property="productId" />
+        <result column="operation" property="operation" />
+        <result column="time" property="time" />
+        <result column="method" property="method" />
+        <result column="params" property="params" />
+        <result column="ip" property="ip" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <resultMap id="DtoResultMap" type="com.ys.mail.model.dto.SysProductLogDTO">
+        <id column="product_log_id" property="productLogId" />
+        <result column="user_id" property="userId" />
+        <result column="operation" property="operation" />
+        <result column="time" property="time" />
+        <result column="method" property="method" />
+        <result column="params" property="params" />
+        <result column="ip" property="ip" />
+        <result column="create_time" property="createTime" />
+
+        <association property="product" javaType="com.ys.mail.entity.PmsProduct" columnPrefix="pp_">
+            <id column="product_id" property="productId" />
+            <result column="pic" property="pic"/>
+            <result column="product_name" property="productName"/>
+            <result column="price" property="price" />
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        product_log_id, user_id, product_id, operation,`time`, `method`, params, ip, create_time
+    </sql>
+
+
+    <select id="selectAllProductLog" resultMap="DtoResultMap">
+        select
+            spl.product_log_id,
+            spl.user_id,
+            spl.operation,
+            spl.`time`,
+            spl.`method`,
+            spl.params,
+            spl.ip,
+            spl.create_time,
+            pp.product_id pp_product_id,
+            pp.pic pp_pic,
+            pp.product_name pp_product_name,
+            pp.price pp_price
+        from sys_product_log spl left join pms_product pp on spl.product_id = pp.product_id
+        <where>
+            <if test="userId != null">
+                spl.user_id = #{userId}
+            </if>
+            <if test="productLogId != 0">
+                and spl.product_log_id <![CDATA[ < ]]>  #{productLogId}
+            </if>
+        </where>
+        order by spl.product_log_id desc
+        limit 5;
+    </select>
+
+</mapper>

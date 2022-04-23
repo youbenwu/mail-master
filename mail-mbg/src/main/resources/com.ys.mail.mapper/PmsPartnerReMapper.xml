@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsPartnerReMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsPartnerRe">
+        <id column="partner_re_id" property="partnerReId" />
+        <result column="user_id" property="userId" />
+        <result column="order_id" property="orderId" />
+        <result column="periods_num" property="periodsNum" />
+        <result column="periods_price" property="periodsPrice" />
+        <result column="desc_sour" property="descSour" />
+        <result column="periods_status" property="periodsStatus" />
+        <result column="periods_date" property="periodsDate" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="re_num" property="reNum"/>
+    </resultMap>
+
+    <resultMap id="voResultMap" type="com.ys.mail.model.vo.PartnerReIncomeVO">
+        <result column="user_id" property="userId" />
+        <result column="periods_price" property="periodsPrice" />
+        <result column="periods_status" property="periodsStatus" />
+        <result column="periods_date" property="periodsDate" />
+        <result column="re_num" property="reNum"/>
+
+        <association property="income" javaType="com.ys.mail.entity.UmsIncome"
+        column="user_id" select="com.ys.mail.mapper.UmsIncomeMapper.selectNewestByUserId"/>
+
+    </resultMap>
+
+    <resultMap id="dtoResultMap" type="com.ys.mail.model.admin.dto.PcPartnerReDTO">
+        <id column="partner_re_id" property="partnerReId" />
+        <result column="user_id" property="userId" />
+        <result column="order_id" property="orderId" />
+        <result column="periods_num" property="periodsNum" />
+        <result column="periods_price" property="periodsPrice" />
+        <result column="desc_sour" property="descSour" />
+        <result column="periods_status" property="periodsStatus" />
+        <result column="periods_date" property="periodsDate" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="re_num" property="reNum"/>
+
+        <association property="user" javaType="com.ys.mail.model.admin.dto.PcPartnerReDTO$User" columnPrefix="uu_">
+                <result column="alipay_name" property="alipayName"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        partner_re_id, user_id, order_id, periods_num, periods_price, desc_sour, periods_status, periods_date,
+        create_time, update_time,re_num
+    </sql>
+
+    <select id="selectByMonthFirstDates" resultMap="voResultMap">
+        SELECT
+                sum(periods_price) periods_price,
+                sum(re_num) re_num,
+                user_id,
+                periods_status,
+                periods_date
+        FROM
+                pms_partner_re
+        WHERE
+                DATE_FORMAT(`periods_date`, '%Y-%m-%d') = #{format}
+          AND periods_status = 0
+        GROUP BY
+                user_id
+    </select>
+
+    <update id="updateBatch">
+        UPDATE pms_partner_re
+        SET periods_status = 1,
+            update_time = NOW()
+        WHERE
+                DATE_FORMAT(`periods_date`, '%Y-%m-%d') = #{format} and periods_status = 0;
+    </update>
+
+    <select id="selectList" resultMap="dtoResultMap">
+        SELECT
+                ppr.partner_re_id,
+                ppr.user_id,
+                ppr.order_id,
+                ppr.periods_num,
+                ppr.periods_price,
+                ppr.desc_sour,
+                ppr.periods_status,
+                ppr.periods_date,
+                ppr.create_time,
+                ppr.update_time,
+                ppr.re_num,
+                uu.alipay_name uu_alipay_name
+        FROM
+                pms_partner_re ppr
+                        LEFT JOIN ums_user uu ON ppr.user_id = uu.user_id
+        <where>
+            <if test="qo.keyword != null and qo.keyword != ''">
+                uu.alipay_name like CONCAT('%',#{qo.keyword},'%')
+            </if>
+            <if test="qo.beginTime != null and qo.beginTime != ''">
+                and  DATE_FORMAT(ppr.periods_date, '%Y-%m-%d') = #{qo.beginTime}
+            </if>
+        </where>
+        order by ppr.partner_re_id asc
+    </select>
+
+</mapper>

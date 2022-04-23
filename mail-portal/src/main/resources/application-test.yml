@@ -1,0 +1,76 @@
+server:
+  port: 8019
+
+spring:
+  datasource:     #测试服务器地址101.35.185.82
+    url: jdbc:mysql://localhost:3306/happy_mail?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    druid:
+      initial-size: 5 #连接池初始化大小
+      min-idle: 10 #最小空闲连接数
+      max-active: 20 #最大连接数
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
+      stat-view-servlet: #访问监控网页的登录用户名和密码
+        login-username: druid
+        login-password: druid
+  devtools:
+    restart:
+      enabled: false #设置开启热部署
+      additional-paths: src/main/java #重启目录
+      exclude: resources/**
+  freemarker:
+    cache: true   #页面不加载缓存，修改即时生效
+  redis:
+    host: localhost # Redis服务器地址
+    database: 0 # Redis数据库索引（默认为0）
+    port: 6379 # Redis服务器连接端口
+    password: LzLW3k7aw5 #Redis服务器连接密码（默认为空）
+    timeout: 600000ms # 连接超时时间（毫秒）
+  elasticsearch:
+    rest:
+      uris:
+        - http://120.76.132.60:9200
+  rabbitmq:
+    #host: 101.35.185.82
+    port: 5672
+    virtual-host: /
+    username: xingchen
+    password: JH20211208@ZENG
+    listener:
+      simple:
+        acknowledge-mode: manual
+
+logging:
+  level:
+    root: info
+    com.ys.mail: info
+  #file:
+   # path: D:/idea/happyMail     #打印日志 日志关掉,服务器上有日志记录
+
+logstash:
+  host: localhost
+
+mybatis-plus:
+  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql语句打印，会打印出详细查询结果
+    cache-enabled: true    #开启mybatis缓存
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+
+prop:
+  staticAccessPath: /www/wwwroot/mail.huwing.cn/upload/
+  inviteUrl: http://reg.huwing.cn
+
+## 融云IM相关配置（开发测试环境）
+rongcloud:
+  app_key: bmdehs6pbe7fs # 测试环境的 App Key
+  app_secret: J0MejaLE3JU # 测试环境的的 App Secret
+  api_url: api-cn.ronghub.com # 此处填写融云 Api Url
+  default_portrait_url: /headPortrait/ums_user_default.png # 此处填写默认头像地址
+

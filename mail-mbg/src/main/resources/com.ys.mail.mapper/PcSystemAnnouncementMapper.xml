@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PcSystemAnnouncementMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PcSystemAnnouncement">
+        <id column="system_announcement_id" property="systemAnnouncementId" />
+        <result column="system_announcement_title" property="systemAnnouncementTitle" />
+        <result column="system_announcement_content" property="systemAnnouncementContent" />
+        <result column="system_announcement_state" property="systemAnnouncementState" />
+        <result column="system_announcement_time" property="systemAnnouncementTime" />
+        <result column="create_time" property="createTime" />
+        <result column="user_id" property="userId" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        system_announcement_id, system_announcement_title, system_announcement_content, system_announcement_state, system_announcement_time, create_time, user_id, update_time, deleted
+    </sql>
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.GroupSponsorMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.GroupSponsor">
+        <id column="group_sponsor_id" property="groupSponsorId" />
+        <result column="user_id" property="userId" />
+        <result column="group_buy_id" property="groupBuyId" />
+        <result column="join_num" property="joinNum" />
+        <result column="group_status" property="groupStatus" />
+        <result column="scale" property="scale" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        group_sponsor_id, user_id, group_buy_id, join_num, group_status, scale, create_time, update_time, deleted
+    </sql>
+
+    <select id="selectByGroupBuyId" resultType="com.ys.mail.entity.GroupSponsor">
+        select <include refid="Base_Column_List"/>
+        from group_sponsor where group_buy_id = #{groupBuyId} and group_status = 2 and deleted = 0;
+    </select>
+
+</mapper>

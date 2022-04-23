@@ -1,0 +1,70 @@
+# 自定义redis key timeout: 验证码
+redis:
+  database: mail
+  key:
+    authCode: 'ums:authCode'
+    user: 'ums:user'
+    userVerify: 'ums:user:verify' #安全验证码
+    homeAdvertise: 'home:advertise'    #首页轮播图
+    homeSecondProduct: 'home:secondProduct'   #首页秒杀活动缓存
+    homeAllSecondProduct: 'home:allSecondProduct'  #首页正在进行中的全部秒杀活动
+    homeNewestGroupBuy: 'home:newestGroupBuy'     #首页最新的拼团商品
+    homeAllGroupBuy: 'home:allGroupBuy'        #首页全部的拼团商品
+    homeProductType: 'home:productType'        #首页产品的类型
+    homePage: 'home:page'     #首页轮播图,限时秒杀,拼团购
+    districtTree: 'district:tree'  #把地址数据字典存入缓存
+    sysKdOrderNo: 'kd:order' #物流单号
+    sysKdCode: 'kd:code' #物流公司编码
+    bindAlipay: 'bind:alipay'
+    pdtCategory: 'pdt:category'
+    rongCloudToken: 'global:rongCloud:token' # 融云用户token
+    globalSysSetting: 'global:sysSetting:list' # 全局设置缓存
+    userBlackList: 'ums:app:blacklist' # APP用户手机号黑名单
+  expire:
+    district: 365     # 存入一年
+    homePage: 604800  # 首页，7天
+    common: 86400     # 24小时
+    anHour: 3600      # 1小时
+    authCode: 90      # 90s,验证码超期时间
+    minute: 60        # 60s
+
+config:
+  corePoolSize: 10
+  maximumPoolSize: 100
+  keepAliveTime: 1000
+  queueSize: 100
+
+# rabbitmq配置
+#spring:
+#  rabbitmq:
+#    #host: 101.35.185.82
+#    port: 5672
+#    virtual-host: /
+#    username: guest #  xingchen
+#    password: guest #  JH20211208@ZENG
+#    listener:
+#      simple:
+#        acknowledge-mode: manual
+
+# 腾讯云OSS配置
+cos:
+  secretId: AKIDJRJvGK8fv0sUosfCRP6XLs87pGQJvHMA # 永久身份
+  secretKey: YppXzB6j5AyVljQqyqRlnY3HDtIPGqAH # 永久密钥
+  bucket: dwh-1257583875 # 默认桶名称
+  region: ap-guangzhou # 桶区域
+  durationSeconds: 1800 # 30分钟，临时密钥有效时长，单位是秒
+  uploadFolder: mail.huwing.cn # 上传主目录
+  cdnDomain: cos.huwing.cn # CDN加速域名
+  threadPool: 32 # 线程数
+  allowPrefixes: # 临时凭证的白名单
+    - "*"
+  allowActions: # 临时凭证的权限
+    - "*:*"
+
+cfr:
+  daWeiHu:
+    appId: IDA2FSs0    #腾讯云人脸识别大尾狐appId
+    appSecret: DRK24ZMm9qS9QrSnZeTw4hwWLL45oUmjzQJz3cN7UO9wFSO0rwJFhkk2YhlSpP71   #腾讯云大尾狐人脸识别秘钥
+  huLaTu:
+    appId: IDASKxzd     #腾讯云人脸识别呼啦兔appId
+    appSecret: sObqiFiSu4cxwvXkETakEdh58MAqcU8UoZRmUKrlTkHnSGISwqWL02h0eGDDgWBZ   #腾讯云呼啦兔秘钥

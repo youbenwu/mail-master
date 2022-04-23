@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PcReviewMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PcReview">
+        <id column="review_id" property="reviewId" />
+        <result column="review_state" property="reviewState" />
+        <result column="pc_user_id" property="pcUserId" />
+        <result column="review_describe" property="reviewDescribe" />
+        <result column="income_id" property="incomeId" />
+        <result column="rate_income_id" property="rateIncomeId" />
+        <result column="user_id" property="userId" />
+        <result column="review_money" property="reviewMoney" />
+        <result column="alipay_account" property="alipayAccount" />
+        <result column="alipay_name" property="alipayName" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        review_id, review_state, pc_user_id, review_describe, income_id, rate_income_id, user_id, review_money, alipay_account, alipay_name, create_time, update_time, deleted
+    </sql>
+
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM
+             pc_review
+        <where>
+            deleted = 0
+            and user_id= #{userId}
+            <if test="reviewId!=0 and reviewId!=null">
+                and review_id <![CDATA[ > ]]> #{reviewId}
+            </if>
+        </where>
+        ORDER BY review_id DESC LIMIT #{pageSize}
+    </select>
+
+    <select id="getTodayList"  resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM
+            pc_review
+        WHERE
+            date_format( create_time, '%Y-%m-%d' ) = #{time}
+          AND review_state = 0
+        AND deleted = 0
+    </select>
+
+    <select id="getPage" resultType="com.ys.mail.model.admin.vo.PcReviewVO">
+        SELECT pr.review_id,
+               pr.review_state,
+               pr.pc_user_id,
+               pr.review_describe,
+               pr.income_id,
+               pr.rate_income_id,
+               pr.user_id,
+               pr.review_money,
+               pr.alipay_account,
+               pr.alipay_name,
+               pr.create_time,
+               pr.update_time,
+               pr.deleted,
+               pu.username,
+               uu.nickname
+        FROM ((pc_review pr LEFT JOIN pc_user pu ON pr.pc_user_id = pu.pc_user_id)
+                LEFT JOIN ums_user uu ON pr.user_id = uu.user_id) ${ew.customSqlSegment}
+    </select>
+
+    <select id="getAwaitReview" resultType="com.ys.mail.model.admin.dto.excel.ReviewCollectDTO">
+        SELECT user_id,
+               ROUND(review_money / 100, 2) reviewMoney
+        FROM pc_review
+        WHERE DATE(create_time) = CURRENT_DATE()
+          AND review_state = 0
+          AND deleted = 0
+    </select>
+</mapper>

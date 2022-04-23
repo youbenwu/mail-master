@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.UmsUserMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.UmsUser">
+        <id column="user_id" property="userId"/>
+        <result column="phone" property="phone"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
+        <result column="head_portrait" property="headPortrait"/>
+        <result column="openid" property="openid"/>
+        <result column="role_id" property="roleId"/>
+        <result column="user_status" property="userStatus"/>
+        <result column="integral_sum" property="integralSum"/>
+        <result column="alipay_name" property="alipayName"/>
+        <result column="alipay_account" property="alipayAccount"/>
+        <result column="pay_password" property="payPassword"/>
+        <result column="payment_type" property="paymentType"/>
+        <result column="user_image_string" property="userImageString"/>
+        <result column="is_exchange_gift" property="exchangeGift"/>
+        <result column="is_active" property="isActive"/>
+        <result column="deleted" property="deleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="invite_time" property="inviteTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, phone, password, nickname, head_portrait, openid,
+        role_id, user_status ,integral_sum,alipay_name,alipay_account,
+        pay_password,payment_type,user_image_string,is_exchange_gift,
+        is_active,deleted,create_time, update_time,parent_id, invite_time
+    </sql>
+
+    <!-- 根据团长ID查询团长消费日期列表-->
+    <sql id="FindParentDay">
+        SELECT DATE(payment_time) day
+        FROM oms_order
+        WHERE user_id = #{parentId}
+          AND order_type = 1
+          AND trans_id > 0
+        <if test="isCurrent">
+            AND DATE_FORMAT(payment_time,'%Y-%m') = DATE_FORMAT(CURRENT_DATE,'%Y-%m')
+        </if>
+        GROUP BY day
+    </sql>
+
+    <select id="findAdvancedUsersNumber" resultType="java.lang.Integer">
+        SELECT IFNULL(COUNT(*), 0)
+        FROM `ums_user` AS uu
+        WHERE uu.`payment_type` = 1
+          AND uu.`user_id` IN (SELECT uui.`user_id` FROM `ums_user_invite` AS uui WHERE uui.`parent_id` = #{userId})
+    </select>
+
+    <select id="getUserImInfo" resultType="com.ys.mail.model.admin.vo.UserImInfoVO">
+        SELECT user_id,nickname,head_portrait
+        FROM ums_user WHERE user_id IN (
+        <foreach collection="userIds" item="userId" separator=",">
+            #{userId}
+        </foreach>
+        )
+    </select>
+
+    <!-- 根据团长ID获取团员的信息 -->
+    <select id="getUserInviteInfo" resultType="com.ys.mail.model.vo.UserInviteItemDataVO">
+        SELECT
+                uu.user_id,
+                uu.phone,
+                uu.head_portrait head,
+                uui.create_time invite_time,
+                0 team_num,
+                0 consume_num,
+                0 consume_total
+        FROM
+                ums_user uu LEFT JOIN ums_user_invite uui ON uu.user_id = uui.user_id
+        WHERE
+                uu.user_id IN(
+                    SELECT user_id FROM ums_user_invite WHERE parent_id = #{parentId}
+                )
+        ORDER BY uu.user_id DESC
+    </select>
+
+    <!-- 查询团长所有下级成员的有效秒杀订单消费汇总记录（表示：双方在同一天都进行秒杀；查询列：下级用户ID、有效消费金额、有效消费笔数） -->
+    <select id="getInviteOrderCollectByParent" resultType="map">
+        SELECT oo.user_id,
+               SUM(pay_amount) money,
+               COUNT(1)        count
+        FROM
+            oms_order oo
+        WHERE oo.user_id in
+            <foreach item="item" index="index" collection="inviteIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        AND oo.order_type = 1
+          AND oo.trans_id > 0
+          AND DATE(oo.payment_time) IN (<include refid="FindParentDay"/>)
+        GROUP BY oo.user_id;
+    </select>
+
+    <select id="getPage" resultType="com.ys.mail.model.admin.vo.UmsUserBlackListVO">
+        SELECT uu.user_id,
+               uu.phone,
+               uu.nickname,
+               uu.head_portrait,
+               uu.openid,
+               uu.role_id,
+               uu.is_user_status   userStatus,
+               uu.create_time,
+               uu.update_time,
+               uu.deleted,
+               uu.integral_sum,
+               uu.alipay_name,
+               uu.alipay_account,
+               uu.payment_type,
+               uu.is_exchange_gift exchangeGift,
+               uu.is_active,
+               ubl.bl_id,
+               ubl.is_enable       blEnable,
+               ubl.remark          blRemark
+        FROM ums_user uu
+                     LEFT JOIN ums_user_blacklist ubl ON uu.phone = ubl.bl_phone ${ew.customSqlSegment}
+    </select>
+</mapper>

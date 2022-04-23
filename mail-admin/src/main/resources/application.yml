@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: mail-admin
+  profiles:
+    active: common,test #默认为开发环境,每次上传代码的时候改成prod为生产环境,开发环境dev,测试环境test
+  servlet:
+    multipart:
+      enabled: true # 开启文件上传
+      max-file-size: 200MB # 限制文件上传大小为10M
+      max-request-size: 200MB # 请求最大负载，默认10M
+  banner:
+    charset: utf-8
+    image:
+      height: 25
+      width: 60
+      location: banner-fox.png
+#  main:
+#    banner-mode: off # 可以关闭自定义Banner图
+
+mybatis-plus:
+  mapper-locations:
+    - classpath*:com.ys.mail.mapper/*.xml
+
+redis:
+  database: mail
+  key:
+    pcUser: 'pc:user'
+    menuList: 'pc:menuList'
+    user: 'user:account'
+    token: 'pc:token'
+    pcHomePage: 'pc:home:page' # 后台主页
+    everyDayOrder: 'pc:statistics:order:day' # 每日订单数据
+    everyMonthOrder: 'pc:statistics:order:month' # 每月订单数据
+    everyMonthIncome: 'pc:statistics:exIncome:month' # 每月提现数据
+    monitorServers: 'pc:statistics:monitor:servers' # 系统监控信息
+    localLockAnn: 'pc:localLockAnn:key' # 频繁请求池
+
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: electric-admin-secret #JWT加解密使用的密钥
+  expiration: 604800 #JWT的超期限时间(60*60*24*7) 604800 60就是一分钟
+  tokenHead: 'Bearer'  #JWT负载中拿到开头
+
+secure:
+  ignored:
+    urls: #安全路径白名单
+      - /swagger-ui.html
+      - /swagger-resources/**
+      - /swagger/**
+      - /doc.html
+      - /**/v2/api-docs
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.ico
+      - /webjars/springfox-swagger-ui/**
+      - /actuator/**
+      - /druid/**
+      - /img/**
+      - /pc/user/login
+      - /pc/file/*
+      - /pc/user/logout
+      - /pc/product/collect/get
+      - /testManage/*
+
+

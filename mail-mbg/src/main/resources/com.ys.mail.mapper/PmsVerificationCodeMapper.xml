@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsVerificationCodeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsVerificationCode">
+        <id column="verification_id" property="verificationId" />
+        <result column="partner_id" property="partnerId" />
+        <result column="code" property="code" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="is_status" property="isStatus" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+    <select id="queryDetail" resultType="com.ys.mail.model.dto.VerifyDto">
+        SELECT
+        oo.order_sn,ooi.product_name,ooi.product_pic,ooi.product_price,oo.`pay_type`
+        FROM
+        `oms_order` oo
+        LEFT JOIN `oms_order_item` ooi
+        ON oo.order_id = ooi.order_id
+        WHERE oo.order_sn = (SELECT
+        ovo.`order_id`
+        FROM
+        `oms_verification_order` ovo
+        LEFT JOIN `pms_verification_code` pvc
+        ON ovo.`verification_id` = pvc.`verification_id`
+        WHERE pvc.`code` = #{code} LIMIT 1)
+    </select>
+
+</mapper>

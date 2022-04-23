@@ -1,0 +1,55 @@
+package com.ys.mail.component;
+
+import com.shuyuanwl.sms.api.bean.DownRes;
+import com.shuyuanwl.sms.api.core.ApiSender;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author DT
+ * @version 1.0
+ * @date 2021-11-09 11:08
+ */
+@Component
+public class SmsClient {
+
+    /**
+     * url地址
+     */
+    private static final String URL = "http://api.shuyuanwl.com:8080/api/sms/send";
+
+    /**
+     * 短信内容
+     */
+    private static final String CONTENT = "您的短信验证码为.";
+
+    /**
+     * 鸿盛源登录账号
+     */
+    private static final String JIH_ACCOUNT = "hsy@fhkjgd";
+
+    /**
+     * 广盛源登录账号
+     */
+    private static final String JUH_ACCOUNT = "gsy@fhkjgd";
+
+    /**
+     * 扩展码
+     */
+    private static final String EXT_NO = "01";
+
+    /**
+     * 密码
+     */
+    private static final String PASSWORD = "134314";
+
+    /**
+     * 批次号
+     */
+    private static final String BATCH_NO = "";
+
+
+    public void sendRegisterVerify(String phone, String verifyCode,Byte type){
+        String key = type == 0 ? JIH_ACCOUNT : JUH_ACCOUNT;
+        ApiSender.send(URL, key, PASSWORD, phone, CONTENT+verifyCode, EXT_NO,BATCH_NO);
+    }
+}

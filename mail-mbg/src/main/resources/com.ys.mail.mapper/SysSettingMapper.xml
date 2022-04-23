@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.SysSettingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.SysSetting">
+        <id column="sys_setting_id" property="sysSettingId" />
+        <result column="setting_group_name" property="settingGroupName" />
+        <result column="setting_type" property="settingType" />
+        <result column="setting_key" property="settingKey" />
+        <result column="setting_value" property="settingValue" />
+        <result column="setting_default_value" property="settingDefaultValue" />
+        <result column="setting_value_type" property="settingValueType" />
+        <result column="setting_form_type" property="settingFormType" />
+        <result column="setting_remark" property="settingRemark" />
+        <result column="is_enable" property="isEnable" />
+        <result column="is_allow_disable" property="isAllowDisable" />
+        <result column="is_allow_delete" property="isAllowDelete" />
+        <result column="pc_user_id" property="pcUserId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        sys_setting_id, setting_group_name, setting_type, setting_key, setting_value, setting_default_value, setting_value_type, setting_form_type, setting_remark, is_enable, is_allow_disable, is_allow_update, is_allow_delete, pc_user_id, create_time, update_time
+    </sql>
+
+    <select id="getGroupName" resultType="String">
+        SELECT setting_group_name FROM sys_setting GROUP BY setting_group_name
+    </select>
+
+    <select id="getPage" resultType="com.ys.mail.model.admin.vo.SysSettingVo">
+        SELECT ss.sys_setting_id,
+               ss.setting_group_name,
+               ss.setting_type,
+               ss.setting_key,
+               ss.setting_value,
+               ss.setting_default_value,
+               ss.setting_value_type,
+               ss.setting_form_type,
+               ss.setting_remark,
+               ss.is_enable        `enable`,
+               ss.is_allow_disable `allowDisable`,
+               ss.is_allow_update  `allowUpdate`,
+               ss.is_allow_delete  `allowDelete`,
+               ss.pc_user_id,
+               ss.create_time,
+               ss.update_time,
+               pu.username,
+               pu.nickname,
+               pu.head_portrait
+        FROM sys_setting ss
+                     LEFT JOIN pc_user pu ON ss.pc_user_id = pu.pc_user_id ${ew.customSqlSegment}
+    </select>
+</mapper>

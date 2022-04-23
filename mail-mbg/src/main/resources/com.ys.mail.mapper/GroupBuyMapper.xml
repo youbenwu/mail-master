@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.GroupBuyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.GroupBuy">
+        <id column="group_buy_id" property="groupBuyId" />
+        <result column="product_id" property="productId" />
+        <result column="show_price" property="showPrice" />
+        <result column="limit_num" property="limitNum" />
+        <result column="group_num" property="groupNum" />
+        <result column="pattern" property="pattern" />
+        <result column="sort" property="sort" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="tries_num" property="triesNum" />
+        <result column="deadline_time" property="deadlineTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="join_num" property="joinNum"/>
+    </resultMap>
+
+    <resultMap id="DtoBaseResultMap" type="com.ys.mail.model.dto.GroupBuyDTO">
+        <id column="group_buy_id" property="groupBuyId" />
+        <result column="show_price" property="showPrice" />
+        <result column="limit_num" property="limitNum" />
+        <result column="group_num" property="groupNum" />
+        <result column="pattern" property="pattern" />
+        <result column="sort" property="sort" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="tries_num" property="triesNum" />
+        <result column="deadline_time" property="deadlineTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+
+        <association property="product" javaType="com.ys.mail.entity.PmsProduct" columnPrefix="pp_">
+            <id column="product_id" property="productId"/>
+            <result column="product_name" property="productName"/>
+            <result column="pic" property="pic"/>
+            <result column="price" property="price"/>
+        </association>
+
+    </resultMap>
+
+    <resultMap id="InfoResultMap" type="com.ys.mail.model.dto.GroupBuyInfoDTO">
+        <id column="group_buy_id" property="groupBuyId"/>
+        <result column="product_id" property="productId"/>
+        <result column="show_price" property="showPrice"/>
+        <result column="limit_num" property="limitNum"/>
+        <result column="group_num" property="groupNum"/>
+        <result column="is_publish_status" property="publishStatus"/>
+        <result column="tries_num" property="triesNum"/>
+        <result column="deadline_time" property="deadlineTime"/>
+        <result column="brand_id" property="brandId"/>
+        <result column="pdt_cgy_id" property="pdtCgyId"/>
+        <result column="product_name" property="productName"/>
+        <result column="pic" property="pic"/>
+        <result column="sale" property="sale"/>
+        <result column="description" property="description"/>
+        <result column="sub_title" property="subTitle"/>
+        <result column="album_pics" property="albumPics"/>
+        <result column="detail_desc" property="detailDesc"/>
+        <result column="price" property="price"/>
+
+        <collection property="pmsProductAttributes" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="pdt_attribute_cgy_id"
+                    select="com.ys.mail.mapper.PmsProductAttributeMapper.selectByPdtAttributeCgyId"
+        />
+
+        <collection property="productComments" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="product_id"
+                    select="com.ys.mail.mapper.PmsProductCommentMapper.selectOneProductId"
+        />
+
+        <collection property="sponsors" ofType="com.ys.mail.entity.GroupSponsor" column="group_buy_id"
+                    select = "com.ys.mail.mapper.GroupSponsorMapper.selectByGroupBuyId"
+        />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        group_buy_id, good_id, show_price, limit_num, group_num, pattern, sort, is_publish_status,
+        tries_num, deadline_time, create_time, update_time, deleted,join_num
+    </sql>
+
+
+    <select id="selectNewestGroupBuy" resultMap="DtoBaseResultMap">
+        select gb.group_buy_id,
+               gb.show_price,
+               gb.limit_num,
+               gb.group_num,
+               gb.pattern,
+               gb.sort,
+               gb.is_publish_status,
+               gb.tries_num,
+               gb.deadline_time,
+               gb.create_time,
+               gb.update_time,
+               gb.deleted,
+               pp.product_id pp_product_id,
+               pp.product_name pp_product_name,
+               pp.pic pp_pic
+               from group_buy gb left join pms_product pp on gb.product_id = pp.product_id
+               where  pp.promotion_type = 6  AND pp.deleted = 0 AND pp.is_publish_status = 1
+               order by gb.group_buy_id desc
+               limit 3;
+    </select>
+    <select id="selectAllGroupBuy" resultMap="DtoBaseResultMap">
+        select gb.group_buy_id,
+               gb.show_price,
+               gb.limit_num,
+               gb.group_num,
+               gb.pattern,
+               gb.sort,
+               gb.is_publish_status,
+               gb.tries_num,
+               gb.deadline_time,
+               gb.create_time,
+               gb.update_time,
+               gb.deleted,
+               pp.product_id pp_product_id,
+               pp.product_name pp_product_name,
+               pp.pic pp_pic,
+               pp.price pp_price
+        from group_buy gb left join pms_product pp on gb.product_id = pp.product_id
+        where  pp.promotion_type = 6  and pp.deleted = 0
+        order by gb.group_buy_id desc
+    </select>
+
+    <select id="selectByProductIdInfo" resultMap="InfoResultMap">
+        select gb.group_buy_id,
+               gb.product_id,
+               gb.show_price,
+               gb.limit_num,
+               gb.group_num,
+               gb.is_publish_status,
+               gb.tries_num,
+               gb.deadline_time,
+               pp.brand_id,
+               pp.pdt_cgy_id,
+               pp.product_name,
+               pp.pic,
+               pp.sale,
+               pp.description,
+               pp.sub_title,
+               pp.album_pics,
+               pp.detail_desc,
+               pp.price
+               from group_buy gb left join pms_product pp on gb.product_id = pp.product_id
+               where gb.product_id = #{productId}
+                 and gb.is_publish_status = 1
+                 and gb.deleted = 0;
+    </select>
+
+</mapper>

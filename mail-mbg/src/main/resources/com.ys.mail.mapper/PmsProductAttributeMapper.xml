@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsProductAttributeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsProductAttribute">
+        <id column="product_attribute_id" property="productAttributeId" />
+        <result column="pdt_attribute_cgy_id" property="pdtAttributeCgyId" />
+        <result column="product_attribute_name" property="productAttributeName" />
+        <result column="select_type" property="selectType" />
+        <result column="input_type" property="inputType" />
+        <result column="input_list" property="inputList" />
+        <result column="sort" property="sort" />
+        <result column="filter_type" property="filterType" />
+        <result column="search_type" property="searchType" />
+        <result column="is_related_status" property="relatedStatus" />
+        <result column="is_hand_add_status" property="handAddStatus" />
+        <result column="type" property="type" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.PmsProductAttributeVO">
+        <id column="product_attribute_id" property="productAttributeId" />
+        <result column="pdt_attribute_cgy_id" property="pdtAttributeCgyId" />
+        <result column="product_attribute_name" property="productAttributeName" />
+        <result column="select_type" property="selectType" />
+        <result column="input_type" property="inputType" />
+        <result column="input_list" property="inputList" />
+        <result column="sort" property="sort" />
+        <result column="filter_type" property="filterType" />
+        <result column="search_type" property="searchType" />
+        <result column="is_related_status" property="relatedStatus" />
+        <result column="is_hand_add_status" property="handAddStatus" />
+        <result column="type" property="type" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="pdt_attribute_name" property="pdtAttributeCgyName" />
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        product_attribute_id, pdt_attribute_cgy_id, product_attribute_name, select_type, input_type, input_list, sort, filter_type, search_type, is_related_status, is_hand_add_status, type, create_time, update_time
+    </sql>
+    <select id="selectByPdtAttributeCgyId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        from pms_product_attribute
+        where pdt_attribute_cgy_id = #{pdtAttributeCgyId};
+    </select>
+
+    <select id="get" resultMap="BaseResultMapVO">
+        select a.*,b.name pdt_attribute_name from pms_product_attribute a
+        inner join pms_product_attribute_category b on a.pdt_attribute_cgy_id =b.pdt_attribute_cgy_id
+        <where>
+            <if test="productAttributeName!=''">
+                a.product_attribute_name = #{productAttributeName}
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PcRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PcRole">
+        <id column="role_id" property="roleId" />
+        <result column="role_name" property="roleName" />
+        <result column="role_remark" property="roleRemark" />
+        <result column="is_allow_delete" property="allowDelete" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        role_id, role_name, role_remark, is_allow_delete, create_time, update_time
+    </sql>
+    <delete id="delRoleMenuByRoleId">
+        delete from  pc_role_menu where role_id = #{roleId}
+    </delete>
+    <delete id="delUserRoleByRoleId">
+        delete from  pc_user_role where role_id = #{roleId}
+    </delete>
+
+    <select id="getMenusByRoleId" resultType="java.lang.String">
+        select DISTINCT menu_id
+        from pc_role_menu
+        where role_id = #{roleId};
+    </select>
+
+    <insert id="insertRoleMenus">
+        INSERT INTO pc_role_menu(
+        role_menu_id,role_id, menu_id,create_time
+        )VALUES
+        <foreach collection="mapList" item="map" index="index" separator="," close=";">
+            (
+            #{map.roleMenuId}
+            ,#{roleId}
+            ,#{map.menuId}
+            ,now()
+            )
+        </foreach>
+    </insert>
+</mapper>

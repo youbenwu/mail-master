@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PcSysDicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PcSysDic">
+        <id column="sys_dic_id" property="sysDicId" />
+        <result column="sys_dic_type" property="sysDicType" />
+        <result column="sys_dic_key" property="sysDicKey" />
+        <result column="sys_dic_value" property="sysDicValue" />
+        <result column="sys_dic_describe" property="sysDicDescribe" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        sys_dic_id, sys_dic_type, sys_dic_key, sys_dic_value, sys_dic_describe
+    </sql>
+
+</mapper>

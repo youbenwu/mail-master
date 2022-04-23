@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.OmsIntegralOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.OmsIntegralOrder">
+        <id column="integral_order_id" property="integralOrderId" />
+        <result column="integral_pdt_id" property="integralPdtId"/>
+        <result column="user_id" property="userId" />
+        <result column="order_sn" property="orderSn" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="freight_amount" property="freightAmount" />
+        <result column="source_type" property="sourceType" />
+        <result column="order_status" property="orderStatus" />
+        <result column="delivery_company" property="deliveryCompany" />
+        <result column="delivery_sn" property="deliverySn" />
+        <result column="auto_confirm_day" property="autoConfirmDay" />
+        <result column="bill_type" property="billType" />
+        <result column="bill_header" property="billHeader" />
+        <result column="bill_content" property="billContent" />
+        <result column="bill_phone" property="billPhone" />
+        <result column="bill_email" property="billEmail" />
+        <result column="receiver_name" property="receiverName" />
+        <result column="receiver_phone" property="receiverPhone" />
+        <result column="receiver_code" property="receiverCode" />
+        <result column="receiver_province" property="receiverProvince" />
+        <result column="receiver_city" property="receiverCity" />
+        <result column="receiver_region" property="receiverRegion" />
+        <result column="receiver_address" property="receiverAddress" />
+        <result column="order_note" property="orderNote" />
+        <result column="is_confirm_status" property="isConfirmStatus" />
+        <result column="payment_time" property="paymentTime" />
+        <result column="delivery_time" property="deliveryTime" />
+        <result column="receive_time" property="receiveTime" />
+        <result column="comment_time" property="commentTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="quantity" property="quantity"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        integral_order_id, user_id, order_sn, total_amount, freight_amount, source_type,
+        order_status, delivery_company, delivery_sn, auto_confirm_day, bill_type, bill_header,
+        bill_content, bill_phone, bill_email, receiver_name, receiver_phone, receiver_code,
+        receiver_province, receiver_city, receiver_region, receiver_address, order_note,
+        is_confirm_status, payment_time, delivery_time, receive_time, comment_time, create_time,
+        update_time, deleted,integral_pdt_id
+    </sql>
+
+    <select id="selectAllIntegralOrder" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_integral_order
+        <where>
+            <if test="integralOrderId != 0">
+                integral_order_id <![CDATA[ < ]]>  #{integralPdtId}
+            </if>
+                and user_id = #{userId}
+                and deleted = 0
+        </where>
+        order by integral_order_id desc
+        limit 6;
+    </select>
+
+</mapper>

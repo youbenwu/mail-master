@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.UmsProductCollectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.UmsProductCollect">
+        <id column="pdt_collect_id" property="pdtCollectId" />
+        <result column="user_id" property="userId" />
+        <result column="product_id" property="productId" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <resultMap id="UmsProductCollectMap" type="com.ys.mail.model.admin.dto.UmsProductCollectDto">
+        <id column="pdt_collect_id" property="pdtCollectId" />
+        <result column="user_id" property="userId" />
+        <result column="product_id" property="productId" />
+        <result column="create_time" property="createTime" />
+        <result column="nickname" property="nickname" />
+        <result column="head_portrait" property="headPortrait" />
+        <result column="openid" property="openid" />
+        <result column="phone" property="phone" />
+        <result column="pic" property="pic" />
+        <result column="role_id" property="roleId" />
+        <result column="brand_id" property="brandId" />
+        <result column="product_name" property="productName" />
+        <result column="pdt_cgy_id" property="pdtCgyId" />
+        <result column="product_sn" property="productSn" />
+        <result column="sale" property="sale" />
+        <result column="price" property="price" />
+        <result column="description" property="description" />
+        <result column="original_price" property="originalPrice" />
+        <result column="stock" property="stock" />
+        <result column="unit" property="unit" />
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        pdt_collect_id, user_id, product_id, create_time
+    </sql>
+
+    <select id="getUmsProductCollectList" resultType="com.ys.mail.model.admin.dto.UmsProductCollectDto">
+        select upc.pdt_collect_id,upc.create_time,uu.user_id,uu.nickname,uu.head_portrait,uu.openid,uu.phone,pp.pic,uu.role_id,
+        pp.product_name,pp.brand_id,pp.pdt_cgy_id,pp.product_id,pp.product_sn,pp.sale,pp.price,pp.description,pp.original_price,pp.stock,pp.unit
+        from ums_product_collect upc
+        left join pms_product pp on upc.product_id=pp.product_id and pp.deleted=0
+        left join ums_user uu on uu.user_id=upc.user_id and uu.deleted=0 and uu.is_user_status=1
+        order by upc.create_time desc
+    </select>
+
+</mapper>

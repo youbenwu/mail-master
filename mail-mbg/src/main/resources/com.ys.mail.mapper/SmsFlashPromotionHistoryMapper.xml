@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.SmsFlashPromotionHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.SmsFlashPromotionHistory">
+        <id column="histroy_id" property="histroyId" />
+        <result column="product_id" property="productId" />
+        <result column="product_id_parent" property="productIdParent" />
+        <result column="product_id_price" property="productIdPrice" />
+        <result column="user_id" property="userId" />
+        <result column="create_time" property="createTime" />
+        <result column="product_pic" property="productPic" />
+        <result column="nickname" property="nickname" />
+        <result column="new_nickname" property="newNickname" />
+        <result column="user_pic" property="userPic"/>
+        <result column="new_user_pic" property="newUserPic"/>
+        <result column="product_name" property="productName"/>
+
+    </resultMap>
+
+    <resultMap id="msgResultMap" type="com.ys.mail.model.vo.ShoppingMsgVO">
+        <id column="histroy_id" property="histroyId" />
+        <result column="nickname" property="nickName" />
+        <result column="new_nickname" property="newNickname" />
+        <result column="product_pic" property="productPic" />
+        <result column="product_id_price" property="productIdPrice" />
+        <result column="user_pic" property="userPic"/>
+        <result column="new_user_pic" property="newUserPic"/>
+        <result column="product_name" property="productName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        histroy_id, product_id, product_id_parent, product_id_price, user_id, create_time,
+        product_pic,nickname,new_nickname,new_user_id,user_pic,new_user_pic,product_name
+    </sql>
+
+
+    <select id="selectShopMsg" resultMap="msgResultMap">
+        SELECT
+                histroy_id,
+                new_nickname,
+                nickname,
+                product_pic,
+                product_id_price,
+                user_pic,
+                new_user_pic,
+                product_name
+        FROM
+                sms_flash_promotion_history
+        ORDER BY
+                histroy_id DESC
+                LIMIT 1;
+    </select>
+
+    <select id="selectAllHistory" resultMap="msgResultMap">
+        SELECT
+                histroy_id,
+                new_nickname,
+                nickname,
+                product_pic,
+                product_id_price,
+                user_pic,
+                new_user_pic,
+                product_name
+        FROM
+                sms_flash_promotion_history
+        <where>
+            <if test="histroyId != null">
+                histroy_id <![CDATA[ < ]]>  #{histroyId}
+            </if>
+        </where>
+        ORDER BY
+                histroy_id DESC
+                LIMIT 20;
+    </select>
+</mapper>

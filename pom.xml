@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ys.mail</groupId>
+    <artifactId>mail-master</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>mail-common</module>
+        <module>mail-mbg</module>
+        <module>mail-service</module>
+        <module>mail-security</module>
+        <module>mail-admin</module>
+        <module>mail-portal</module>
+    </modules>
+
+    <name>mail-master</name>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <skipTests>true</skipTests>
+        <docker.host>http://192.168.3.101:2375</docker.host>
+        <docker.maven.plugin.version>1.2.2</docker.maven.plugin.version>
+        <pagehelper-starter.version>1.3.0</pagehelper-starter.version>
+        <pagehelper.version>5.2.0</pagehelper.version>
+        <druid.version>1.1.23</druid.version>
+        <hutool.version>5.4.0</hutool.version>
+        <swagger2.version>2.9.2</swagger2.version>
+        <swagger-models.version>1.6.0</swagger-models.version>
+        <swagger-annotations.version>1.6.0</swagger-annotations.version>
+        <mybatis-plus.version>3.4.1</mybatis-plus.version>
+        <mysql-connector.version>8.0.20</mysql-connector.version>
+        <spring-data-commons.version>2.3.0.RELEASE</spring-data-commons.version>
+        <jjwt.version>0.9.0</jjwt.version>
+        <aliyun-oss.version>2.5.0</aliyun-oss.version>
+        <logstash-logback.version>5.3</logstash-logback.version>
+        <minio.version>7.1.0</minio.version>
+        <template-common.version>1.0-SNAPSHOT</template-common.version>
+        <template-mbg.version>1.0-SNAPSHOT</template-mbg.version>
+        <template-service.version>1.0-SNAPSHOT</template-service.version>
+        <template-security.version>1.0-SNAPSHOT</template-security.version>
+        <aliyun-core.version>4.5.3</aliyun-core.version>
+        <qcloudsms.version>1.0.5</qcloudsms.version>
+        <fastjson.version>1.2.47</fastjson.version>
+        <pay-java-ali.version>2.13.3</pay-java-ali.version>
+        <pay-java-wx.version>2.13.3</pay-java-wx.version>
+        <swagger-bootstrap-ui.version>1.9.4</swagger-bootstrap-ui.version>
+        <guava.version>21.0</guava.version>
+        <okhttp.version>3.10.0</okhttp.version>
+        <alipay.sdk.version>4.9.79</alipay.sdk.version>
+    </properties>
+
+    <dependencies>
+        <!-- swagger-bootstrap-ui增强ui  -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+            <version>${swagger-bootstrap-ui.version}</version>
+        </dependency>
+        <!--控系统健康情况-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--Spring aop-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <!--Java工具类库-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+        <!--springboot使用xml时需配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--template通用模块-->
+            <dependency>
+                <groupId>com.ys.mail</groupId>
+                <artifactId>mail-common</artifactId>
+                <version>${template-common.version}</version>
+            </dependency>
+            <!--template中MBG生成模块-->
+            <dependency>
+                <groupId>com.ys.mail</groupId>
+                <artifactId>mail-mbg</artifactId>
+                <version>${template-mbg.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ys.mail</groupId>
+                <artifactId>mail-service</artifactId>
+                <version>${template-service.version}</version>
+            </dependency>
+            <!--template安全模块-->
+            <dependency>
+                <groupId>com.ys.mail</groupId>
+                <artifactId>mail-security</artifactId>
+                <version>${template-security.version}</version>
+            </dependency>
+            <!--SpringData工具包-->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-commons</artifactId>
+                <version>${spring-data-commons.version}</version>
+            </dependency>
+            <!--集成druid连接池-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <!--Hutool Java工具包-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <!--Swagger-UI API文档生产工具-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <!--解决Swagger 2.9.2版本NumberFormatException-->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-models.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
+            </dependency>
+            <!--Mysql数据库驱动-->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector.version}</version>
+            </dependency>
+            <!--MyBatis-plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!--JWT(Json Web Token)登录支持-->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <!-- 阿里云OSS -->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun-oss.version}</version>
+            </dependency>
+            <!--阿里云短信-->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-core</artifactId>
+                <version>${aliyun-core.version}</version>
+            </dependency>
+            <!--集成logstash,日志管理平台-->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback.version}</version>
+            </dependency>
+            <!--MinIO JAVA SDK 对象存储-->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+            <!-- 良心云 sms -->
+            <dependency>
+                <groupId>com.github.qcloudsms</groupId>
+                <artifactId>qcloudsms</artifactId>
+                <version>${qcloudsms.version}</version>
+            </dependency>
+            <!-- 阿里巴巴 json 解析 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <!--阿里巴巴支付实现-->
+            <dependency>
+                <groupId>com.egzosn</groupId>
+                <artifactId>pay-java-ali</artifactId>
+                <version>${pay-java-ali.version}</version>
+            </dependency>
+            <!--微信支付实现-->
+            <dependency>
+                <groupId>com.egzosn</groupId>
+                <artifactId>pay-java-wx</artifactId>
+                <version>${pay-java-wx.version}</version>
+            </dependency>
+            <!-- 微信第三方封装Api -->
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-pay</artifactId>
+                <version>3.3.0</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>qrcode-utils</artifactId>
+                        <groupId>com.github.binarywang</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!--短信对接所需包-->
+            <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.12</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.13</version>
+            </dependency>
+            <!--本地短信-->
+            <dependency>
+                <groupId>org.item.sms-sdk</groupId>
+                <artifactId>sms-sdk</artifactId>
+                <version>1.2</version>
+            </dependency>
+
+            <!--引入PageHelper分页插件 → PageHelper-->
+           <!-- <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>5.1.7</version>
+            </dependency>-->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>5.1.7</version>
+            </dependency>
+             <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-autoconfigure</artifactId>
+                <version>1.2.9</version>
+            </dependency>
+
+             <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>1.2.9</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!--添加热部署,不用多次debug,自己启动-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-devtools</artifactId>
+                <version>${spring-boot.version}</version>
+                <optional>true</optional>
+                <scope>true</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+           <!-- <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.7.25</version>
+                <scope>test</scope>
+            </dependency>-->
+            <dependency>
+                <groupId>com.alipay.api</groupId>
+                <artifactId>alipay.api</artifactId>
+                <version>${alipay.sdk.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                  <!--  <source>1.8</source>
+                    <target>1.8</target>-->
+                    <!--fork:如果没有该项配置,整个devtools不会起作用-->
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <skipTests>true</skipTests>    <!--默认关掉单元测试 -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

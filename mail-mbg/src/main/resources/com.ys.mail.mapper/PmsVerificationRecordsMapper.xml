@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsVerificationRecordsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsVerificationRecords">
+        <id column="record_id" property="recordId" />
+        <result column="code" property="code" />
+        <result column="partner_id" property="partnerId" />
+        <result column="order_id" property="orderId" />
+        <result column="product_name" property="productName" />
+        <result column="product_price" property="productPrice" />
+        <result column="total_price" property="totalPrice" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        record_id, code, partner_id, order_id, product_name, product_price, total_price, create_time, update_time
+    </sql>
+    <select id="selectOrderDetail" resultType="com.ys.mail.model.dto.OrderDetailDto">
+        SELECT
+        pvr.`record_id`,
+        pvr.`code`,
+        pvr.`product_name`,
+        pvr.`product_pic`,
+        pvr.`partner_name`,
+        pvr.`create_time` AS `verTime`,
+        ooi.product_quantity,
+        oo.`total_amount`,
+        oo.`receiver_province`,
+        oo.`receiver_name`,
+        oo.`order_id`,
+        oo.`user_id`,
+        oo.`create_time`,
+        oo.`order_note`,
+        oo.`order_sn`
+        FROM pms_verification_records pvr
+        LEFT JOIN `oms_order`  oo
+        LEFT JOIN `oms_order_item` ooi
+        ON oo.order_id = ooi.order_id
+        ON pvr.`order_id`=oo.`order_sn`
+        WHERE record_id=#{recordId}
+    </select>
+    <select id="partnerTodayResults" resultType="com.ys.mail.model.vo.PartnerTodayResultsVO">
+        SELECT SUM(total_price) AS `total_amount` ,
+        COUNT(pvr.`record_id`) AS `order_number`,
+        COUNT(pvr.`record_id`) AS `visitors`
+        FROM `pms_verification_records` AS pvr WHERE pvr.`partner_id` = #{partnerId}
+        AND DATE_FORMAT(pvr.`create_time`,'%Y%m%d') = DATE_FORMAT(NOW(),'%Y%m%d')
+    </select>
+
+</mapper>

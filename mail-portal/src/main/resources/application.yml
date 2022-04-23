@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: mail-portal
+  profiles:
+    active: common,test #默认为开发环境,每次上传代码的时候改成prod为生产环境,开发环境dev,测试环境test
+  servlet:
+    multipart:
+      enabled: true  #开启文件上传
+      max-file-size: 10MB
+      max-request-size: 100MB
+  banner:
+    charset: utf-8
+    image:
+      height: 25
+      width: 60
+      location: banner-fox.png
+#  main:
+#    banner-mode: off # 可以关闭自定义Banner图
+
+mybatis-plus:
+  mapper-locations:
+    - classpath*:com.ys.mail.mapper/*.xml
+
+#配置jwt生成的token
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: mail-portal-secret #JWT加解密使用的密钥
+  expiration: 2592000 #JWT的超期限时间(60*60*24*7),默认给他一个月的时间
+  tokenHead: 'Bearer'  #JWT负载中拿到开头
+
+#配置安全路径白名单
+secure:
+  ignored:
+    urls: #安全路径白名单
+      - /swagger-ui.html
+      - /swagger-resources/**
+      - /swagger/**
+      - /**/v2/api-docs
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.ico
+      - /webjars/springfox-swagger-ui/**
+      - /druid/**
+      - /actuator/**
+      - /sso/**
+      - /home/**
+      - /product/**
+      - /brand/**
+      - /doc.html
+      - /file/**
+      - /img/**
+      - /audio/**
+      - /video/**
+      - /user/getAuthCode
+      - /user/register
+      - /user/oauth
+      - /user/hulatu/oauth
+      - /unionPay/notifyUrl
+      - /unionPay/aliPayNotify
+
+#自定义一键登录参数
+oauth:
+  app_key: m5e254702a22b7                  #5dd23f6d7c895 旧版
+  app_secret: 700e41efdf22a9d334aa223faf2c9346          #a931990ca352f2cd2d7265a36711bc52   旧版
+  app_store: 7e3aee69764965616dd45df12af00498
+  url: http://identify.accuratead.cn/auth/auth/sdkClientFreeLogin
+  hulatu: #呼啦兔的一键登录参数
+    app_key: m5e254dd47c59c                #5de56e3dd9346 旧版
+    app_secret: 7539d592fc6f9838ad13db572db06452        #7ebbc12b806cf68b1be5c5d31c274322旧版
+
+#线程池配置参数
+task:
+  pool:
+    corePoolSize: 5 #设置核心线程数
+    maxPoolSize: 20  #设置最大线程数
+    keepAliveSeconds: 300 #设置线程活跃时间（秒）
+    queueCapacity: 50 #设置队列容量
+    threadNamePrefix: # 线程名称前缀
+
+# redis key
+redis:
+  key:
+    inviteUser: 'ums:invite:user' # 用户个人邀请，map结构

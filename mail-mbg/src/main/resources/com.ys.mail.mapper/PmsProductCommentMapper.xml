@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsProductCommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsProductComment">
+        <id column="pdt_comment_id" property="pdtCommentId" />
+        <result column="product_id" property="productId" />
+        <result column="user_id" property="userId" />
+        <result column="product_star" property="productStar" />
+        <result column="courier_star" property="courierStar" />
+        <result column="delivery_star" property="deliveryStar" />
+        <result column="mark_star" property="markStar" />
+        <result column="is_anonymous" property="anonymous" />
+        <result column="product_attribute" property="productAttribute" />
+        <result column="pics" property="pics" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <resultMap id="PmsProductCommentVOMap" type="com.ys.mail.model.vo.PmsProductCommentVO" extends="BaseResultMap">
+        <result column="nickname" property="nickname" />
+        <result column="head_portrait" property="headPortrait" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        pdt_comment_id, product_id, user_id, product_star, courier_star, delivery_star, mark_star, is_anonymous, product_content, product_attribute, pics, create_time, update_time
+    </sql>
+
+    <select id="selectOneProductId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from pms_product_comment
+        where product_id = #{productId}
+        order by pdt_comment_id desc
+        limit 1;
+    </select>
+    <select id="selectProductComment" resultMap="PmsProductCommentVOMap">
+        SELECT
+            pdt_comment_id, product_id, t1.user_id, product_star, courier_star,
+            delivery_star, mark_star, is_anonymous, product_content, product_attribute,pics, t1.create_time, t1.update_time,
+            t2.nickname,t2.head_portrait
+        FROM
+            pms_product_comment t1 LEFT JOIN ums_user t2 ON t1.user_id = t2.user_id
+        <where>
+            product_id = #{productId}
+            <if test="pdtCommentId != 0">
+                and pdt_comment_id <![CDATA[ < ]]>  #{pdtCommentId}
+            </if>
+        </where>
+        order by pdt_comment_id desc
+        LIMIT #{pageSize};
+    </select>
+
+</mapper>

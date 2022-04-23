@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.DataStatisticsMapper">
+    <!-- 统计后台当日审核汇总数据 -->
+    <select id="getReviewDataByDate" resultType="com.ys.mail.model.admin.vo.statistics.PcReviewCollectDataVo">
+        SELECT COUNT(*)                                                                   totalNumber,
+               COALESCE(ROUND(SUM(review_money) / 100, 2), 0)                             totalAmount,
+               COALESCE(SUM(IF(review_state = '-1', 1, 0)), 0)                            expiredNumber,
+               COALESCE(SUM(IF(review_state = '0', 1, 0)), 0)                             unReviewNumber,
+               COALESCE(SUM(IF(review_state = '1', 1, 0)), 0)                             passedNumber,
+               COALESCE(SUM(IF(review_state = '2', 1, 0)), 0)                             refusedNumber,
+               COALESCE(SUM(IF(review_state = '3', 1, 0)), 0)                             closedNumber,
+               COALESCE(SUM(IF(review_state = '4', 1, 0)), 0)                             cancelNumber,
+               COALESCE(ROUND(SUM(IF(review_state = '-1', review_money, 0)) / 100, 2), 0) expiredAmount,
+               COALESCE(ROUND(SUM(IF(review_state = '0', review_money, 0)) / 100, 2), 0)  unReviewAmount,
+               COALESCE(ROUND(SUM(IF(review_state = '1', review_money, 0)) / 100, 2), 0)  passedAmount,
+               COALESCE(ROUND(SUM(IF(review_state = '2', review_money, 0)) / 100, 2), 0)  refusedAmount,
+               COALESCE(ROUND(SUM(IF(review_state = '3', review_money, 0)) / 100, 2), 0)  closedAmount,
+               COALESCE(ROUND(SUM(IF(review_state = '4', review_money, 0)) / 100, 2), 0)  cancelAmount
+        FROM pc_review
+        WHERE DATE(create_time) = #{date}
+          AND deleted = 0
+    </select>
+
+    <!-- 统计用户汇总数据：所有用户、高级用户、合伙人，可扩展 -->
+    <select id="getUserCollectData" resultType="com.ys.mail.model.admin.vo.statistics.UserCollectDataVo">
+        SELECT SUM(a) userNumber,
+               SUM(b) seniorUser,
+               SUM(c) partnerNumber
+        FROM (
+                     SELECT COUNT(1) a, 0 b, 0 c
+                     FROM ums_user
+                     WHERE deleted = 0
+                     UNION
+                     SELECT 0 a, COUNT(1) b, 0 c
+                     FROM ums_user
+                     WHERE deleted = 0
+                       AND role_id = 1
+                     UNION
+                     SELECT 0 a, 0 b, COUNT(1) c
+                     FROM ums_partner
+                     WHERE deleted = 0
+                     ) t
+    </select>
+
+    <!-- 按订单类型分组统计数据 -->
+    <select id="getOrderDataByDate" resultType="com.ys.mail.model.admin.vo.statistics.PcOrderCollectDataVo">
+        SELECT
+        order_type,
+        COUNT(1) orderNumber,
+        SUM(pay_amount) orderAmount
+        FROM
+        oms_order
+        <where>
+            delete_status = 0
+            AND trans_id > 0
+            <if test="date!=null and date!=''">
+                AND DATE(create_time) = #{date}
+            </if>
+        </where>
+        GROUP BY order_type
+        ORDER BY order_type
+    </select>
+
+    <!-- 按年月查询已支付的秒杀订单，然后按每日分组显示，接着只返回指定列，最后按日期进行升序 -->
+    <select id="getSaleOrderDataByYearMonth" resultType="com.ys.mail.model.admin.vo.statistics.EveryMonthCollectDataVo">
+        SELECT DATE(create_time) day,
+               COUNT(1)          count,
+               SUM(pay_amount)   money
+        FROM oms_order
+        WHERE delete_status = 0
+          AND trans_id > 0
+          AND order_type = 1
+          AND DATE_FORMAT(create_time, '%Y-%m') = #{date}
+        GROUP BY DATE(create_time)
+        ORDER BY day
+    </select>
+
+    <!-- 按年月查询提现审核数据，然后按每日分组显示，接着只返回指定列，最后按日期进行升序 -->
+    <select id="getExIncomeDataByYearMonth" resultType="com.ys.mail.model.admin.vo.statistics.EveryMonthCollectDataVo">
+        SELECT DATE(create_time)                day,
+               SUM(IF(income_type = '2', 1, 0)) count,
+               SUM(expenditure)                 money
+        FROM ums_income
+        WHERE deleted = 0
+          AND (income_type = 2 OR income_type = 4)
+          AND DATE_FORMAT(create_time, '%Y-%m') = #{date}
+        GROUP BY DATE(create_time)
+        ORDER BY day
+    </select>
+
+    <!-- 查询所有用户的下级邀请人数、分组、排序-->
+    <select id="getAllUserInviteCount" resultType="com.ys.mail.model.admin.vo.statistics.InviteLadderListVo">
+        SELECT uu.user_id,
+               uu.nickname,
+               uu.head_portrait,
+               uu.alipay_name,
+               COUNT(1) inviteCount
+        FROM ums_user uu
+                     JOIN ums_user_invite uui ON uu.user_id = uui.parent_id
+        GROUP BY uu.user_id
+        ORDER BY inviteCount DESC
+    </select>
+</mapper>
