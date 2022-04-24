@@ -67,8 +67,8 @@ public class PcReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> i
                .like("pr.alipay_name", query.getAlipayName()).like("pr.income_id", query.getIncomeId())
                .eq("pr.user_id", query.getUserId())
                .compareDate("pr.create_time", query.getBeginTime(), query.getEndTime())
-               .orderByAsc(StringConstant.STRING_ZERO.equals(query.getKeyword()), "pr.review_id")
-               .orderByDesc(!StringConstant.STRING_ZERO.equals(query.getKeyword()), "pr.review_id");
+               .orderByAsc(StringConstant.ZERO.equals(query.getKeyword()), "pr.review_id")
+               .orderByDesc(!StringConstant.ZERO.equals(query.getKeyword()), "pr.review_id");
         return CommonResult.success(pcReviewMapper.getPage(page, wrapper));
     }
 
@@ -111,9 +111,9 @@ public class PcReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> i
         UmsIncome umsIncome = latestIncome.get(0);
 
         Long incomeId;
-        boolean ifCondition = NumberUtils.INTEGER_ZERO.equals(dbReviewState) && (StringConstant.STRING_TWO.equals(reviewState) || StringConstant.STRING_THREE.equals(reviewState));
+        boolean ifCondition = NumberUtils.INTEGER_ZERO.equals(dbReviewState) && (StringConstant.TWO.equals(reviewState) || StringConstant.THREE.equals(reviewState));
         // 审核通过后系统将直接转账
-        if (Objects.equals(dbReviewState, NumberUtils.INTEGER_ZERO) && StringConstant.STRING_ONE.equals(reviewState)) {
+        if (Objects.equals(dbReviewState, NumberUtils.INTEGER_ZERO) && StringConstant.ONE.equals(reviewState)) {
             if (openPaidOut) {
                 CommonResult<Boolean> commonResult = this.transferAccounts(pcReview.getAlipayName(), pcReview.getAlipayAccount(), actualMoney);
                 Boolean result = commonResult.getData();

@@ -231,7 +231,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         if (overdueL <= 0L) {
             return CommonResult.failed("秒杀场次已经结束");
         }
-        if (countRedis == null && overdueL > 0L) {
+        if (countRedis == null) {
             redisTemplate.opsForValue().set(key, 0, overdueL, TimeUnit.MILLISECONDS);
             countRedis = 0;
         }

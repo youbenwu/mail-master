@@ -87,10 +87,11 @@ public interface PmsProductService extends IService<PmsProduct> {
      *
      * @param skuStockId sku_id
      * @param quantity   数量
-     * @param flag       值
+     * @param flag       标识
+     * @param addressId  地址ID，当不传时从个人地址中重新获取，最终获取不到则为空
      * @return 返回值
      */
-    BuyProductDTO getBuyProduct(Long skuStockId, Integer quantity, Boolean flag);
+    BuyProductDTO getBuyProduct(Long skuStockId, Integer quantity, Boolean flag, Long addressId);
 
     /**
      * 为你精选,猜你喜欢

@@ -44,7 +44,7 @@ public class ReviewController {
     public CommonResult<List<PcReview>> getPage(@RequestParam(name = "reviewId", required = false) String reviewId,
                                                 @RequestParam(name = "pageSize", defaultValue = "10")
                                                 @Range(min = 1, max = 50, message = "分页大小范围为1-50条") String pageSize) {
-        if (BlankUtil.isEmpty(reviewId)) reviewId = StringConstant.STRING_ZERO;
+        if (BlankUtil.isEmpty(reviewId)) reviewId = StringConstant.ZERO;
         List<PcReview> list = reviewService.selectList(Long.valueOf(reviewId), Long.valueOf(pageSize));
         return CommonResult.success(list);
     }

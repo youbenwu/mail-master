@@ -18,12 +18,14 @@ import java.util.List;
 public interface UmsAddressService extends IService<UmsAddress> {
     /**
      * 查询用户收货地址列表
+     *
      * @return 返回收货地址集合
      */
     List<UmsAddress> getAllAddress();
 
     /**
      * 用户删除收货地址
+     *
      * @param addressId 收货地址id
      * @return 返回值
      */
@@ -31,6 +33,7 @@ public interface UmsAddressService extends IService<UmsAddress> {
 
     /**
      * 用户设计收货地址是否为默认
+     *
      * @param addressId 收货地址id
      * @return 返回值
      */
@@ -38,6 +41,7 @@ public interface UmsAddressService extends IService<UmsAddress> {
 
     /**
      * 新增和修改收货地址
+     *
      * @param param 实体对象
      * @return 返回值
      */
@@ -45,8 +49,29 @@ public interface UmsAddressService extends IService<UmsAddress> {
 
     /**
      * 获取当前用户的默认收货地址
+     *
      * @param userId 用户id
      * @return 返回值
      */
     UmsAddress getByUserId(Long userId);
+
+    /**
+     * 获取当前用户的最近的收货地址
+     *
+     * @param userId 用户ID
+     * @param lat    纬度
+     * @param lng    经度
+     * @return 最近的地址，没有则为空
+     */
+    UmsAddress getRecentAddress(Long userId, double lat, double lng);
+
+    /**
+     * 获取当前用户的最近的收货地址，如果经纬度为空则为默认的
+     *
+     * @param userId 用户ID
+     * @param lat    纬度
+     * @param lng    经度
+     * @return 最近的地址，没有则为空
+     */
+    UmsAddress getRecentAddressOrDefault(Long userId, Double lat, Double lng);
 }

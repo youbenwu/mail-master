@@ -8,6 +8,8 @@ package com.ys.mail.exception.code;
 public enum BusinessErrorCode implements IErrorCode {
     // 后三位1开头与商品有关
     RESPONSE_SUCCESS(200, "操作成功"),
+
+    NPE_PARAM(400000, "数据异常"),
     GOODS_NOT_EXIST(400100, "商品不存在"),
     GOODS_STOCK_EMPTY(400101, "商品库存不足"),
     GOODS_STOCK_DEDUCT_FAILED(400102, "商品库存扣减失败"),

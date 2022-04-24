@@ -25,7 +25,7 @@ import java.util.Date;
 @Builder
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="UmsAddress对象", description="用户收货地址表")
+@ApiModel(value = "UmsAddress对象", description = "用户收货地址表")
 public class UmsAddress implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -66,6 +66,12 @@ public class UmsAddress implements Serializable {
     @ApiModelProperty(value = "详细地址")
     private String clientAddress;
 
+    @ApiModelProperty(value = "纬度")
+    private Double latitude;
+
+    @ApiModelProperty(value = "经度")
+    private Double longitude;
+
     @ApiModelProperty(value = "是否默认地址0->false,1->true")
     @TableField("is_default_status")
     private Boolean defaultStatus;
@@ -75,12 +81,12 @@ public class UmsAddress implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
 

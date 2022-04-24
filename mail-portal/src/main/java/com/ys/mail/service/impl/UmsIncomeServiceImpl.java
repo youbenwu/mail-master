@@ -101,7 +101,7 @@ public class UmsIncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome
         if (BlankUtil.isNotEmpty(lastIncomeId) && lastIncomeId != 0) wrapper.lt("income_id", lastIncomeId);
 
         // 0 表示开启时间查询
-        if (StringConstant.STRING_ZERO.equals(lately)) {
+        if (StringConstant.ZERO.equals(lately)) {
             int length = beginTime.length();
             String dateFormat;
             switch (length) {

@@ -84,7 +84,7 @@ public class DataStatisticsController {
                                                                       @DateValidator(dft = DateValidator.DFT.YM, required = true) String date,
                                                                       @RequestParam(value = "refresh", defaultValue = "0") boolean refresh) {
         Map<String, Object> resultMap;
-        if (StringConstant.STRING_ONE.equals(type)) resultMap = dsService.getSaleOrderDataByYearMonth(date, refresh);
+        if (StringConstant.ONE.equals(type)) resultMap = dsService.getSaleOrderDataByYearMonth(date, refresh);
         else resultMap = dsService.getExIncomeDataByYearMonth(date, refresh);
         return CommonResult.success(resultMap);
     }

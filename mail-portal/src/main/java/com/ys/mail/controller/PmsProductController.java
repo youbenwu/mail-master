@@ -1,6 +1,7 @@
 package com.ys.mail.controller;
 
 
+import com.ys.mail.annotation.BlankOrPattern;
 import com.ys.mail.annotation.LocalLockAnn;
 import com.ys.mail.annotation.ProductLog;
 import com.ys.mail.entity.PmsProduct;
@@ -108,11 +109,19 @@ public class PmsProductController {
 
     @ApiOperation("商品立即购买页面-DT")
     @PostMapping(value = "/getBuy/{skuStockId:^\\d{19}$}")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "skuStockId", value = "商品skuID", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "quantity", value = "数量", dataType = "int", required = true),
+            @ApiImplicitParam(name = "flag", value = "标识", dataType = "boolean"),
+            @ApiImplicitParam(name = "addressId", value = "地址ID", dataType = "Long")
+    })
     public CommonResult<BuyProductDTO> getBuyProduct(@PathVariable Long skuStockId,
                                                      @RequestParam(value = "quantity", defaultValue = "1") @Min(value = 1) Integer quantity,
-                                                     @RequestParam(value = "flag", required = false) Boolean flag) {
+                                                     @RequestParam(value = "flag", required = false) Boolean flag,
+                                                     @RequestParam(value = "addressId", required = false)
+                                                     @BlankOrPattern(regexp = "^\\d{19}$") Long addressId) {
         // 当前的这个商品id,sku_id,数量, 获取购买商品的基本属性,加上会员价,由web前端传入是否显示会员价给展示
-        BuyProductDTO result = productService.getBuyProduct(skuStockId, quantity, flag);
+        BuyProductDTO result = productService.getBuyProduct(skuStockId, quantity, flag, addressId);
         return BlankUtil.isEmpty(result) ? CommonResult.failed(BusinessErrorCode.GOODS_NOT_EXIST) : CommonResult.success(result);
     }
 

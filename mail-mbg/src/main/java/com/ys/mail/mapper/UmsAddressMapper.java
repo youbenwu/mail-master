@@ -19,6 +19,7 @@ import java.util.List;
 public interface UmsAddressMapper extends BaseMapper<UmsAddress> {
     /**
      * 修改当前用户的所有收货地址为false
+     *
      * @param addresses 集合
      * @return 返回值
      */
@@ -26,15 +27,28 @@ public interface UmsAddressMapper extends BaseMapper<UmsAddress> {
 
     /**
      * 获取当前用户的默认收货地址
+     *
      * @param userId 用户id
      * @return 返回值
      */
     UmsAddress selectByUserId(@Param("userId") Long userId);
 
     /**
+     * 获取当前用户的最近的收货地址
+     *
+     * @param userId 用户ID
+     * @param lat    纬度
+     * @param lng    经度
+     * @return 最近的地址，没有则为空
+     */
+    UmsAddress selectRecentAddress(@Param("userId") Long userId, @Param("lat") double lat, @Param("lng") double lng);
+
+    /**
      * 查询用户收货地址列表
+     *
      * @param userId 用户id
      * @return 返回收货地址集合
      */
     List<UmsAddress> selectAllAddress(@Param("userId") Long userId);
+
 }

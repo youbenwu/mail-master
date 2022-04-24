@@ -1,12 +1,9 @@
 package com.ys.mail.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.protobuf.Api;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import com.ys.mail.constant.FigureConstant;
 import com.ys.mail.entity.*;
 import com.ys.mail.exception.ApiException;
@@ -21,7 +18,6 @@ import com.ys.mail.model.dto.ProductCollectDTO;
 import com.ys.mail.model.dto.ProductInfoDTO;
 import com.ys.mail.model.param.BathGenerateOrderParam;
 import com.ys.mail.model.param.ConGenerateOrderParam;
-import com.ys.mail.model.param.GenerateOrderParam;
 import com.ys.mail.model.param.ProductParam;
 import com.ys.mail.model.po.BuyProductPO;
 import com.ys.mail.model.po.MebSkuPO;
@@ -107,7 +103,8 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
         Long userId = UserUtil.getCurrentUser().getUserId();
         long result = 0;
         boolean b = false;
-        QueryWrapper<UmsProductCollect> eq = new QueryWrapper<UmsProductCollect>().eq("product_id", productId).eq("user_id", userId);
+        QueryWrapper<UmsProductCollect> eq = new QueryWrapper<UmsProductCollect>().eq("product_id", productId)
+                                                                                  .eq("user_id", userId);
         UmsProductCollect one = productCollectService.getOne(eq);
         if (pdtCollectId.equals(NumberUtils.LONG_ZERO) && BlankUtil.isEmpty(one)) {
             // 新增
@@ -142,17 +139,29 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
     }
 
     @Override
-    public BuyProductDTO getBuyProduct(Long skuStockId, Integer quantity, Boolean flag) {
+    public BuyProductDTO getBuyProduct(Long skuStockId, Integer quantity, Boolean flag, Long addressId) {
         // TODO 商品id
         BuyProductPO buyProduct = productMapper.selectBuyProduct(skuStockId, quantity, flag);
         if (BlankUtil.isEmpty(buyProduct)) {
             return null;
         }
         buyProduct.setQuantity(quantity);
+
+        // 获取最近的个人地址或者默认的
+        Long userId = UserUtil.getCurrentUser().getUserId();
+        UmsAddress umsAddress = null;
+        if (BlankUtil.isNotEmpty(addressId)) {
+            umsAddress = addressService.getById(addressId);
+        }
+        if (BlankUtil.isEmpty(umsAddress)) {
+            umsAddress = addressService.getRecentAddressOrDefault(userId, null, null);
+        }
+
+        // 返回结果
         return BuyProductDTO.builder()
-                .address(addressService.getByUserId(UserUtil.getCurrentUser().getUserId()))
-                .buyProductPo(buyProduct)
-                .build();
+                            .address(umsAddress)
+                            .buyProductPo(buyProduct)
+                            .build();
     }
 
     /**
@@ -164,7 +173,8 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
     @Override
     public BuyProductDTO getBuyProduct(Long productId) {
         QueryWrapper<PmsProduct> wrapper = new QueryWrapper<>();
-        wrapper.eq("product_id", productId).eq("is_publish_status", NumberUtils.INTEGER_ONE).eq("promotion_type", 7).last("LIMIT 1");
+        wrapper.eq("product_id", productId).eq("is_publish_status", NumberUtils.INTEGER_ONE).eq("promotion_type", 7)
+               .last("LIMIT 1");
         PmsProduct pmsProduct = this.getOne(wrapper);
 
         if (BeanUtil.isNotEmpty(pmsProduct)) {
@@ -179,8 +189,8 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
             buyProductPO.setSpData("");
 
             return BuyProductDTO.builder()
-                    .buyProductPo(buyProductPO)
-                    .address(addressService.getByUserId(UserUtil.getCurrentUser().getUserId())).build();
+                                .buyProductPo(buyProductPO)
+                                .address(addressService.getByUserId(UserUtil.getCurrentUser().getUserId())).build();
         }
         return null;
     }
@@ -230,26 +240,27 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
         order.setTotalAmount(price);
         order.setPayAmount(price);
         order.setOrderType(NumberUtils.INTEGER_ZERO);
-        order.setAutoConfirmDay(param.getOrderSelect().equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
+        order.setAutoConfirmDay(param.getOrderSelect()
+                                     .equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
         try {
             // 为true生成item的子订单
             if (!orderService.save(order)) {
                 return CommonResult.failed(BusinessErrorCode.ORDER_STOCK_FAILED);
             }
             OmsOrderItem orderItem = OmsOrderItem.builder()
-                    .orderId(orderId)
-                    .productId(Long.valueOf(param.getProductId()))
-                    .orderItemId(IdWorker.generateId())
-                    .orderSn(orderSn)
-                    .productPic(param.getPic())
-                    .pdtCgyId(Long.valueOf(param.getPdtCgyId()))
-                    .productName(param.getProductName())
-                    .productPrice(price)
-                    .productQuantity(param.getQuantity())
-                    .productSkuId(po.getSkuStockId())
-                    .productAttr(po.getSpData())
-                    .realAmount(Objects.isNull(param.getMebPrice()) ? NumberUtils.LONG_ZERO : price)
-                    .build();
+                                                 .orderId(orderId)
+                                                 .productId(Long.valueOf(param.getProductId()))
+                                                 .orderItemId(IdWorker.generateId())
+                                                 .orderSn(orderSn)
+                                                 .productPic(param.getPic())
+                                                 .pdtCgyId(Long.valueOf(param.getPdtCgyId()))
+                                                 .productName(param.getProductName())
+                                                 .productPrice(price)
+                                                 .productQuantity(param.getQuantity())
+                                                 .productSkuId(po.getSkuStockId())
+                                                 .productAttr(po.getSpData())
+                                                 .realAmount(Objects.isNull(param.getMebPrice()) ? NumberUtils.LONG_ZERO : price)
+                                                 .build();
             if (!orderItemService.save(orderItem)) {
                 throw new ApiException(BusinessErrorCode.ORDER_STOCK_FAILED);
             }
@@ -296,7 +307,8 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
             order.setOrderStatus(NumberUtils.INTEGER_ZERO);
             order.setDeleteStatus(NumberUtils.INTEGER_ZERO);
             order.setBillType(NumberUtils.INTEGER_ZERO);
-            order.setAutoConfirmDay(param.getOrderSelect().equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
+            order.setAutoConfirmDay(param.getOrderSelect()
+                                         .equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
 
             long totalAmount = 0L;//订单总金额
             long payAmount = 0L;//应付金额
@@ -305,7 +317,8 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
             List<OmsCartItem> cartItems = omsCartItemService.listByIds(param.getOmsCartItemIds());
             for (OmsCartItem item : cartItems) {
                 //查询商品
-                PmsProduct product = productMapper.selectOne(new QueryWrapper<PmsProduct>().eq("product_id", item.getProductId()).eq("deleted", NumberUtils.INTEGER_ZERO));
+                PmsProduct product = productMapper.selectOne(new QueryWrapper<PmsProduct>()
+                        .eq("product_id", item.getProductId()).eq("deleted", NumberUtils.INTEGER_ZERO));
                 if (BlankUtil.isEmpty(product)) return CommonResult.failed(BusinessErrorCode.GOODS_NOT_EXIST);
 
                 PmsSkuStock sku = skuStockService.getById(item.getProductSkuId());
@@ -320,19 +333,19 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
                 long skuPrice = sku.getPrice() * item.getQuantity();//库存价格
 
                 OmsOrderItem orderItem = OmsOrderItem.builder()
-                        .orderId(orderId)
-                        .productId(item.getProductId())
-                        .orderItemId(IdWorker.generateId())
-                        .orderSn(orderSn)
-                        .productPic(sku.getPic())
-                        .pdtCgyId(product.getPdtCgyId())
-                        .productName(product.getProductName())
-                        .productPrice(sku.getPrice())
-                        .productQuantity(item.getQuantity())
-                        .productSkuId(item.getProductSkuId())
-                        .productAttr(item.getProductAttr())
-                        .productSkuCode(sku.getSkuCode())
-                        .build();
+                                                     .orderId(orderId)
+                                                     .productId(item.getProductId())
+                                                     .orderItemId(IdWorker.generateId())
+                                                     .orderSn(orderSn)
+                                                     .productPic(sku.getPic())
+                                                     .pdtCgyId(product.getPdtCgyId())
+                                                     .productName(product.getProductName())
+                                                     .productPrice(sku.getPrice())
+                                                     .productQuantity(item.getQuantity())
+                                                     .productSkuId(item.getProductSkuId())
+                                                     .productAttr(item.getProductAttr())
+                                                     .productSkuCode(sku.getSkuCode())
+                                                     .build();
                 orderItems.add(orderItem);
 
                 totalAmount += productPrice;
@@ -369,7 +382,9 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
     @Override
     public List<PmsProduct> partnerProduct(Long productId, Integer pageSize) {
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery().eq(UmsPartner::getUserId, userId).eq(UmsPartner::getDeleted, 0));
+        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery()
+                                                                .eq(UmsPartner::getUserId, userId)
+                                                                .eq(UmsPartner::getDeleted, 0));
         if (BlankUtil.isEmpty(umsPartner)) {
             return new ArrayList<>(0);
         }

@@ -34,7 +34,7 @@ public class UmsAddressParam implements Serializable {
 
     @ApiModelProperty(value = "联系电话",required = true)
     @NotBlank
-    @Pattern(regexp = "^[1][3,4,5,6,7,8,9][0-9]{9}$")
+    @Pattern(regexp = "^[1][3-9][0-9]{9}$")
     private String phone;
 
     @ApiModelProperty(value = "一级地址省编码",required = true)
