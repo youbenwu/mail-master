@@ -6,7 +6,6 @@ import com.ys.mail.exception.code.IErrorCode;
 import com.ys.mail.util.BlankUtil;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 /**
  * 断言处理类
@@ -87,4 +86,29 @@ public class ApiAssert {
             throw new BusinessException(errorCode);
         }
     }
+
+    /**
+     * 如果为true则抛出异常
+     *
+     * @param condition 条件，如 3 > 2 等表达式
+     * @param errorCode 异常码
+     */
+    public static <T> void isTrue(boolean condition, IErrorCode errorCode) {
+        if (condition) {
+            throw new BusinessException(errorCode);
+        }
+    }
+
+    /**
+     * 如果为false则抛出异常
+     *
+     * @param condition 条件，如 3 > 5 等表达式
+     * @param errorCode 异常码
+     */
+    public static <T> void isFalse(boolean condition, IErrorCode errorCode) {
+        if (!condition) {
+            throw new BusinessException(errorCode);
+        }
+    }
+
 }
