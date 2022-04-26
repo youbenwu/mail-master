@@ -126,6 +126,9 @@ public class ProductInfoDTO implements Serializable {
     @ApiModelProperty(value = "详情描述")
     private String detailTitle;
 
+    @ApiModelProperty(value = "用户购买须知")
+    private String purchaseNote;
+
     @ApiModelProperty(value = "详情页,富文本")
     private String detailDesc;
 

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.UmsPartnerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.UmsPartner">
+        <id column="partner_id" property="partnerId" />
+        <result column="user_id" property="userId" />
+        <result column="real_name" property="realName" />
+        <result column="idy_card" property="idyCard" />
+        <result column="idy_front" property="idyFront" />
+        <result column="idy_reverse" property="idyReverse" />
+        <result column="corporate_name" property="corporateName" />
+        <result column="uniform_social_credit_code" property="uniformSocialCreditCode" />
+        <result column="position" property="position" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="region" property="region" />
+        <result column="address" property="address" />
+        <result column="latitude" property="latitude" />
+        <result column="longitude" property="longitude" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="PartnerAddressMap" type="com.ys.mail.model.dto.PartnerAddressDTO">
+        <result column="partner_id" property="partnerId"/>
+        <result column="phone" property="phone"/>
+        <result column="fullAddress" property="fullAddress"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        partner_id, user_id, real_name, idy_card, idy_front, idy_reverse, corporate_name, uniform_social_credit_code, position, phone, email, create_time, update_time, province, city, region, address, latitude, longitude, deleted
+    </sql>
+
+    <select id="getAddressByProductId" resultMap="PartnerAddressMap">
+        SELECT
+                up.partner_id,up.phone,
+                CONCAT(up.province,up.region,up.address) AS fullAddress
+        FROM
+                pms_product pp INNER JOIN ums_partner up ON pp.partner_id = up.partner_id
+        WHERE pp.product_id = #{productId}
+    </select>
+
+</mapper>

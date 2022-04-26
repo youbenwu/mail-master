@@ -15,7 +15,8 @@ public enum CommonResultCode implements IErrorCode {
     UNAUTHORIZED(406, "暂未登录或token已经过期"),
     FREQUENT_REQUEST(407, "频繁请求"),
     NOT_SENIOR_USER(408, "不是高级用户"),
-    ILLEGAL_REQUEST(409, "非法请求"),
+    ILLEGAL_REQUEST(409, "非法操作"),
+    ID_NO_EXIST(410, "ID不存在"),
 
     VALIDATE_FAILED(1001, "参数检验失败"),
     REQUEST_PARAM_ISEMPTY(1002, "请求参数不允许为空"),

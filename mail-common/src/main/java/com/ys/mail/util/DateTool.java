@@ -41,6 +41,14 @@ public class DateTool {
         return isThisTime(time, "yyyy-MM-dd");
     }
 
+    public static boolean isToday(Date date) {
+        if (BlankUtil.isEmpty(date)) {
+            return false;
+        }
+        long time = date.getTime();
+        return isToday(time);
+    }
+
     /**
      * 获取当天日期字符串，不带时间
      *
@@ -65,8 +73,8 @@ public class DateTool {
     public static boolean isThisTime(long time, String pattern) {
         Date date = new Date(time);
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        String param = sdf.format(date);//参数时间
-        String now = sdf.format(new Date());//当前时间
+        String param = sdf.format(date);
+        String now = sdf.format(new Date());
         return param.equals(now);
     }
 

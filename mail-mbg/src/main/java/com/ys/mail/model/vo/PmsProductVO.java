@@ -21,7 +21,7 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="PmsProduct对象", description="商品信息表")
+@ApiModel(value = "PmsProduct对象", description = "商品信息表")
 public class PmsProductVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -129,12 +129,15 @@ public class PmsProductVO implements Serializable {
     @ApiModelProperty(value = "详情页,富文本")
     private String detailDesc;
 
+    @ApiModelProperty(value = "用户购买须知")
+    private String purchaseNote;
+
     @ApiModelProperty(value = "促销开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date promotionStartTime;
 
     @ApiModelProperty(value = "促销结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date promotionEndTime;
 
     @ApiModelProperty(value = "活动限购数量")
@@ -145,12 +148,12 @@ public class PmsProductVO implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
     @TableField(fill = FieldFill.UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     @ApiModelProperty(value = "逻辑删除：0->未删除,1->删除")

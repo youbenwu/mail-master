@@ -5,6 +5,9 @@ import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.IErrorCode;
 import com.ys.mail.util.BlankUtil;
 
+import java.util.Objects;
+import java.util.function.Supplier;
+
 /**
  * 断言处理类
  *
@@ -20,18 +23,68 @@ public class ApiAssert {
         throw new ApiException(errorCode);
     }
 
-    public static <T> void fail(T t, IErrorCode errorCode) {
-        if (BlankUtil.isEmpty(t)) {
-            throw new ApiException(errorCode);
-        }
-    }
-
     public static <T> void fail(T t1, T t2, IErrorCode errorCode) {
         if (BlankUtil.isEmpty(t1) || BlankUtil.isEmpty(t2)) {
             throw new ApiException(BusinessErrorCode.NPE_PARAM);
         }
         if (!t1.equals(t2)) {
             throw new ApiException(errorCode);
+        }
+    }
+
+    /**
+     * 当数据有值时抛出异常
+     *
+     * @param t         数据对象
+     * @param errorCode 异常码
+     */
+    public static <T> void haveValue(T t, IErrorCode errorCode) {
+        if (BlankUtil.isNotEmpty(t)) {
+            throw new BusinessException(errorCode);
+        }
+    }
+
+    /**
+     * 当数据无值时抛出异常
+     *
+     * @param t         数据对象
+     * @param errorCode 异常码
+     */
+    public static <T> void noValue(T t, IErrorCode errorCode) {
+        if (BlankUtil.isEmpty(t)) {
+            throw new BusinessException(errorCode);
+        }
+    }
+
+    /**
+     * {t1}与{t2}相等则抛出异常
+     *
+     * @param t1        数据t1
+     * @param t2        数据t2
+     * @param errorCode 异常码
+     */
+    public static <T> void eq(T t1, T t2, IErrorCode errorCode) {
+        if (BlankUtil.isEmpty(t1) || BlankUtil.isEmpty(t2)) {
+            throw new BusinessException(BusinessErrorCode.NPE_PARAM);
+        }
+        if (Objects.equals(t1, t2)) {
+            throw new BusinessException(errorCode);
+        }
+    }
+
+    /**
+     * {t1}与{t2}不相等则抛出异常
+     *
+     * @param t1        数据t1
+     * @param t2        数据t2
+     * @param errorCode 异常码
+     */
+    public static <T> void noEq(T t1, T t2, IErrorCode errorCode) {
+        if (BlankUtil.isEmpty(t1) || BlankUtil.isEmpty(t2)) {
+            throw new BusinessException(BusinessErrorCode.NPE_PARAM);
+        }
+        if (!Objects.equals(t1, t2)) {
+            throw new BusinessException(errorCode);
         }
     }
 }

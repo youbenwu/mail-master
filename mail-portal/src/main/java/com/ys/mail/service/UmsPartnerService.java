@@ -8,6 +8,7 @@ import com.ys.mail.model.admin.query.DetailQuery;
 import com.ys.mail.model.admin.query.Query;
 import com.ys.mail.model.dto.OrderDetailDto;
 import com.ys.mail.model.dto.OrderInfoDTO;
+import com.ys.mail.model.dto.PartnerAddressDTO;
 import com.ys.mail.model.vo.ElectronicVo;
 import com.ys.mail.model.vo.MerchandiseVo;
 import com.ys.mail.model.vo.PartnerTodayResultsVO;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author 070
@@ -39,4 +40,6 @@ public interface UmsPartnerService extends IService<UmsPartner> {
     CommonResult<PmsVerificationRecords> verificationList(Query query);
 
     CommonResult<OrderInfoDTO> orderDetail(Long orderId);
+
+    PartnerAddressDTO getAddressByProductId(Long productId);
 }

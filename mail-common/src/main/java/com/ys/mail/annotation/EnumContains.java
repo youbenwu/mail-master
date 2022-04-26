@@ -15,9 +15,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * @Desc 自动校验枚举类型
- * @Author CRH
- * @Create 2022-03-01 12:23
+ * 自动校验枚举类型
+ *
+ * @author CRH
+ * @date 2022-04-26 14:21
+ * @since 1.0
  */
 @Documented
 @Target({ElementType.FIELD, ElementType.PARAMETER})
@@ -28,7 +30,7 @@ public @interface EnumContains {
     /**
      * 错误提示
      */
-    String message() default "Enum Type Error";
+    String message() default " enum type error";
 
     /**
      * 必须的属性
@@ -80,13 +82,19 @@ public @interface EnumContains {
         public boolean isValid(Object key, ConstraintValidatorContext constraintValidatorContext) {
             // 先判断是否被排除，当已经排除了则无法再进行匹配
             if (include.length == 0) {
-                for (String s : exclude) if (StringUtil.compareKey(s, key)) return false;
+                for (String s : exclude) {
+                    if (StringUtil.compareKey(s, key)) {
+                        return false;
+                    }
+                }
             }
             // 仅包含判断
             if (include.length > 0) {
                 List<String> tempList = Arrays.asList(include);
                 boolean contains = tempList.contains(Objects.toString(key));
-                if (!contains) return false;
+                if (!contains) {
+                    return false;
+                }
             }
             // 实际类型匹配
             boolean contains = EnumTool.contains(enumClass, "", key);

@@ -9,7 +9,7 @@ public enum BusinessErrorCode implements IErrorCode {
     // 后三位1开头与商品有关
     RESPONSE_SUCCESS(200, "操作成功"),
 
-    NPE_PARAM(400000, "数据异常"),
+    NPE_PARAM(400000, "参数异常"),
     GOODS_NOT_EXIST(400100, "商品不存在"),
     GOODS_STOCK_EMPTY(400101, "商品库存不足"),
     GOODS_STOCK_DEDUCT_FAILED(400102, "商品库存扣减失败"),
@@ -70,6 +70,13 @@ public enum BusinessErrorCode implements IErrorCode {
     NOT_PARTNER_EARNEST_MONEY(400222, "合伙人保证金错误"),
     NOT_PARTNER_PRICE(400223, "合伙人金额错误"),
     NOT_ROLE_ONE_USER(400224, "合伙人金额错误"),
+
+    STORE_NAME_EXIST(400225, "店铺名称已存在"),
+    USER_STORE_EXIST(400226, "不能重复添加店铺"),
+    USER_STORE_NO_EXIST(400227, "还未添加店铺"),
+    USER_STORE_REVIEWING(400228, "店铺信息审核中"),
+    USER_STORE_REVIEWED(400229, "当天已经审核过"),
+
     ;
 
     private int code;

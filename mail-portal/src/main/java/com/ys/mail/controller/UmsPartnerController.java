@@ -7,11 +7,13 @@ import com.ys.mail.model.admin.query.DetailQuery;
 import com.ys.mail.model.admin.query.Query;
 import com.ys.mail.model.dto.OrderDetailDto;
 import com.ys.mail.model.dto.OrderInfoDTO;
+import com.ys.mail.model.dto.PartnerAddressDTO;
 import com.ys.mail.model.vo.ElectronicVo;
 import com.ys.mail.model.vo.MerchandiseVo;
 import com.ys.mail.model.vo.PartnerTodayResultsVO;
 import com.ys.mail.service.UmsPartnerService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -86,5 +88,12 @@ public class UmsPartnerController {
         return partnerService.orderDetail(orderId);
     }
 
+    @GetMapping("/product/{productId}")
+    @ApiOperation("根据商品ID获取供应商信息")
+    @ApiImplicitParam(name = "productId", value = "合伙人商品ID", dataType = "Long")
+    public CommonResult<PartnerAddressDTO> getAddressByProductId(@PathVariable Long productId) {
+        PartnerAddressDTO result = partnerService.getAddressByProductId(productId);
+        return CommonResult.success(result);
+    }
 
 }

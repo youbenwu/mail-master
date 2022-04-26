@@ -1,29 +1,11 @@
 package com.ys.mail.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.ys.mail.entity.UmsUser;
-import com.ys.mail.entity.UmsUserPaymentCode;
-import com.ys.mail.exception.code.CommonResultCode;
-import com.ys.mail.mapper.UmsUserPaymentCodeMapper;
-import com.ys.mail.model.CommonResult;
-import com.ys.mail.model.param.UserTemPayCodeParam;
-import com.ys.mail.service.RedisService;
-import com.ys.mail.service.UmsUserPaymentCodeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ys.mail.util.AesUtil;
-import com.ys.mail.util.BlankUtil;
-import com.ys.mail.util.IdWorker;
-import com.ys.mail.util.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.ys.mail.entity.UmsUserPaymentCode;
+import com.ys.mail.mapper.UmsUserPaymentCodeMapper;
+import com.ys.mail.service.UmsUserPaymentCodeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * <p>

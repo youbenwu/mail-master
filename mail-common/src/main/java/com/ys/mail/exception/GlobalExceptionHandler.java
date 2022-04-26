@@ -32,15 +32,28 @@ import java.io.StringWriter;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @ResponseBody
     @ExceptionHandler(value = ApiException.class)
-    public CommonResult<Object> handle(ApiException e) {
+    public CommonResult<String> handler(ApiException e) {
+        e.printStackTrace();
         if (e.getErrorCode() != null) {
             return CommonResult.failed(e.getErrorCode());
         }
         return CommonResult.failed(e.getMessage());
+    }
+
+    @ResponseBody
+    @ExceptionHandler(value = BusinessException.class)
+    public CommonResult<String> handler(BusinessException e) {
+        String message = e.getMessage();
+        if (e.getErrorCode() != null) {
+            logger.warn("【业务异常】-[异常编码:{}]-[异常结果:{}]", e.getErrorCode().getCode(), message);
+            return CommonResult.failed(e.getErrorCode(), message);
+        }
+        logger.warn("【业务异常】-[异常结果:{}]", message);
+        return CommonResult.failed(message);
     }
 
     @ResponseBody
@@ -109,17 +122,6 @@ public class GlobalExceptionHandler {
         ex.printStackTrace();
         return errorResult;
     }
-
-
-    /*@ExceptionHandler(UtilException.class)
-    @ResponseBody
-    public CommonResult<String> utilExceptionHandler(UtilException e) {
-        String message = e.getMessage();
-        if(!StringUtils.isEmpty(message)){
-            message=message.substring(message.lastIndexOf(".")+1);
-        }
-        return CommonResult.urlFailed(message,null);
-    }*/
 
     /**
      * 处理请求参数格式错误 @RequestParam上validate失败后抛出的异常是javax.validation.ConstraintViolationException

@@ -14,6 +14,7 @@ import com.ys.mail.model.admin.query.DetailQuery;
 import com.ys.mail.model.admin.query.Query;
 import com.ys.mail.model.dto.OrderDetailDto;
 import com.ys.mail.model.dto.OrderInfoDTO;
+import com.ys.mail.model.dto.PartnerAddressDTO;
 import com.ys.mail.model.dto.VerifyDto;
 import com.ys.mail.model.vo.ElectronicVo;
 import com.ys.mail.model.vo.MerchandiseVo;
@@ -73,7 +74,9 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     public CommonResult<PartnerTodayResultsVO> todayResults() {
         // 1. 首先要是合伙人
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery().eq(UmsPartner::getUserId, userId).eq(UmsPartner::getDeleted, 0));
+        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery()
+                                                                .eq(UmsPartner::getUserId, userId)
+                                                                .eq(UmsPartner::getDeleted, 0));
         if (ObjectUtils.isEmpty(umsPartner)) {
             return CommonResult.failed("您还不是合伙人");
         }
@@ -91,7 +94,8 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
             Long totalAmount = vo.getTotalAmount();
             // 均价
             if (totalAmount != null) {
-                BigDecimal divide = BigDecimal.valueOf(totalAmount).divide(BigDecimal.valueOf(orderNumber), 0, RoundingMode.DOWN);
+                BigDecimal divide = BigDecimal.valueOf(totalAmount)
+                                              .divide(BigDecimal.valueOf(orderNumber), 0, RoundingMode.DOWN);
                 vo.setAvgPrice(divide.longValue());
                 // 访客数 todo:访客数暂时等于订单数
             } else {
@@ -109,14 +113,17 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Override
     public CommonResult<MerchandiseVo> merchandise(Query query) {
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery().eq(UmsPartner::getUserId, userId).eq(UmsPartner::getDeleted, 0));
+        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery()
+                                                                .eq(UmsPartner::getUserId, userId)
+                                                                .eq(UmsPartner::getDeleted, 0));
         if (ObjectUtils.isEmpty(umsPartner)) {
             return CommonResult.failed("您还不是合伙人");
         }
         // 得到合伙人id
         Long partnerId = umsPartner.getPartnerId();
         IPage<PmsProduct> iPage = new Page<>(query.getPageNum(), query.getPageSize());
-        iPage = productMapper.selectPage(iPage, Wrappers.<PmsProduct>lambdaQuery().eq(PmsProduct::getPartnerId, partnerId));
+        iPage = productMapper.selectPage(iPage, Wrappers.<PmsProduct>lambdaQuery()
+                                                        .eq(PmsProduct::getPartnerId, partnerId));
         List<MerchandiseVo> voList = new ArrayList<>();
         iPage.getRecords().forEach(obj -> {
             MerchandiseVo vo = new MerchandiseVo();
@@ -132,7 +139,9 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Override
     public CommonResult<ElectronicVo> electronic(Query query) {
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery().eq(UmsPartner::getUserId, userId).eq(UmsPartner::getDeleted, 0));
+        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery()
+                                                                .eq(UmsPartner::getUserId, userId)
+                                                                .eq(UmsPartner::getDeleted, 0));
         if (ObjectUtils.isEmpty(umsPartner)) {
             return CommonResult.failed("您还不是合伙人");
         }
@@ -156,7 +165,8 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
             return CommonResult.failed("没有核销码信息");
         }
 
-        PmsVerificationCode verificationCode = verificationCodeMapper.selectOne(Wrappers.<PmsVerificationCode>lambdaQuery()
+        PmsVerificationCode verificationCode = verificationCodeMapper.selectOne(Wrappers
+                .<PmsVerificationCode>lambdaQuery()
                 .eq(PmsVerificationCode::getCode, code));
         if (ObjectUtils.isEmpty(verificationCode)) {
             return CommonResult.failed("没有核销码信息");
@@ -171,7 +181,7 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
         } else if (isStatus.equals(PmsVerificationCode.CODE_STATUS_ZERO)) {
             PmsVerificationRecords records = new PmsVerificationRecords();
             UmsPartner umsPartner = partnerMapper.selectById(verificationCode.getPartnerId());
-            if (ObjectUtils.isEmpty(umsPartner)){
+            if (ObjectUtils.isEmpty(umsPartner)) {
                 return CommonResult.failed("没有合伙人信息");
             }
             Long userId = umsPartner.getUserId();
@@ -205,7 +215,7 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
             BigDecimal divide = BigDecimal.valueOf(productPrice);
             // {收益}---------并发
             UmsIncome newest = umsIncomeMapper.selectNewestByUserId(userId);
-            if(newest!=null) {
+            if (newest != null) {
                 Date createTime = newest.getCreateTime();
                 Date now = new Date();
 
@@ -219,11 +229,11 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
             }
 
             // 收益表.(最新)今日收益
-            Long todayIncome = newest!=null?newest.getTodayIncome():0L;
+            Long todayIncome = newest != null ? newest.getTodayIncome() : 0L;
             // 收益表.(最新)总收益
-            Long allIncome   = newest!=null?newest.getAllIncome():0L;
+            Long allIncome = newest != null ? newest.getAllIncome() : 0L;
             // 收益表.(最新)结余
-            Long balance     = newest!=null?newest.getBalance():0L;
+            Long balance = newest != null ? newest.getBalance() : 0L;
 
             // Bg.(最新)今日收益
             BigDecimal todayIncomeBg = new BigDecimal(todayIncome);
@@ -259,7 +269,7 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
             // 来源
             umsIncome.setDetailSource("核销收入");
             // 备注
-            umsIncome.setRemark("核销收入-产生的金额总值:{"+productPrice+"}");
+            umsIncome.setRemark("核销收入-产生的金额总值:{" + productPrice + "}");
             umsIncomeMapper.insert(umsIncome);
 
         }
@@ -269,7 +279,9 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Override
     public CommonResult<PmsVerificationRecords> queryDetail(DetailQuery query) {
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery().eq(UmsPartner::getUserId, userId).eq(UmsPartner::getDeleted, 0));
+        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery()
+                                                                .eq(UmsPartner::getUserId, userId)
+                                                                .eq(UmsPartner::getDeleted, 0));
         if (ObjectUtils.isEmpty(umsPartner)) {
             return PageCommonResult.failed("您还不是合伙人");
         }
@@ -282,7 +294,7 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
         Calendar c = Calendar.getInstance();
         c.add(Calendar.MONTH, month);
         c.set(Calendar.YEAR, query.getYear());
-        c.set(Calendar.DAY_OF_MONTH,1);//设置为1号,当前日期既为本月第一天
+        c.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
         String first = format.format(c.getTime());
 
         //获取当前月最后一天
@@ -294,9 +306,9 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
 
         IPage<PmsVerificationRecords> ipage = new Page<>(query.getPageNum(), query.getPageSize());
         ipage = verificationRecordsMapper.selectPage(ipage, Wrappers.<PmsVerificationRecords>lambdaQuery()
-                .eq(PmsVerificationRecords::getPartnerId, partnerId)
-                .between(PmsVerificationRecords::getCreateTime, first, last)
-                .orderByDesc(PmsVerificationRecords::getCreateTime));
+                                                                    .eq(PmsVerificationRecords::getPartnerId, partnerId)
+                                                                    .between(PmsVerificationRecords::getCreateTime, first, last)
+                                                                    .orderByDesc(PmsVerificationRecords::getCreateTime));
         PageCommonResult result = new PageCommonResult(query.getPageNum(), query.getPageSize(), (int) ipage.getTotal());
         result.setMessage("操作成功");
         result.setData(ipage.getRecords());
@@ -306,7 +318,8 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Override
     public CommonResult<OrderDetailDto> verifDetail(Long recordId) {
         OrderDetailDto dto = verificationRecordsMapper.selectOrderDetail(recordId);
-        PmsVerificationCode verificationCode = verificationCodeMapper.selectOne(Wrappers.<PmsVerificationCode>lambdaQuery().eq(PmsVerificationCode::getCode, dto.getCode()));
+        PmsVerificationCode verificationCode = verificationCodeMapper.selectOne(Wrappers
+                .<PmsVerificationCode>lambdaQuery().eq(PmsVerificationCode::getCode, dto.getCode()));
         dto.setStatus(verificationCode.getIsStatus());
         return CommonResult.success(dto);
     }
@@ -314,14 +327,17 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Override
     public CommonResult<PmsVerificationRecords> verificationList(Query query) {
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery().eq(UmsPartner::getUserId, userId).eq(UmsPartner::getDeleted, 0));
+        UmsPartner umsPartner = partnerMapper.selectOne(Wrappers.<UmsPartner>lambdaQuery()
+                                                                .eq(UmsPartner::getUserId, userId)
+                                                                .eq(UmsPartner::getDeleted, 0));
         if (ObjectUtils.isEmpty(umsPartner)) {
             return PageCommonResult.failed("您还不是合伙人");
         }
         // 得到合伙人id
         Long partnerId = umsPartner.getPartnerId();
         IPage<PmsVerificationRecords> iPage = new Page<>(query.getPageNum(), query.getPageSize());
-        iPage = verificationRecordsMapper.selectPage(iPage, Wrappers.<PmsVerificationRecords>lambdaQuery().eq(PmsVerificationRecords::getPartnerId, partnerId));
+        iPage = verificationRecordsMapper.selectPage(iPage, Wrappers.<PmsVerificationRecords>lambdaQuery()
+                                                                    .eq(PmsVerificationRecords::getPartnerId, partnerId));
         PageCommonResult result = new PageCommonResult(query.getPageNum(), query.getPageSize(), (int) iPage.getTotal());
         result.setMessage("操作成功");
         result.setData(iPage.getRecords());
@@ -331,15 +347,16 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Override
     public CommonResult<OrderInfoDTO> orderDetail(Long orderId) {
         OmsOrder order = orderService.getById(orderId);
-        if (ObjectUtils.isEmpty(order)){
+        if (ObjectUtils.isEmpty(order)) {
             return CommonResult.failed("无此订单信息");
         }
         OrderInfoDTO dto = new OrderInfoDTO();
 
         // 商品核销码信息
-        OmsVerificationOrder verificationOrder = verificationOrderMapper.selectOne(Wrappers.<OmsVerificationOrder>lambdaQuery()
+        OmsVerificationOrder verificationOrder = verificationOrderMapper.selectOne(Wrappers
+                .<OmsVerificationOrder>lambdaQuery()
                 .eq(OmsVerificationOrder::getOrderId, order.getOrderSn()));
-        if (ObjectUtils.isNotEmpty(verificationOrder)){
+        if (ObjectUtils.isNotEmpty(verificationOrder)) {
             PmsVerificationCode verificationCode = verificationCodeMapper.selectById(verificationOrder.getVerificationId());
             dto.setCode(verificationCode.getCode());
             dto.setIsStatus(verificationCode.getIsStatus().toString());
@@ -347,13 +364,14 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
 
         // 商品合伙人信息
         UmsPartner umsPartner = umsPartnerMapper.selectById(order.getPartnerId());
-        if (ObjectUtils.isNotEmpty(umsPartner)){
-            BeanUtils.copyProperties(umsPartner,dto);
+        if (ObjectUtils.isNotEmpty(umsPartner)) {
+            BeanUtils.copyProperties(umsPartner, dto);
         }
 
         BeanUtils.copyProperties(order, dto);
         // dto.setKdName(order);
-        List<OmsOrderItem> omsOrderItemList = omsOrderItemMapper.selectList(Wrappers.<OmsOrderItem>lambdaQuery().eq(OmsOrderItem::getOrderId, order.getOrderId()));
+        List<OmsOrderItem> omsOrderItemList = omsOrderItemMapper.selectList(Wrappers.<OmsOrderItem>lambdaQuery()
+                                                                                    .eq(OmsOrderItem::getOrderId, order.getOrderId()));
         List<OrderItemDetailsVO> voList = new ArrayList<>();
         if (ObjectUtils.isNotEmpty(omsOrderItemList)) {
             for (OmsOrderItem orderItem : omsOrderItemList) {
@@ -365,5 +383,10 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
         }
         dto.setOmsOrderItem(voList);
         return CommonResult.success(dto);
+    }
+
+    @Override
+    public PartnerAddressDTO getAddressByProductId(Long productId) {
+        return umsPartnerMapper.getAddressByProductId(productId);
     }
 }
