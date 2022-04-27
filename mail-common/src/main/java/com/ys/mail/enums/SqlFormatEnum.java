@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum EnumSqlFormat {
+public enum SqlFormatEnum {
 
     /**
      * 年月日

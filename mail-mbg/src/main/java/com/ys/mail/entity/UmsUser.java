@@ -95,11 +95,11 @@ public class UmsUser implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
-    @ApiModelProperty(value = "上级id")
+    @ApiModelProperty(value = "上级id（暂不用）")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long parentId;
 
-    @ApiModelProperty(value = "邀请时间", notes = "注意：只能在邀请时主动更新一次，之后不能再更新")
+    @ApiModelProperty(value = "邀请时间（暂不用）", notes = "注意：只能在邀请时主动更新一次，之后不能再更新")
     private Date inviteTime;
 
     /**

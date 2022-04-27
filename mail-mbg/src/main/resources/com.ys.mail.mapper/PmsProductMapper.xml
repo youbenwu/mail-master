@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ys.mail.mapper.PmsProductMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ys.mail.entity.PmsProduct">
+        <id column="product_id" property="productId" />
+        <result column="brand_id" property="brandId" />
+        <result column="pdt_cgy_id" property="pdtCgyId" />
+        <result column="freight_template_id" property="freightTemplateId" />
+        <result column="pdt_attribute_cgy_id" property="pdtAttributeCgyId" />
+        <result column="product_name" property="productName" />
+        <result column="pic" property="pic" />
+        <result column="product_sn" property="productSn" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="is_new_status" property="newStatus" />
+        <result column="is_recommend_status" property="recommendStatus" />
+        <result column="is_verify_status" property="verifyStatus" />
+        <result column="sort" property="sort" />
+        <result column="sale" property="sale" />
+        <result column="price" property="price" />
+        <result column="promotion_price" property="promotionPrice" />
+        <result column="gift_growth" property="giftGrowth" />
+        <result column="gift_point" property="giftPoint" />
+        <result column="use_point_limit" property="usePointLimit" />
+        <result column="sub_title" property="subTitle" />
+        <result column="description" property="description" />
+        <result column="original_price" property="originalPrice" />
+        <result column="stock" property="stock" />
+        <result column="low_stock" property="lowStock" />
+        <result column="unit" property="unit" />
+        <result column="weight" property="weight" />
+        <result column="preview_status" property="previewStatus" />
+        <result column="service_ids" property="serviceIds" />
+        <result column="album_pics" property="albumPics" />
+        <result column="detail_title" property="detailTitle" />
+        <result column="detail_desc" property="detailDesc" />
+        <result column="purchase_note" property="purchaseNote" />
+        <result column="promotion_start_time" property="promotionStartTime" />
+        <result column="promotion_end_time" property="promotionEndTime" />
+        <result column="promotion_per_limit" property="promotionPerLimit" />
+        <result column="promotion_type" property="promotionType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="is_handpick_status" property="handpickStatus"/>
+        <result column="is_delicacy_status" property="delicacyStatus"/>
+        <result column="is_style_status" property="styleStatus"/>
+        <result column="is_live_status" property="liveStatus"/>
+        <result column="comment_sum" property="commentSum"/>
+        <result column="partner_id" property="partnerId"/>
+        <result column="meb_price" property="mebPrice"/>
+        <result column="dis_count" property="disCount"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.PmsProductVO">
+        <id column="product_id" property="productId" />
+        <result column="brand_id" property="brandId" />
+        <result column="pdt_cgy_id" property="pdtCgyId" />
+        <result column="freight_template_id" property="freightTemplateId" />
+        <result column="pdt_attribute_cgy_id" property="pdtAttributeCgyId" />
+        <result column="product_name" property="productName" />
+        <result column="pic" property="pic" />
+        <result column="product_sn" property="productSn" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="is_new_status" property="newStatus" />
+        <result column="is_recommend_status" property="recommendStatus" />
+        <result column="is_verify_status" property="verifyStatus" />
+        <result column="sort" property="sort" />
+        <result column="sale" property="sale" />
+        <result column="price" property="price" />
+        <result column="promotion_price" property="promotionPrice" />
+        <result column="gift_growth" property="giftGrowth" />
+        <result column="gift_point" property="giftPoint" />
+        <result column="use_point_limit" property="usePointLimit" />
+        <result column="sub_title" property="subTitle" />
+        <result column="description" property="description" />
+        <result column="original_price" property="originalPrice" />
+        <result column="stock" property="stock" />
+        <result column="low_stock" property="lowStock" />
+        <result column="unit" property="unit" />
+        <result column="weight" property="weight" />
+        <result column="preview_status" property="previewStatus" />
+        <result column="service_ids" property="serviceIds" />
+        <result column="album_pics" property="albumPics" />
+        <result column="detail_title" property="detailTitle" />
+        <result column="detail_desc" property="detailDesc" />
+        <result column="purchase_note" property="purchaseNote" />
+        <result column="promotion_start_time" property="promotionStartTime" />
+        <result column="promotion_end_time" property="promotionEndTime" />
+        <result column="promotion_per_limit" property="promotionPerLimit" />
+        <result column="promotion_type" property="promotionType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="is_handpick_status" property="handpickStatus"/>
+        <result column="is_delicacy_status" property="delicacyStatus"/>
+        <result column="is_style_status" property="styleStatus"/>
+        <result column="is_live_status" property="liveStatus"/>
+        <result column="comment_sum" property="commentSum"/>
+        <result column="brand_name" property="brandName"/>
+        <result column="pdt_cgy_name" property="pdtCgyName"/>
+        <result column="pdt_attribute_name" property="pdtAttributeName"/>
+        <result column="meb_price" property="mebPrice"/>
+        <result column="dis_count" property="disCount"/>
+    </resultMap>
+
+    <resultMap id="DtoResultMap" type="com.ys.mail.model.dto.ProductInfoDTO">
+        <id column="product_id" property="productId" />
+        <result column="brand_id" property="brandId" />
+        <result column="pdt_cgy_id" property="pdtCgyId" />
+        <result column="freight_template_id" property="freightTemplateId" />
+        <result column="pdt_attribute_cgy_id" property="pdtAttributeCgyId" />
+        <result column="product_name" property="productName" />
+        <result column="pic" property="pic" />
+        <result column="product_sn" property="productSn" />
+        <result column="is_publish_status" property="publishStatus" />
+        <result column="is_new_status" property="newStatus" />
+        <result column="is_recommend_status" property="recommendStatus" />
+        <result column="is_verify_status" property="verifyStatus" />
+        <result column="sort" property="sort" />
+        <result column="sale" property="sale" />
+        <result column="price" property="price" />
+        <result column="promotion_price" property="promotionPrice" />
+        <result column="gift_growth" property="giftGrowth" />
+        <result column="gift_point" property="giftPoint" />
+        <result column="use_point_limit" property="usePointLimit" />
+        <result column="sub_title" property="subTitle" />
+        <result column="description" property="description" />
+        <result column="original_price" property="originalPrice" />
+        <result column="stock" property="stock" />
+        <result column="low_stock" property="lowStock" />
+        <result column="unit" property="unit" />
+        <result column="weight" property="weight" />
+        <result column="preview_status" property="previewStatus" />
+        <result column="service_ids" property="serviceIds" />
+        <result column="album_pics" property="albumPics" />
+        <result column="detail_title" property="detailTitle" />
+        <result column="detail_desc" property="detailDesc" />
+        <result column="purchase_note" property="purchaseNote" />
+        <result column="promotion_start_time" property="promotionStartTime" />
+        <result column="promotion_end_time" property="promotionEndTime" />
+        <result column="promotion_per_limit" property="promotionPerLimit" />
+        <result column="promotion_type" property="promotionType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="is_handpick_status" property="handpickStatus"/>
+        <result column="is_delicacy_status" property="delicacyStatus"/>
+        <result column="is_style_status" property="styleStatus"/>
+        <result column="is_live_status" property="liveStatus"/>
+        <result column="comment_sum" property="commentSum"/>
+        <result column="meb_price" property="mebPrice"/>
+        <result column="dis_count" property="disCount"/>
+        
+        <collection property="pmsProductAttributes" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="pdt_attribute_cgy_id"
+            select="com.ys.mail.mapper.PmsProductAttributeMapper.selectByPdtAttributeCgyId"
+        />
+
+        <collection property="productComments" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="product_id"
+            select="com.ys.mail.mapper.PmsProductCommentMapper.selectOneProductId"
+        />
+    </resultMap>
+
+    <resultMap id="PdtCollectResultMap" type="com.ys.mail.model.dto.ProductCollectDTO">
+        <id column="pdt_collect_id" property="pdtCollectId"/>
+        <result column="user_id" property="userId"/>
+        <result column="create_time" property="createTime"/>
+
+        <association property="product" javaType="com.ys.mail.entity.PmsProduct" columnPrefix="pp_">
+            <id column="product_id" property="productId"/>
+            <result column="product_name" property="productName"/>
+            <result column="pic" property="pic"/>
+            <result column="price" property="price"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        product_id, brand_id, pdt_cgy_id, freight_template_id, pdt_attribute_cgy_id, product_name,
+        pic, product_sn, is_publish_status, is_new_status, is_recommend_status, is_verify_status,
+        sort, sale, price, promotion_price, gift_growth, gift_point, use_point_limit, sub_title,
+        description, original_price, stock, low_stock, unit, weight, preview_status, service_ids,
+        album_pics, detail_title, detail_desc, purchase_note,promotion_start_time, promotion_end_time, promotion_per_limit,
+        promotion_type, create_time, update_time, deleted,is_handpick_status,is_delicacy_status,
+        is_style_status,is_live_status,comment_sum,partner_id,meb_price,dis_count
+    </sql>
+    <insert id="saveCollectProduct">
+        insert into ums_product_collect(pdt_collect_id,user_id,product_id,create_time)
+        values (#{pdtCollectId},#{userId},#{productId},now());
+    </insert>
+
+    <delete id="delCollectProduct">
+        delete from ums_product_collect
+        where pdt_collect_id = #{pdtCollectId};
+    </delete>
+    <delete id="batchCollectDel">
+        delete from ums_product_collect where pdt_collect_id in
+        <foreach collection="ids" open="(" close=")"  separator="," item="item">
+             #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectAllProduct" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        FROM pms_product
+        <where>
+            <if test="productId != 0">
+                product_id <![CDATA[ < ]]>  #{productId}
+            </if>
+            and deleted = 0
+            and is_publish_status = 1
+        </where>
+        order by product_id desc
+        limit 20;
+    </select>
+
+    <select id="selectProductPick" resultType="com.ys.mail.entity.PmsProduct">
+        select
+            p.product_id,p.brand_id,p.pdt_cgy_id,p.freight_template_id,p.pdt_attribute_cgy_id,p.product_name,
+               p.pic,p.product_sn,p.is_publish_status,p.is_new_status,p.is_recommend_status,p.is_verify_status,
+               p.sort,p.sale,p.price,p.promotion_price,p.gift_growth,p.gift_point,p.use_point_limit,p.sub_title,
+               p.description,p.original_price,p.stock,p.low_stock,p.unit,p.weight,p.preview_status,p.service_ids,
+               p.album_pics,p.detail_title,p.detail_desc,p.promotion_start_time,p.promotion_end_time,p.promotion_per_limit,
+               p.promotion_type,p.create_time,p.update_time,p.deleted,p.is_handpick_status,p.is_delicacy_status,
+               p.is_style_status,p.is_live_status,p.comment_sum
+        from
+             pms_product p INNER JOIN pms_product_category c
+        where
+              p.pdt_cgy_id=c.pdt_cgy_id
+          AND p.is_publish_status = 1
+          AND p.deleted = 0
+          and (c.pdt_cgy_id= #{pdtCgyId} or c.parent_id= #{pdtCgyId} )
+        ORDER BY RAND()
+        LIMIT 6;
+    </select>
+
+    <select id="selectHomeProductType" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from pms_product
+        <where>
+            <choose>
+                <when test="homeProductType == 1">
+                    is_handpick_status = 1
+                </when>
+                <when test="homeProductType == 2">
+                    is_delicacy_status = 1
+                </when>
+                <when test="homeProductType == 3">
+                    is_style_status = 1
+                </when>
+                <otherwise>
+                    is_live_status = 1
+                </otherwise>
+            </choose>
+            <if test="productId != 0">
+                and product_id <![CDATA[ < ]]>  #{productId}
+            </if>
+            and deleted = 0
+            and is_publish_status = 1
+        </where>
+        order by product_id desc
+        limit 20;
+    </select>
+    <select id="selectProductInfo" resultMap="DtoResultMap">
+        select product_id, brand_id, pdt_cgy_id, freight_template_id, pdt_attribute_cgy_id, product_name,
+               pic, product_sn, is_publish_status, is_new_status, is_recommend_status, is_verify_status,
+               sort, sale, price, promotion_price, gift_growth, gift_point, use_point_limit, sub_title,
+               description, original_price, stock, low_stock, unit, weight, preview_status, service_ids,
+               album_pics, detail_title, detail_desc, promotion_start_time, promotion_end_time, promotion_per_limit,
+               promotion_type, create_time, update_time, deleted,is_handpick_status,is_delicacy_status,
+               is_style_status,is_live_status,comment_sum,meb_price,
+               dis_count,partner_id
+        from pms_product where product_id = #{productId} AND deleted = 0 and is_publish_status = 1
+    </select>
+
+    <select id="selectAllCollectProduct" resultMap="PdtCollectResultMap">
+        <!--  要换实体    -->
+        select upc.pdt_collect_id,
+        upc.user_id,
+        upc.create_time,
+        pp.product_id pp_product_id,
+        pp.product_name pp_product_name,
+        pp.pic pp_pic,
+        pp.price pp_price
+        FROM
+        ums_product_collect upc
+        LEFT JOIN
+        pms_product pp on pp.product_id = upc.product_id
+        <where>
+            <if test="pdtCollectId != 0">
+                upc.pdt_collect_id <![CDATA[ < ]]>  #{pdtCollectId}
+            </if>
+            and upc.user_id = #{userId} and pp.deleted = 0 and pp.is_publish_status = 1
+        </where>
+        order by upc.pdt_collect_id desc
+        limit 5;
+    </select>
+    <select id="selectBuyProduct" resultType="com.ys.mail.model.po.BuyProductPO">
+        SELECT
+            pp.product_id,
+            pp.pdt_cgy_id,
+            pp.pic,
+            pp.product_name,
+            psk.sku_stock_id,
+            psk.sp_data,
+            <if test="flag == 1">
+                psk.price * pp.dis_count as meb_price,
+                pp.dis_count,
+            </if>
+            psk.price
+        from pms_product pp LEFT JOIN pms_sku_stock psk on pp.product_id = psk.product_id
+        where pp.deleted = 0 AND pp.is_publish_status = 1  and psk.sku_stock_id = #{skuStockId};
+    </select>
+    <select id="selectHandpickProduct" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from pms_product
+        <where>
+            <if test="productId != 0">
+                product_id <![CDATA[ < ]]>  #{productId}
+            </if>
+            <if test="pdtCgyId != null">
+                and pdt_cgy_id = #{pdtCgyId}
+            </if>
+                and is_handpick_status = 1 and deleted = 0 and is_publish_status = 1
+        </where>
+        order by product_id desc
+        limit 20;
+    </select>
+
+
+    <select id="getPage" resultMap="BaseResultMapVO">
+        select a.*,b.brand_name,c.pdt_cgy_name,d.name pdt_attribute_name from pms_product a
+        left join pms_brand b on b.brand_id=a.brand_id
+        left join pms_product_category c on c.pdt_cgy_id=a.pdt_cgy_id
+        left join pms_product_attribute_category d on d.pdt_attribute_cgy_id=a.pdt_attribute_cgy_id
+        <where>
+            <if test="query.deleted != null and query.deleted !=''">
+                AND a.deleted = #{query.deleted}
+            </if>
+            <if test="query.publishStatus != null and query.publishStatus !=''">
+                AND a.is_publish_status = #{query.publishStatus}
+            </if>
+            <if test="query.productName != null and query.productName !=''">
+                AND a.product_name like CONCAT('%',#{query.productName},'%')
+            </if>
+            <if test="query.pdtAttributeCgyId != null and query.pdtAttributeCgyId !=''">
+                AND a.pdt_attribute_cgy_id = #{query.pdtAttributeCgyId}
+            </if>
+            <if test="query.pdtCgyId != null and query.pdtCgyId !=''">
+                AND a.pdt_cgy_id = #{query.pdtCgyId}
+            </if>
+            <if test="query.promotionType != null">
+                AND a.promotion_type = #{query.promotionType}
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="selectByUserIdOrPdtId" resultType="java.lang.Long">
+        select pdt_collect_id from ums_product_collect
+        where user_id = #{userId} and product_id = #{productId}
+    </select>
+
+    <select id="selectProductOfHandpickRecommend" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        FROM  pms_product
+        <where>
+            is_publish_status = 1
+            AND deleted = 0
+            AND is_recommend_status = 1
+            AND is_handpick_status = 1
+            <if test="productId != 0">
+                AND product_id <![CDATA[ < ]]>  #{productId}
+            </if>
+        </where>
+        ORDER BY product_id DESC
+        LIMIT #{pageSize};
+    </select>
+
+
+    <update id="updateSale">
+        update pms_product
+        set sale = sale + #{quantity}
+        where product_id = #{productId};
+    </update>
+    <update id="updateReduce">
+        update pms_product
+        set sale =
+        CASE
+        WHEN sale &gt;= #{quantity} THEN sale - #{quantity}
+        WHEN sale &lt; #{quantity} THEN 0
+        END
+        where product_id = #{productId};
+    </update>
+
+    <delete id="delById">
+        DELETE pp.*,pss.*
+        FROM pms_product pp LEFT JOIN pms_sku_stock pss ON pp.product_id = pss.product_id
+        WHERE pp.product_id = #{productId};
+    </delete>
+
+    <select id="partnerProduct" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        FROM  pms_product
+        <where>
+            is_publish_status = 1
+            AND deleted = 0
+            AND is_recommend_status = 1
+            AND is_handpick_status = 1
+            AND partner_id = #{partnerId}
+            <if test="productId != 0">
+                AND product_id <![CDATA[ < ]]>  #{productId}
+            </if>
+        </where>
+        ORDER BY product_id DESC
+        LIMIT #{pageSize};
+    </select>
+
+    <update id="updateByOrderId">
+        update pms_product
+            set sale = sale + 1,
+            stock = stock -1
+        where product_id = (select product_id from oms_order_item where order_id = #{orderId});
+    </update>
+
+    <resultMap id="pdtPoResultMap" type="com.ys.mail.model.po.ProductPO">
+        <id column="product_id" property="productId"/>
+        <id column="pic" property="pic"/>
+        <id column="product_name" property="productName"/>
+        <id column="price" property="price"/>
+        <id column="sale" property="sale"/>
+        <id column="meb_price" property="mebPrice"/>
+    </resultMap>
+
+    <select id="selectAllPdtType" resultType="com.ys.mail.model.po.ProductPO">
+        SELECT
+                product_id,
+                pic,
+                product_name,
+                price,
+                <if test="param.flag == 1">
+                    meb_price,
+                </if>
+                sale
+        FROM
+                pms_product
+        <where>
+            <choose>
+                <when test="param.hType == null or param.hType == 1">
+                    is_handpick_status = 1
+                </when>
+                <when test="param.hType == 2">
+                    is_delicacy_status = 1
+                </when>
+                <when test="param.hType == 3">
+                    is_style_status = 1
+                </when>
+                <otherwise>
+                    is_live_status = 1
+                </otherwise>
+            </choose>
+            <if test="param.productId != null">
+                and product_id <![CDATA[ < ]]>  #{param.productId}
+            </if>
+            and deleted = 0
+            and is_publish_status = 1
+        </where>
+        order by product_id desc
+        limit 20;
+    </select>
+
+    <select id="selectMebs" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_product
+        WHERE deleted=0 AND (is_handpick_status = true OR is_delicacy_status = true OR is_style_status = true OR is_live_status = true) and promotion_type = 0;
+    </select>
+
+    <select id="selectPdtInfo" resultMap="DtoResultMap">
+        select product_id, brand_id, pdt_cgy_id, freight_template_id, pdt_attribute_cgy_id, product_name,
+               pic, product_sn, is_publish_status, is_new_status, is_recommend_status, is_verify_status,
+               sort, sale, price, promotion_price, gift_growth, gift_point, use_point_limit, sub_title,
+               description, original_price, stock, low_stock, unit, weight, preview_status, service_ids,
+               album_pics, detail_title, detail_desc, purchase_note,promotion_start_time, promotion_end_time, promotion_per_limit,
+               promotion_type, create_time, update_time, deleted,is_handpick_status,is_delicacy_status,
+               is_style_status,is_live_status,comment_sum,
+               <if test="flag == 1">
+                   meb_price,
+                   dis_count,
+               </if>
+               partner_id
+        from pms_product where product_id = #{productId} AND deleted = 0 and is_publish_status = 1
+    </select>
+</mapper>

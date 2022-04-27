@@ -11,7 +11,7 @@ import com.ys.mail.constant.StringConstant;
 import com.ys.mail.entity.PcReview;
 import com.ys.mail.entity.PcUser;
 import com.ys.mail.entity.UmsIncome;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.mapper.PcReviewMapper;
 import com.ys.mail.model.CommonResult;
@@ -75,9 +75,9 @@ public class PcReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> i
     @Override
     public CommonResult<Boolean> updateReview(PcReviewParam param) {
         // 是否开启后台审核功能
-        Boolean openReview = sysSettingService.getSettingValue(EnumSettingType.twelve);
+        Boolean openReview = sysSettingService.getSettingValue(SettingTypeEnum.twelve);
         // 是否开启后台审核转账
-        Boolean openPaidOut = sysSettingService.getSettingValue(EnumSettingType.thirteen);
+        Boolean openPaidOut = sysSettingService.getSettingValue(SettingTypeEnum.thirteen);
         // 暂停后台审核
         if (!openReview) {
             return CommonResult.failed("系统已经暂停后台审核，请联系管理员", Boolean.FALSE);

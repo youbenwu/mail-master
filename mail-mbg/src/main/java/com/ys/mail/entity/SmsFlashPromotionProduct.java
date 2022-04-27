@@ -105,6 +105,9 @@ public class SmsFlashPromotionProduct implements Serializable {
     @ApiModelProperty(value = "合伙人价格")
     private Long partnerPrice;
 
+    @ApiModelProperty(value = "商品店铺对象")
+    private String pdtStoreObj;
+
     @AllArgsConstructor
     public enum FlashProductStatus implements IPairs<Integer, String, FlashProductStatus> {
         ONE(1, "已卖出"),

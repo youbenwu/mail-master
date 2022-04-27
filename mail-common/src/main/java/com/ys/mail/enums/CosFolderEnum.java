@@ -3,25 +3,24 @@ package com.ys.mail.enums;
 import lombok.AllArgsConstructor;
 
 /**
- * 文件地址分类枚举
+ * 存储主目录
  *
- * @author 007
+ * @author CRH
+ * @date 2022-04-27 15:19
+ * @since 1.0
  */
 @AllArgsConstructor
-public enum EnumFilePath implements IPairs<Integer, String, EnumFilePath> {
+public enum CosFolderEnum implements IPairs<Integer, String, CosFolderEnum> {
+
     /**
-     * 开发测试，默认类型
+     * 主要存储图片
      */
-    TEST_PATH(-1, "/test/"),
+    IMAGES_FOLDER(1, "/images"),
+
     /**
-     * APK存储路径
+     * 主要存储文件
      */
-    APK_PATH(0, "/apk/"),
-    /**
-     * 视频存储路径
-     */
-    VIDEO_PATH(1, "/video/"),
-    ;
+    FILE_FOLDER(2, "/files");
 
     final Integer type;
     final String path;

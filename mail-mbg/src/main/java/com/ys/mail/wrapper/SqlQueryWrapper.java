@@ -2,7 +2,7 @@ package com.ys.mail.wrapper;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.ys.mail.enums.EnumSqlFormat;
+import com.ys.mail.enums.SqlFormatEnum;
 import com.ys.mail.util.BlankUtil;
 
 import java.util.Collection;
@@ -108,20 +108,20 @@ public class SqlQueryWrapper<T> extends QueryWrapper<T> {
      * @return wrapper
      */
     public SqlQueryWrapper<T> compareDate(String column, String val1, String val2) {
-        String applySql = StrUtil.format(EnumSqlFormat.STRING_DATE_FORMAT_BETWEEN.getContent(), column);
+        String applySql = StrUtil.format(SqlFormatEnum.STRING_DATE_FORMAT_BETWEEN.getContent(), column);
         return (SqlQueryWrapper<T>) super.apply(BlankUtil.isNotEmpty(val1) && BlankUtil.isNotEmpty(val2), applySql, val1, val2);
     }
 
     /**
      * 扩展函数：单个日期条件，链式调用时需要在父类方法前
      *
-     * @param enumSqlFormat 待格式化的SQL，枚举类型 {@link EnumSqlFormat}
+     * @param sqlFormatEnum 待格式化的SQL，枚举类型 {@link SqlFormatEnum}
      * @param column        列名
      * @param val           值
      * @return wrapper
      */
-    public SqlQueryWrapper<T> compareDate(EnumSqlFormat enumSqlFormat, String column, String val) {
-        String applySql = StrUtil.format(enumSqlFormat.getContent(), column);
+    public SqlQueryWrapper<T> compareDate(SqlFormatEnum sqlFormatEnum, String column, String val) {
+        String applySql = StrUtil.format(sqlFormatEnum.getContent(), column);
         return (SqlQueryWrapper<T>) super.apply(BlankUtil.isNotEmpty(val), applySql, val);
     }
 
@@ -133,7 +133,7 @@ public class SqlQueryWrapper<T> extends QueryWrapper<T> {
      * @return wrapper
      */
     public SqlQueryWrapper<T> sum(String column, String alias) {
-        column = StrUtil.format(EnumSqlFormat.STRING_SUM.getContent(), column, alias);
+        column = StrUtil.format(SqlFormatEnum.STRING_SUM.getContent(), column, alias);
         return (SqlQueryWrapper<T>) super.select(column);
     }
 

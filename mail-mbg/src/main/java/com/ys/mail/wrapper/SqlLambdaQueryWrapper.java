@@ -3,7 +3,7 @@ package com.ys.mail.wrapper;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.ys.mail.enums.EnumSqlFormat;
+import com.ys.mail.enums.SqlFormatEnum;
 import com.ys.mail.util.BlankUtil;
 
 import java.util.Collection;
@@ -104,20 +104,20 @@ public class SqlLambdaQueryWrapper<T> extends LambdaQueryWrapper<T> {
      * @return wrapper
      */
     public SqlLambdaQueryWrapper<T> compareDate(SFunction<T, ?> column, String val1, String val2) {
-        String applySql = StrUtil.format(EnumSqlFormat.STRING_DATE_FORMAT_BETWEEN.getContent(), columnsToString(column));
+        String applySql = StrUtil.format(SqlFormatEnum.STRING_DATE_FORMAT_BETWEEN.getContent(), columnsToString(column));
         return (SqlLambdaQueryWrapper<T>) super.apply(BlankUtil.isNotEmpty(val1) && BlankUtil.isNotEmpty(val2), applySql, val1, val2);
     }
 
     /**
      * 扩展函数：单个日期条件，链式调用时需要在父类方法前
      *
-     * @param enumSqlFormat 待格式化的SQL，枚举类型 {@link EnumSqlFormat}
+     * @param sqlFormatEnum 待格式化的SQL，枚举类型 {@link SqlFormatEnum}
      * @param column        列名
      * @param val           值
      * @return wrapper
      */
-    public SqlLambdaQueryWrapper<T> compareDate(EnumSqlFormat enumSqlFormat, SFunction<T, ?> column, String val) {
-        String applySql = StrUtil.format(enumSqlFormat.getContent(), columnsToString(column));
+    public SqlLambdaQueryWrapper<T> compareDate(SqlFormatEnum sqlFormatEnum, SFunction<T, ?> column, String val) {
+        String applySql = StrUtil.format(sqlFormatEnum.getContent(), columnsToString(column));
         return (SqlLambdaQueryWrapper<T>) super.apply(BlankUtil.isNotEmpty(val), applySql, val);
     }
 

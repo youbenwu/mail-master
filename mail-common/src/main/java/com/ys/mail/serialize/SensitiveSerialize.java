@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.ys.mail.annotation.Sensitive;
-import com.ys.mail.enums.EnumSensitiveType;
+import com.ys.mail.enums.SensitiveTypeEnum;
 import com.ys.mail.util.DesensitizedUtil;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class SensitiveSerialize extends JsonSerializer<String> implements Contex
     /**
      * 脱敏类型
      */
-    private EnumSensitiveType enumSensitiveType;
+    private SensitiveTypeEnum sensitiveTypeEnum;
 
     /**
      * 前几位不脱敏
@@ -46,7 +46,7 @@ public class SensitiveSerialize extends JsonSerializer<String> implements Contex
 
     @Override
     public void serialize(final String origin, final JsonGenerator jsonGenerator, final SerializerProvider serializerProvider) throws IOException {
-        switch (enumSensitiveType) {
+        switch (sensitiveTypeEnum) {
             case CUSTOMER:
                 jsonGenerator.writeString(DesensitizedUtil.desValue(origin, prefixNoMaskLen, suffixNoMaskLen, symbol));
                 break;
@@ -66,7 +66,7 @@ public class SensitiveSerialize extends JsonSerializer<String> implements Contex
                 jsonGenerator.writeString(DesensitizedUtil.mobilePhone(origin));
                 break;
             default:
-                throw new IllegalArgumentException("unknown sensitive type enum " + enumSensitiveType);
+                throw new IllegalArgumentException("unknown sensitive type enum " + sensitiveTypeEnum);
         }
     }
 

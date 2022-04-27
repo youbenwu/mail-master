@@ -2,7 +2,7 @@ package com.ys.mail.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ys.mail.enums.EnumSensitiveType;
+import com.ys.mail.enums.SensitiveTypeEnum;
 import com.ys.mail.serialize.SensitiveSerialize;
 
 import java.lang.annotation.ElementType;
@@ -24,7 +24,7 @@ public @interface Sensitive {
     /**
      * 脱敏数据类型
      */
-    EnumSensitiveType type() default EnumSensitiveType.CUSTOMER;
+    SensitiveTypeEnum type() default SensitiveTypeEnum.CUSTOMER;
 
     /**
      * 前置不需要打码的长度

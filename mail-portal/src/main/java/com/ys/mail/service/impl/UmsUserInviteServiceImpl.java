@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.UmsUser;
 import com.ys.mail.entity.UmsUserInvite;
-import com.ys.mail.enums.EnumImgPath;
+import com.ys.mail.enums.ImgPathEnum;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.UmsUserInviteMapper;
 import com.ys.mail.mapper.UmsUserMapper;
@@ -109,7 +109,7 @@ public class UmsUserInviteServiceImpl extends ServiceImpl<UmsUserInviteMapper, U
         if (NumberUtils.INTEGER_ZERO.equals(currentUser.getRoleId()))
             return CommonResult.failed(CommonResultCode.NOT_SENIOR_USER);
         // 用户二维码key，对应COS存储路径
-        String key = String.format("%s%d-%s.jpg", EnumImgPath.QR_CODE_PATH.value(), userId, type);
+        String key = String.format("%s%d-%s.jpg", ImgPathEnum.QR_CODE_PATH.value(), userId, type);
         Boolean existKey = cosService.isExistKey(key);
         // 存在直接返回
         if (existKey) return CommonResult.success(key);

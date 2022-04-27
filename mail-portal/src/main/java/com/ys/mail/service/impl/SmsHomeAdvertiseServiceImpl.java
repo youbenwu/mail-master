@@ -3,15 +3,13 @@ package com.ys.mail.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.SmsHomeAdvertise;
 import com.ys.mail.entity.UmsUser;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.mapper.SmsHomeAdvertiseMapper;
-import com.ys.mail.model.vo.HomeGroupBuyVO;
 import com.ys.mail.model.vo.HomePageVO;
 import com.ys.mail.service.*;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.UserUtil;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -105,8 +103,6 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
                     .secondProductDTO(promotionService.getSecondProduct(ite, cpyType))
                     // COS路径前缀
                     .cosFilePath(cosService.getOssPath())
-                    // app提现规则
-                    .depositRules(readDepositRules())
                     .build();
             if (!BlankUtil.isEmpty(homePageVO)) {
                 redisTemplate.opsForValue().set(key, homePageVO, redisExpireHomePage, TimeUnit.SECONDS);
@@ -115,12 +111,4 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
         return homePageVO;
     }
 
-
-    /**
-     * 系统设置：APP提现规则
-     * @return 临时直接在这里读取，后面配置信息将通过单独接口提供服务
-     */
-    private List<String> readDepositRules() {
-        return sysSettingService.getSettingValue(EnumSettingType.three);
-    }
 }

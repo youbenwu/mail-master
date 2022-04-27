@@ -1,5 +1,7 @@
 package com.ys.mail.util;
 
+import com.ys.mail.enums.SensitiveTypeEnum;
+
 /**
  * @Desc 脱敏工具类，可扩展
  * @Author CRH
@@ -38,7 +40,7 @@ public class DesensitizedUtil {
 
     /**
      * 【中文姓名】只显示最后一个汉字，其他隐藏为星号，比如：**梦
-     * 参考类型：{@link com.ys.mail.enums.EnumSensitiveType}
+     * 参考类型：{@link SensitiveTypeEnum}
      *
      * @param fullName 姓名
      * @return 结果

@@ -46,6 +46,7 @@ public enum BusinessErrorCode implements IErrorCode {
     NOT_ORDER_LIST(400132, "没有订单信息"),
     PRODUCT_CONFIRMRECEIPT_FAILED(400140, "确认收货失败"),
     PRODUCT_CONFIRMRECEIPT_FAILED_ORDER_ERROR(400141, "确认收货失败-订单状态异常"),
+    FLASH_PRODUCT_NO_EXIST(400142, "秒杀商品不存在"),
 
     ERR_DEPOSIT_MONEY_EX_COUNT(400150, "当天提现次数已达上限(由于风控：暂时每天限提%d次)"),
     REVIEW_DEPOSIT_MONEY_EXCEED(400151, "该笔提现已申请后台审核，请稍后查看结果"),
@@ -72,10 +73,11 @@ public enum BusinessErrorCode implements IErrorCode {
     NOT_ROLE_ONE_USER(400224, "合伙人金额错误"),
 
     STORE_NAME_EXIST(400225, "店铺名称已存在"),
-    USER_STORE_EXIST(400226, "不能重复添加店铺"),
-    USER_STORE_NO_EXIST(400227, "还未添加店铺"),
+    USER_STORE_EXIST(400226, "只能添加一个店铺"),
+    USER_STORE_NO_EXIST(400227, "还未添加店铺信息"),
     USER_STORE_REVIEWING(400228, "店铺信息审核中"),
     USER_STORE_REVIEWED(400229, "当天已经审核过"),
+    USER_STORE_NO_PASS(400230, "店铺信息审核不通过"),
 
     ;
 

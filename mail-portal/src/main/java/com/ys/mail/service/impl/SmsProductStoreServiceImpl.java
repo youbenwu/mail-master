@@ -9,10 +9,7 @@ import com.ys.mail.mapper.SmsProductStoreMapper;
 import com.ys.mail.model.param.insert.ProductStoreInsertParam;
 import com.ys.mail.model.vo.ProductStoreVO;
 import com.ys.mail.service.SmsProductStoreService;
-import com.ys.mail.util.BlankUtil;
-import com.ys.mail.util.DateTool;
-import com.ys.mail.util.IdWorker;
-import com.ys.mail.util.UserUtil;
+import com.ys.mail.util.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,6 +94,27 @@ public class SmsProductStoreServiceImpl extends ServiceImpl<SmsProductStoreMappe
         wrapper.eq(SmsProductStore::getStoreName, storeName);
         List<SmsProductStore> list = this.list(wrapper);
         ApiAssert.haveValue(list, BusinessErrorCode.STORE_NAME_EXIST);
+    }
+
+    @Override
+    public SmsProductStore getReviewed() {
+        SmsProductStore productStore = this.get();
+        ApiAssert.noValue(productStore, BusinessErrorCode.USER_STORE_NO_EXIST);
+
+        Integer reviewState = productStore.getReviewState();
+        SmsProductStore.ReviewState reviewStateEnum = EnumTool.getEnum(SmsProductStore.ReviewState.class, reviewState);
+        switch (reviewStateEnum) {
+            case ZERO:
+                ApiAssert.fail(BusinessErrorCode.USER_STORE_REVIEWING);
+                break;
+            case TWO:
+                ApiAssert.fail(BusinessErrorCode.USER_STORE_NO_PASS);
+                break;
+            case ONE:
+            default:
+        }
+
+        return productStore;
     }
 
 }

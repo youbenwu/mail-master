@@ -16,8 +16,8 @@ import com.ys.mail.entity.PcReview;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.entity.UmsUser;
 import com.ys.mail.entity.UmsUserInvite;
-import com.ys.mail.enums.EnumSettingType;
-import com.ys.mail.enums.EnumSqlFormat;
+import com.ys.mail.enums.SettingTypeEnum;
+import com.ys.mail.enums.SqlFormatEnum;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.CommonResultCode;
@@ -381,12 +381,12 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
     @Override
     public CommonResult<String> depositAlipay(DepositAlipayParam param) throws AlipayApiException {
         // 实时读取系统设置
-        Double temp = sysSettingService.getSettingValue(EnumSettingType.eight);
+        Double temp = sysSettingService.getSettingValue(SettingTypeEnum.eight);
         Long maxSingleLimit = DecimalUtil.strToLongForMultiply(temp);// 单笔最大限额，读取出来需要乘以100
-        Integer maxExCount = sysSettingService.getSettingValue(EnumSettingType.nine);// 每日最大提现次数
-        temp = sysSettingService.getSettingValue(EnumSettingType.ten);
+        Integer maxExCount = sysSettingService.getSettingValue(SettingTypeEnum.nine);// 每日最大提现次数
+        temp = sysSettingService.getSettingValue(SettingTypeEnum.ten);
         Long maxSecondsEx = DecimalUtil.strToLongForMultiply(temp);// 单次最大秒提阈值，读取出来需要乘以100
-        Boolean openWithdraw = sysSettingService.getSettingValue(EnumSettingType.eleven);// 是否开启APP端提现，默认为false
+        Boolean openWithdraw = sysSettingService.getSettingValue(SettingTypeEnum.eleven);// 是否开启APP端提现，默认为false
         // 暂停提现
         if (!openWithdraw) return CommonResult.failed("系统维护中，请稍后重试");
         // 日志模板
@@ -455,7 +455,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         UmsUser currentUser = UserUtil.getCurrentUser();
         String alipayName = currentUser.getAlipayName();
         Long userId = currentUser.getUserId();
-        JSON depositTimeRange = sysSettingService.getSettingValue(EnumSettingType.nineteen);// 提现的时间范围
+        JSON depositTimeRange = sysSettingService.getSettingValue(SettingTypeEnum.nineteen);// 提现的时间范围
         if (BlankUtil.isNotEmpty(depositTimeRange)) {
             // 解析时间规则
             JSONObject jsonObject = JSONObject.parseObject(depositTimeRange.toString());
@@ -526,7 +526,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
      * @return 结果
      */
     private CommonResult<String> reviewAmount(PcReview review, UmsIncome income, Long money) {
-        String todayBeforeTime = sysSettingService.getSettingValue(EnumSettingType.seven);// 最晚提交申请审核时间 是否在21点前
+        String todayBeforeTime = sysSettingService.getSettingValue(SettingTypeEnum.seven);// 最晚提交申请审核时间 是否在21点前
         UmsUser currentUser = UserUtil.getCurrentUser();
         Long userId = currentUser.getUserId();
         boolean updateResult;
@@ -695,7 +695,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
                 // 统计团长分佣，当月
                 teamSumMap = umsIncomeService.getMap(new SqlQueryWrapper<UmsIncome>().eq("user_id", parentId)
                                                                                      .eq("income_type", UmsIncome.IncomeType.SIX.key())
-                                                                                     .compareDate(EnumSqlFormat.STRING_DATE_FORMAT_YM_EQ, "create_time", DateTool.getYearMonth())
+                                                                                     .compareDate(SqlFormatEnum.STRING_DATE_FORMAT_YM_EQ, "create_time", DateTool.getYearMonth())
                                                                                      .sum("income", "teamSum"));
 
                 // 查询团长的所有下级信息(下级用户ID、被邀请人电话、被邀请人头像、被邀请时间) TODO：当迁移parentId到用户表后需要修改这里

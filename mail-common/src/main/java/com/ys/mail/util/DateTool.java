@@ -141,6 +141,11 @@ public class DateTool {
         return localTimeIsBefore(LocalTime.now(), rightTimeText);
     }
 
+    public static boolean isBefore(DateTime t1, DateTime t2) {
+        return t1.isBefore(t2);
+    }
+
+
     public static void main(String[] args) {
 //        System.out.println(localTimeIsBetween("14:17:00", "14:40:05"));
 //        System.out.println(localTimeIsAfter("14:32:20"));

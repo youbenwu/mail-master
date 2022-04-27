@@ -5,7 +5,7 @@ package com.ys.mail.enums;
  * @Author CRH
  * @Create 2022-03-01 18:28
  */
-public enum EnumSensitiveType {
+public enum SensitiveTypeEnum {
     /**
      * 自定义，不常用使用定义即可
      */

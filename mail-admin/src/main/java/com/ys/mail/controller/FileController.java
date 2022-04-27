@@ -2,8 +2,8 @@ package com.ys.mail.controller;
 
 
 import com.ys.mail.annotation.EnumContains;
-import com.ys.mail.enums.EnumFilePath;
-import com.ys.mail.enums.EnumImgPath;
+import com.ys.mail.enums.FilePathEnum;
+import com.ys.mail.enums.ImgPathEnum;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.service.CosService;
@@ -53,16 +53,16 @@ public class FileController {
     @PostMapping(value = "/cos/upload")
     @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌", required = true, dataType = "int")
     public CommonResult<String> cosUpload(@RequestParam(name = "file") MultipartFile file,
-                                          @RequestParam(name = "imgType") @EnumContains(enumClass = EnumImgPath.class) Integer imgType,
+                                          @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class) Integer imgType,
                                           HttpServletRequest req) {
-        return fileService.imageUpload(file, EnumTool.getEnum(EnumImgPath.class, imgType));
+        return fileService.imageUpload(file, EnumTool.getEnum(ImgPathEnum.class, imgType));
     }
 
     @ApiOperation(value = "图片批量上传-COS", notes = "批量上传图片到腾讯云COS")
     @PostMapping(value = "/cos/uploadBatch")
     @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌", required = true, dataType = "int")
     public CommonResult<String> cosUploadBatch(@RequestParam(value = "file", required = false) MultipartFile[] multipartFile,
-                                               @RequestParam(name = "imgType") @EnumContains(enumClass = EnumImgPath.class) Integer imgType,
+                                               @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class) Integer imgType,
                                                HttpServletRequest req) {
         if (BlankUtil.isEmpty(multipartFile)) {
             return CommonResult.failed("请选择要上传的图片");
@@ -71,7 +71,7 @@ public class FileController {
         String join = "";
         if (multipartFile.length > 0) {
             for (MultipartFile mf : multipartFile) {
-                CommonResult<String> result = fileService.imageUpload(mf, EnumTool.getEnum(EnumImgPath.class, imgType));
+                CommonResult<String> result = fileService.imageUpload(mf, EnumTool.getEnum(ImgPathEnum.class, imgType));
                 if (result.getCode() != CommonResultCode.SUCCESS.getCode()) return result;
                 imgList.add(result.getData());
                 join = String.join(";", imgList);
@@ -85,7 +85,7 @@ public class FileController {
     @ApiOperation(value = "异步文件上传-COS", notes = "最大不超过200MB")
     @ApiImplicitParam(name = "fileType", value = "文件类型：-1->开发测试,0->APK目录,1->视频存储", required = true, dataType = "int")
     public CommonResult<String> asyncFileUpload(@RequestParam(name = "file") MultipartFile multipartFile,
-                                                @RequestParam(name = "fileType") @EnumContains(enumClass = EnumFilePath.class) Integer fileType) {
-        return fileService.asyncFileUpload(multipartFile, EnumTool.getEnum(EnumFilePath.class, fileType), "");
+                                                @RequestParam(name = "fileType") @EnumContains(enumClass = FilePathEnum.class) Integer fileType) {
+        return fileService.asyncFileUpload(multipartFile, EnumTool.getEnum(FilePathEnum.class, fileType), "");
     }
 }

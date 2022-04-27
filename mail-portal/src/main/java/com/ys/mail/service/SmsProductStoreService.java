@@ -51,4 +51,11 @@ public interface SmsProductStoreService extends IService<SmsProductStore> {
      * @param storeName 店铺名称
      */
     void isExistsStoreName(String storeName);
+
+    /**
+     * 获取已经审核过的店铺信息
+     *
+     * @return 结果
+     */
+    SmsProductStore getReviewed();
 }

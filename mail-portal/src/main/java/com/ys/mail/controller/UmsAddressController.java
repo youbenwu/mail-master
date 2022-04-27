@@ -1,10 +1,9 @@
 package com.ys.mail.controller;
 
 
-import com.ys.mail.annotation.BlankOrPattern;
 import com.ys.mail.entity.UmsAddress;
-import com.ys.mail.enums.RegularEnum;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.param.UmsAddressParam;
 import com.ys.mail.service.UmsAddressService;
 import com.ys.mail.util.UserUtil;
@@ -68,18 +67,11 @@ public class UmsAddressController {
         return addressService.createAddress(param);
     }
 
-    @ApiOperation(value = "获取当前距离最近的收货地址", notes = "当经纬度为空则返回默认的地址")
+    @ApiOperation(value = "获取最近的收货地址", notes = "当经纬度为空则返回默认的地址")
     @GetMapping(value = "/getRecentAddress")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "lat", value = "纬度，范围：-90~90，小数长度最大10位", dataType = "Double"),
-            @ApiImplicitParam(name = "lng", value = "经度，范围：-180~180，小数长度最大10位", dataType = "Double")
-    })
-    public CommonResult<UmsAddress> getRecentAddress(@RequestParam(value = "lat", required = false)
-                                                     @BlankOrPattern(regEnum = RegularEnum.LAT, message = "纬度范围：-90~90") Double lat,
-                                                     @RequestParam(value = "lng", required = false)
-                                                     @BlankOrPattern(regEnum = RegularEnum.LNG, message = "经度范围：-180~180") Double lng) {
+    public CommonResult<UmsAddress> getRecentAddress(@Validated MapQuery query) {
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsAddress result = addressService.getRecentAddressOrDefault(userId, lat, lng);
+        UmsAddress result = addressService.getRecentAddressOrDefault(userId, query.getLat(), query.getLng());
         return CommonResult.success(result);
     }
 }

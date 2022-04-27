@@ -3,7 +3,7 @@ package com.ys.mail.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.SysSetting;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.SysSettingParam;
 import com.ys.mail.model.admin.query.SysSettingQuery;
@@ -48,7 +48,7 @@ public interface SysSettingService extends IService<SysSetting> {
      * @param typeList 类型列表
      * @return 返回一批设置
      */
-    List<SysSetting> getMatchList(List<EnumSettingType> typeList);
+    List<SysSetting> getMatchList(List<SettingTypeEnum> typeList);
 
     /**
      * 根据设置类型查找单条设置，优先从缓存中读取
@@ -57,7 +57,7 @@ public interface SysSettingService extends IService<SysSetting> {
      * @param settingType 设置类型，枚举
      * @return 返回整条设置记录（单条）
      */
-    SysSetting getOneByType(EnumSettingType settingType);
+    SysSetting getOneByType(SettingTypeEnum settingType);
 
     /**
      * 根据设置类型获取值，优先从缓存中读取
@@ -67,7 +67,7 @@ public interface SysSettingService extends IService<SysSetting> {
      * @param settingType 设置类型
      * @return 值
      */
-    <V> V getSettingValue(EnumSettingType settingType);
+    <V> V getSettingValue(SettingTypeEnum settingType);
 
     // 根据设置获取值
     <V> V getSettingValue(SysSetting sysSetting);
@@ -79,7 +79,7 @@ public interface SysSettingService extends IService<SysSetting> {
     List<String> getGroupName();
 
     // 判断设置类型是否已存在
-    Boolean isExist(EnumSettingType settingType);
+    Boolean isExist(SettingTypeEnum settingType);
 
     /**
      * 根据类型获取组名
@@ -88,7 +88,7 @@ public interface SysSettingService extends IService<SysSetting> {
      * @param settingType 设置类型，枚举
      * @return 组名
      */
-    String getGroupNameByType(EnumSettingType settingType);
+    String getGroupNameByType(SettingTypeEnum settingType);
 
     // 根据组名获取该组设置列表
     List<SysSetting> getSettingByGroupName(String settingGroupName);

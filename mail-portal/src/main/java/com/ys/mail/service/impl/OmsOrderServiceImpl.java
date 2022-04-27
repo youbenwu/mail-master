@@ -317,8 +317,8 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     @Override
     public OrderInfoDTO getNewOrderInfo(String orderSn) {
         OrderInfoDTO orderInfoDTO = omsOrderMapper.selectOrderInfo(orderSn);
-        orderInfoDTO.getOmsOrderItem().stream().filter(Objects::nonNull).forEach(item ->{
-            if(BlankUtil.isNotEmpty(item) && BlankUtil.isNotEmpty(item.getProductPrice()) && BlankUtil.isNotEmpty(item.getProductQuantity())){
+        orderInfoDTO.getOmsOrderItem().stream().filter(Objects::nonNull).forEach(item -> {
+            if (BlankUtil.isNotEmpty(item) && BlankUtil.isNotEmpty(item.getProductPrice()) && BlankUtil.isNotEmpty(item.getProductQuantity())) {
                 item.setProductPrice(item.getProductPrice() / item.getProductQuantity());
             }
         });

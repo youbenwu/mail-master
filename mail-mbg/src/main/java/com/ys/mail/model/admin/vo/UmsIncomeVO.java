@@ -2,7 +2,7 @@ package com.ys.mail.model.admin.vo;
 
 import com.ys.mail.annotation.Sensitive;
 import com.ys.mail.entity.UmsIncome;
-import com.ys.mail.enums.EnumSensitiveType;
+import com.ys.mail.enums.SensitiveTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,11 +22,11 @@ public class UmsIncomeVO extends UmsIncome implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Sensitive(type = EnumSensitiveType.NAME)
+    @Sensitive(type = SensitiveTypeEnum.NAME)
     @ApiModelProperty(value = "支付宝姓名")
     private String alipayName;
 
-    @Sensitive(type = EnumSensitiveType.PHONE_NUM)
+    @Sensitive(type = SensitiveTypeEnum.PHONE_NUM)
     @ApiModelProperty(value = "手机号码")
     private String phone;
 

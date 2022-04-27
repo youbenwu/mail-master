@@ -55,11 +55,11 @@ config:
 cos:
   secretId: AKIDJRJvGK8fv0sUosfCRP6XLs87pGQJvHMA # 永久身份
   secretKey: YppXzB6j5AyVljQqyqRlnY3HDtIPGqAH # 永久密钥
-  bucket: dwh-1257583875 # 默认桶名称
+  bucket: qcy-1257583875 # 默认桶名称
   region: ap-guangzhou # 桶区域
   durationSeconds: 1800 # 30分钟，临时密钥有效时长，单位是秒
-  uploadFolder: mail.huwing.cn # 上传主目录
-  cdnDomain: cos.huwing.cn # CDN加速域名
+  uploadFolder: images # 上传主目录
+  cdnDomain: qcy-1257583875.cos.ap-guangzhou.myqcloud.com # 默认域名或CDN加速域名
   threadPool: 32 # 线程数
   allowPrefixes: # 临时凭证的白名单
     - "*"

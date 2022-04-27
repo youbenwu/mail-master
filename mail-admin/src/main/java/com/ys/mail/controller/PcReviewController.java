@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ys.mail.annotation.ApiBlock;
 import com.ys.mail.annotation.LocalLockAnn;
 import com.ys.mail.entity.SysSetting;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.PcReviewParam;
 import com.ys.mail.model.admin.query.PcReviewQuery;
@@ -74,7 +74,7 @@ public class PcReviewController {
     @ApiOperation(value = "获取审核相关的设置")
     @GetMapping(value = "/getRelatedSetting")
     public CommonResult<List<SysSetting>> getRelatedSetting() {
-        List<SysSetting> settingList = sysSettingService.getMatchList(Arrays.asList(EnumSettingType.twelve, EnumSettingType.thirteen));
+        List<SysSetting> settingList = sysSettingService.getMatchList(Arrays.asList(SettingTypeEnum.twelve, SettingTypeEnum.thirteen));
         return CommonResult.success(settingList);
     }
 

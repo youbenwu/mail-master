@@ -1,8 +1,6 @@
 package com.ys.mail.model.admin.vo.statistics;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ys.mail.annotation.Sensitive;
-import com.ys.mail.enums.EnumSensitiveType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

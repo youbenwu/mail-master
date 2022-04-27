@@ -22,7 +22,7 @@ import com.tencent.cloud.Credentials;
 import com.tencent.cloud.Response;
 import com.tencent.cloud.Scope;
 import com.ys.mail.config.CosConfig;
-import com.ys.mail.enums.EnumCosFolder;
+import com.ys.mail.enums.CosFolderEnum;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.service.CosService;
 import com.ys.mail.util.BlankUtil;
@@ -148,10 +148,10 @@ public class CosServiceImpl implements CosService {
      * @return URL
      */
     @Override
-    public URL upload(String bucketName, EnumCosFolder cosFolder, String key, File file) {
+    public URL upload(String bucketName, CosFolderEnum cosFolder, String key, File file) {
         try {
             // 获取上传目录
-            String folder = EnumCosFolder.IMAGES_FOLDER.value();
+            String folder = CosFolderEnum.IMAGES_FOLDER.value();
             if (BlankUtil.isNotEmpty(cosFolder)) folder = cosFolder.value();
             // 拼接完整的key
             key = folder + key;
@@ -182,15 +182,15 @@ public class CosServiceImpl implements CosService {
     }
 
     @Override
-    public URL upload(EnumCosFolder cosFolder, String key, File file) {
+    public URL upload(CosFolderEnum cosFolder, String key, File file) {
         return this.upload("", cosFolder, key, file);
     }
 
     @Override
-    public URL asyncUpload(File file, EnumCosFolder cosFolder, String path) {
+    public URL asyncUpload(File file, CosFolderEnum cosFolder, String path) {
         try {
             // 获取上传目录
-            String folder = EnumCosFolder.IMAGES_FOLDER.value();
+            String folder = CosFolderEnum.IMAGES_FOLDER.value();
             if (BlankUtil.isNotEmpty(cosFolder)) folder = cosFolder.value();
             // 拼接完整的path
             path = folder + path;

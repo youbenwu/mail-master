@@ -203,7 +203,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long keys(String s) {
-        Set<String> keys = redisTemplate.keys(redisTemplate + s);
+        Set<String> keys = redisTemplate.keys(s);
         return BlankUtil.isEmpty(keys) ? NumberUtils.LONG_ZERO : redisTemplate.delete(keys);
     }
 

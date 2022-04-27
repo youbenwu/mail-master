@@ -1,9 +1,9 @@
 package com.ys.mail.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.ys.mail.enums.EnumCosFolder;
-import com.ys.mail.enums.EnumFilePath;
-import com.ys.mail.enums.EnumImgPath;
+import com.ys.mail.enums.CosFolderEnum;
+import com.ys.mail.enums.FilePathEnum;
+import com.ys.mail.enums.ImgPathEnum;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.model.CommonResult;
@@ -43,7 +43,7 @@ public class FileServiceImpl implements FileService {
     private final static String FILE_SIZE_OVERSTEP = "文件大小不能大于500KB";
 
     @Override
-    public CommonResult<String> imageUpload(MultipartFile file, EnumImgPath imgType) {
+    public CommonResult<String> imageUpload(MultipartFile file, ImgPathEnum imgType) {
         // 文件校验
         if (BlankUtil.isEmpty(file)) {
             return CommonResult.failed(FILE_NULL);
@@ -63,7 +63,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @SneakyThrows
-    public CommonResult<String> asyncFileUpload(MultipartFile file, EnumFilePath filePath, String filename) {
+    public CommonResult<String> asyncFileUpload(MultipartFile file, FilePathEnum filePath, String filename) {
         // 文件校验
         if (BlankUtil.isEmpty(file)) return CommonResult.failed(CommonResultCode.ERR_INTERFACE_PARAM);
         // 文件名校验
@@ -75,7 +75,7 @@ public class FileServiceImpl implements FileService {
         }
         // 使用异步上传
         String path = filePath.value() + newFileName;
-        cosService.asyncUpload(FileTool.multipartToFile(file), EnumCosFolder.FILE_FOLDER, path);
+        cosService.asyncUpload(FileTool.multipartToFile(file), CosFolderEnum.FILE_FOLDER, path);
         return CommonResult.success(path);
     }
 

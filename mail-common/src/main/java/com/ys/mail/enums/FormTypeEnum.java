@@ -5,7 +5,7 @@ package com.ys.mail.enums;
  * @Author CRH
  * @Create 2022-02-14 15:16
  */
-public enum EnumFormType {
+public enum FormTypeEnum {
     TEXT, // 文本框
     TEXTAREA,// 文本域
     BOOLEAN, // 开关类型

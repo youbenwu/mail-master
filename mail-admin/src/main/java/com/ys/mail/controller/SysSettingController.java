@@ -4,7 +4,7 @@ package com.ys.mail.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.annotation.EnumContains;
 import com.ys.mail.entity.SysSetting;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.SysSettingParam;
 import com.ys.mail.model.admin.query.SysSettingQuery;
@@ -80,8 +80,8 @@ public class SysSettingController {
     @ApiOperation("判断设置类型是否已存在")
     @GetMapping(value = "/isExist/{settingType}")
     @ApiImplicitParam(name = "settingType", value = "系统设置类型", dataType = "int", required = true)
-    public CommonResult<Boolean> isExist(@PathVariable @EnumContains(enumClass = EnumSettingType.class) Integer settingType) {
-        Boolean exist = sysSettingService.isExist(EnumTool.getEnum(EnumSettingType.class, settingType));
+    public CommonResult<Boolean> isExist(@PathVariable @EnumContains(enumClass = SettingTypeEnum.class) Integer settingType) {
+        Boolean exist = sysSettingService.isExist(EnumTool.getEnum(SettingTypeEnum.class, settingType));
         String msg = "设置类型【" + settingType + "】";
         return exist ? CommonResult.failed(msg + "已存在", Boolean.FALSE) : CommonResult.success(msg + "不存在，允许添加", Boolean.TRUE);
     }

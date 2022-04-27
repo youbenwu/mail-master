@@ -92,6 +92,7 @@
         <result column="pic" property="pic"/>
         <result column="price" property="price"/>
         <result column="partner_id" property="partnerId"/>
+        <result column="distance" property="distance"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -154,20 +155,33 @@
     </select>
     <select id="selectAllNewestSecondPage" resultMap="BoResultMap">
         <!-- 实现思路,使用mybatis映射-->
-        SELECT fpp.flash_promotion_pdt_id,
-        fpp.flash_promotion_id,
-        fpp.flash_promotion_sn_id,
-        fpp.flash_promotion_price,
-        SUM(fpp.flash_promotion_count) flash_promotion_count ,
-        fpp.flash_promotion_limit,
-        fpp.sort,
-        pp.product_id,
-        pp.product_name,
-        pp.pic,
-        pp.price,
-        pp.partner_id
+        SELECT
+            fpp.flash_promotion_pdt_id,
+            fpp.flash_promotion_id,
+            fpp.flash_promotion_sn_id,
+            fpp.flash_promotion_price,
+            SUM(fpp.flash_promotion_count) flash_promotion_count ,
+            fpp.flash_promotion_limit,
+            fpp.sort,
+            pp.product_id,
+            pp.product_name,
+            pp.pic,
+            pp.price,
+            pp.partner_id,
+            ROUND(
+                6378.138*2*ASIN(
+                SQRT(
+                    POW(
+                        SIN(( #{mapQuery.lat}*PI()/180 - up.latitude*PI()/180)/2),2) +
+                        COS( #{mapQuery.lat}*PI()/180) *
+                        COS( up.latitude*PI()/180) *
+                        POW( SIN(( #{mapQuery.lng}*PI()/180-up.longitude*PI()/180)/2),2)
+                    )
+                )*1000,2
+            ) AS distance
         from  sms_flash_promotion_product fpp
         left join pms_product pp on pp.product_id = fpp.product_id
+        LEFT JOIN ums_partner up ON pp.partner_id = up.partner_id
         <where>
             fpp.flash_promotion_id = #{flashPromotionId}
             <choose>
@@ -178,11 +192,13 @@
                     and fpp.user_id <![CDATA[ > ]]> 0
                 </when>
             </choose>
-            and fpp.flash_promotion_pdt_id <![CDATA[ < ]]>  #{flashPromotionPdtId}
+            <if test="flashPromotionPdtId != 0">
+                and fpp.flash_promotion_pdt_id <![CDATA[ < ]]>  #{flashPromotionPdtId}
+            </if>
             and fpp.flash_product_status = 2
         </where>
         GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
-        order by fpp.flash_promotion_pdt_id desc
+        ORDER BY distance DESC,fpp.flash_promotion_pdt_id DESC
         limit 20;
     </select>
 

@@ -5,7 +5,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.UmsIncome;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.mapper.UmsIncomeMapper;
 import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
@@ -137,7 +137,7 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
     public BigDecimal calcuCharges(Long money) {
         // 读取设置
         BigDecimal penny = new BigDecimal("10");
-        JSON rules = sysSettingService.getSettingValue(EnumSettingType.eighteen);
+        JSON rules = sysSettingService.getSettingValue(SettingTypeEnum.eighteen);
         if (BlankUtil.isNotEmpty(rules)) {
             // 解析规则
             JSONArray parseArray = JSONUtil.parseArray(rules);

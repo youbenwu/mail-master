@@ -8,7 +8,7 @@ import com.ys.mail.annotation.BlackListPhone;
 import com.ys.mail.annotation.BlankOrPattern;
 import com.ys.mail.annotation.LocalLockAnn;
 import com.ys.mail.entity.UmsUser;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.param.*;
 import com.ys.mail.model.vo.UserInviteDataVO;
@@ -167,7 +167,7 @@ public class UmsUserController {
     @PostMapping(value = "/getSeniorUserCount")
     public CommonResult<Map<String, Object>> getSeniorUserCount() {
         // 读取付费会员价格
-        Integer price = sysSettingService.getSettingValue(EnumSettingType.fourteen);
+        Integer price = sysSettingService.getSettingValue(SettingTypeEnum.fourteen);
 
         // 获取当前所有高级数量
         QueryWrapper<UmsUser> qw = new QueryWrapper<>();

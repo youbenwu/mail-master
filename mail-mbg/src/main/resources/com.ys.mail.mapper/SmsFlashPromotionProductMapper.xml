@@ -20,6 +20,7 @@
         <result column="flash_promotion_origin_price" property="flashPromotionOriginPrice" />
         <result column="order_id" property="orderId"/>
         <result column="total_amount" property="totalAmount"/>
+        <result column="pdt_store_obj" property="pdtStoreObj"/>
     </resultMap>
 
     <resultMap id="DtoBaseResultMap" type="com.ys.mail.model.admin.dto.PcFlashPromotionProductDTO">

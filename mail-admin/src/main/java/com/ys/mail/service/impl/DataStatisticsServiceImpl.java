@@ -3,7 +3,7 @@ package com.ys.mail.service.impl;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.OmsOrder;
 import com.ys.mail.entity.PcReview;
-import com.ys.mail.enums.EnumSqlFormat;
+import com.ys.mail.enums.SqlFormatEnum;
 import com.ys.mail.mapper.DataStatisticsMapper;
 import com.ys.mail.model.admin.vo.statistics.*;
 import com.ys.mail.service.DataStatisticsService;
@@ -123,7 +123,7 @@ public class DataStatisticsServiceImpl implements DataStatisticsService {
             resultCollect = paddingEmptyData(currentList, Arrays.asList(0, 1));
             // 读取订单总数
             SqlLambdaQueryWrapper<OmsOrder> wrapper = new SqlLambdaQueryWrapper<>();
-            wrapper.eq(OmsOrder::getDeleteStatus, NumberUtils.INTEGER_ZERO).compareDate(EnumSqlFormat.STRING_DATE_EQ, OmsOrder::getCreateTime, date);
+            wrapper.eq(OmsOrder::getDeleteStatus, NumberUtils.INTEGER_ZERO).compareDate(SqlFormatEnum.STRING_DATE_EQ, OmsOrder::getCreateTime, date);
             int totalCount = omsOrderService.count(wrapper);
             // 封装结果
             Map<String, Object> resultMap = new HashMap<>(4);
@@ -191,7 +191,7 @@ public class DataStatisticsServiceImpl implements DataStatisticsService {
             SqlQueryWrapper<PcReview> queryWrapper = new SqlQueryWrapper<>();
             queryWrapper.eq("deleted", NumberUtils.INTEGER_ZERO)
                     .eq("review_state", NumberUtils.INTEGER_ZERO)
-                    .compareDate(EnumSqlFormat.STRING_DATE_EQ, "create_time", todayNow)
+                    .compareDate(SqlFormatEnum.STRING_DATE_EQ, "create_time", todayNow)
                     .select("IFNULL(SUM(review_money),0) reviewMoney");
             Map<String, Object> reviewMap = pcReviewService.getMap(queryWrapper);
             AtomicLong reviewMoney = new AtomicLong(0L);

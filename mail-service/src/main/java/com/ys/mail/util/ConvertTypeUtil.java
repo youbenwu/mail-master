@@ -3,11 +3,11 @@ package com.ys.mail.util;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.ConvertException;
 import cn.hutool.json.JSONUtil;
-import com.ys.mail.enums.EnumSettingValueType;
+import com.ys.mail.enums.SettingValueTypeEnum;
 
 import java.util.Arrays;
 
-import static com.ys.mail.enums.EnumSettingValueType.valueOf;
+import static com.ys.mail.enums.SettingValueTypeEnum.valueOf;
 
 /**
  * @Desc 类型转换工具
@@ -25,7 +25,7 @@ public class ConvertTypeUtil {
      * @throws ConvertException e
      */
     public static <V> V convert(String value, String type) throws ConvertException {
-        EnumSettingValueType choice = valueOf(type);
+        SettingValueTypeEnum choice = valueOf(type);
         switch (choice) {
             case STRING:
                 return (V) Convert.convert(String.class, value);

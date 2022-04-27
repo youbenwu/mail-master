@@ -59,18 +59,11 @@ public class FlashPromotionProductBO implements Serializable {
     @ApiModelProperty(value = "排序")
     private Integer sort;
 
-    @ApiModelProperty(value = "创建时间")
-    @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
-    private Date createTime;
-
-    @ApiModelProperty(value = "修改时间")
-    @TableField(fill = FieldFill.UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
-    private Date updateTime;
-
     @ApiModelProperty(value = "合伙人id")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long partnerId;
+
+    @ApiModelProperty(value = "距离，单位m")
+    private Double distance;
 
 }

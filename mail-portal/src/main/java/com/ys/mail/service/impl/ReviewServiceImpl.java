@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.PcReview;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.entity.UmsUser;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.mapper.PcReviewMapper;
 import com.ys.mail.model.CommonResult;
@@ -60,7 +60,7 @@ public class ReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> imp
     @Override
     public CommonResult<Boolean> cancel(Long reviewId) {
         // 读取设置（是否允许取消、取消截止时间）
-        String time = sysSettingService.getSettingValue(EnumSettingType.seventeen);// APP取消提现审核截止时间点,如 23:30
+        String time = sysSettingService.getSettingValue(SettingTypeEnum.seventeen);// APP取消提现审核截止时间点,如 23:30
         if (DateTool.localTimeIsAfter(time)) return CommonResult.failed("已超过取消时间点，需要等系统自动退还", false);
         // 获取当前用户
         UmsUser currentUser = UserUtil.getCurrentUser();

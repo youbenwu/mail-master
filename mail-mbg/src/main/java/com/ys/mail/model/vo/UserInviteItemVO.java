@@ -2,7 +2,7 @@ package com.ys.mail.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ys.mail.annotation.Sensitive;
-import com.ys.mail.enums.EnumSensitiveType;
+import com.ys.mail.enums.SensitiveTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,7 +26,7 @@ public class UserInviteItemVO implements Serializable {
     private Date createTime;
 
     @ApiModelProperty("被邀请人的电话")
-    @Sensitive(type = EnumSensitiveType.PHONE_NUM)
+    @Sensitive(type = SensitiveTypeEnum.PHONE_NUM)
     private String phone;
 
     @ApiModelProperty("被邀请人的头像")

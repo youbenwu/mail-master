@@ -6,14 +6,15 @@ import com.ys.mail.entity.*;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.mapper.SmsFlashPromotionMapper;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.bo.FlashPromotionProductBO;
-import com.ys.mail.model.dto.FlashPromotionProductDTO;
 import com.ys.mail.model.dto.SecondProductDTO;
 import com.ys.mail.model.param.TimeShopParam;
 import com.ys.mail.model.po.FlashPromotionProductPO;
-import com.ys.mail.model.vo.FlashPromotionProductVO;
-import com.ys.mail.service.*;
-import com.ys.mail.util.BlankUtil;
+import com.ys.mail.service.OmsOrderItemService;
+import com.ys.mail.service.OmsOrderService;
+import com.ys.mail.service.PmsSkuStockService;
+import com.ys.mail.service.SmsFlashPromotionService;
 import com.ys.mail.util.IdGenerator;
 import com.ys.mail.util.IdWorker;
 import com.ys.mail.util.UserUtil;
@@ -23,16 +24,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author DT
@@ -61,7 +61,8 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
             0L,
             TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(1024),
-            new ThreadFactoryBuilder().setNameFormat("export-report-pool-thread-%d").setDaemon(false).setPriority(Thread.NORM_PRIORITY).build());
+            new ThreadFactoryBuilder().setNameFormat("export-report-pool-thread-%d").setDaemon(false)
+                                      .setPriority(Thread.NORM_PRIORITY).build());
 
     @Value("${redis.database}")
     private String redisDatabase;
@@ -80,20 +81,20 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
 
 
     @Override
-    public CommonResult<Boolean> saveTimeShop(TimeShopParam param) throws Exception{
+    public CommonResult<Boolean> saveTimeShop(TimeShopParam param) throws Exception {
         UmsUser currentUser = UserUtil.getCurrentUser();
-        if(currentUser.getRoleId().equals(NumberUtils.INTEGER_ZERO)){
+        if (currentUser.getRoleId().equals(NumberUtils.INTEGER_ZERO)) {
             return CommonResult.failed("不是高级用户", false);
         }
         // 对比价格
         PmsSkuStock skuStock = skuStockService.getById(param.getProductSkuId());
         long quantity = skuStock.getPromotionPrice() * param.getQuantity();
-        if(!param.getProductPrice().equals(quantity)){
-            return CommonResult.failed("金额不一致",false);
+        if (!param.getProductPrice().equals(quantity)) {
+            return CommonResult.failed("金额不一致", false);
         }
         // TODO 限购数量要做判断,前端做判断,关联的商品与显示抢购表显示数量
         OmsOrder order = new OmsOrder();
-        BeanUtils.copyProperties(param,order);
+        BeanUtils.copyProperties(param, order);
         Long userId = currentUser.getUserId();
         Long orderId = IdWorker.generateId();
         Long productPrice = param.getProductPrice();
@@ -104,21 +105,21 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
         order.setPayAmount(productPrice);
         order.setOrderSn(IdGenerator.INSTANCE.generateId());
         order.setOrderType(NumberUtils.INTEGER_ONE);
-        if(!orderService.save(order)){
-            return CommonResult.failed("生成订单失败",false);
+        if (!orderService.save(order)) {
+            return CommonResult.failed("生成订单失败", false);
         }
-        log.info("生成订单{}:",true);
+        log.info("生成订单{}:", true);
 
         // 生成订单商品表
         OmsOrderItem orderItem = new OmsOrderItem();
-        BeanUtils.copyProperties(param,orderItem);
+        BeanUtils.copyProperties(param, orderItem);
         orderItem.setProductQuantity(param.getQuantity());
         orderItem.setOrderItemId(IdWorker.generateId());
         orderItem.setOrderId(orderId);
-        if(!orderItemService.save(orderItem)){
+        if (!orderItemService.save(orderItem)) {
             throw new ApiException("生成商品订单失败");
         }
-        log.info("生成商品订单{}:",true);
+        log.info("生成商品订单{}:", true);
         return CommonResult.success(true);
     }
 
@@ -126,10 +127,10 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     public CommonResult<Boolean> savePostedOnline(String orderId, Long productPrice) {
         // 订单设置为失效,
         OmsOrder build = OmsOrder.builder()
-                .orderId(Long.valueOf(orderId))
-                .orderStatus(5)
-                .build();
-        if(!orderService.updateById(build)){
+                                 .orderId(Long.valueOf(orderId))
+                                 .orderStatus(5)
+                                 .build();
+        if (!orderService.updateById(build)) {
             return CommonResult.failed("修改订单失败");
         }
         // 轮回秒杀
@@ -138,13 +139,13 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     }
 
     @Override
-    public SecondProductDTO getSecondProduct(Integer ite,Byte cpyType) {
-        return ite.equals(NumberUtils.INTEGER_ONE) ? flashPromotionMapper.selectSecondProduct(cpyType): null;
+    public SecondProductDTO getSecondProduct(Integer ite, Byte cpyType) {
+        return ite.equals(NumberUtils.INTEGER_ONE) ? flashPromotionMapper.selectSecondProduct(cpyType) : null;
     }
 
     @Override
-    public List<FlashPromotionProductBO> getAllNewestSecondPage(String flashPromotionId, String flashPromotionPdtId,Byte robBuyType) {
-        return flashPromotionMapper.selectAllNewestSecondPage(Long.valueOf(flashPromotionId),Long.valueOf(flashPromotionPdtId),robBuyType);
+    public List<FlashPromotionProductBO> getAllNewestSecondPage(String flashPromotionId, String flashPromotionPdtId, Byte robBuyType, MapQuery mapQuery) {
+        return flashPromotionMapper.selectAllNewestSecondPage(Long.valueOf(flashPromotionId), Long.valueOf(flashPromotionPdtId), robBuyType, mapQuery);
     }
 
 }

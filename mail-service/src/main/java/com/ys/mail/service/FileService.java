@@ -1,7 +1,7 @@
 package com.ys.mail.service;
 
-import com.ys.mail.enums.EnumFilePath;
-import com.ys.mail.enums.EnumImgPath;
+import com.ys.mail.enums.FilePathEnum;
+import com.ys.mail.enums.ImgPathEnum;
 import com.ys.mail.model.CommonResult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +19,7 @@ public interface FileService {
      * @param imgType 图片类型，不同类型存储的文件夹不同
      * @return 上传结果
      */
-    CommonResult<String> imageUpload(MultipartFile file, EnumImgPath imgType);
+    CommonResult<String> imageUpload(MultipartFile file, ImgPathEnum imgType);
 
     /**
      * 异步文件上传，大小类型宽松处理
@@ -29,5 +29,5 @@ public interface FileService {
      * @param filename 文件名称，为空则随机生成
      * @return 结果
      */
-    CommonResult<String> asyncFileUpload(MultipartFile file, EnumFilePath filePath, String filename);
+    CommonResult<String> asyncFileUpload(MultipartFile file, FilePathEnum filePath, String filename);
 }

@@ -79,13 +79,28 @@ public interface OmsOrderService extends IService<OmsOrder> {
      */
     CommonResult<Boolean> updateGiftOrder(GiftOrderParam param);
 
-    // 查看当前用户的礼品订单
+    /**
+     * 查看当前用户的礼品订单
+     *
+     * @param userId 用户ID
+     * @return 订单
+     */
     OmsOrder getGiftOrder(Long userId);
 
-    // 高级会员支付回调更新使用
+    /**
+     * 高级会员支付回调更新使用
+     *
+     * @param userId 用户ID
+     * @param order  回调订单
+     * @return 是否成功
+     */
     boolean updateUserForSeniorPay(Long userId, OmsOrder order);
 
-    // 是待发货
+    /**
+     * 是待发货
+     *
+     * @param orderId 订单ID
+     */
     void updateByOrderType(Long orderId);
 
     /**
@@ -104,6 +119,7 @@ public interface OmsOrderService extends IService<OmsOrder> {
 
     /**
      * 订单详情
+     *
      * @param orderSn 订单sn
      * @return 返回值
      */

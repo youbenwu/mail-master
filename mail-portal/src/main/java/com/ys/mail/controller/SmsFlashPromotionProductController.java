@@ -1,9 +1,11 @@
 package com.ys.mail.controller;
 
 import com.ys.mail.annotation.ApiBlock;
+import com.ys.mail.annotation.BlankOrPattern;
 import com.ys.mail.annotation.LocalLockAnn;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.bo.FlashPromotionProductBO;
 import com.ys.mail.model.bo.GenerateOrderBO;
 import com.ys.mail.model.dto.*;
@@ -36,9 +38,9 @@ import java.util.List;
  * @version 1.0
  * @date 2021-11-12 16:00
  */
+@Validated
 @RestController
 @RequestMapping("/flash/promotion/product")
-@Validated
 @Api(tags = "限时抢购管理")
 public class SmsFlashPromotionProductController {
 
@@ -99,30 +101,30 @@ public class SmsFlashPromotionProductController {
         return CommonResult.success(result);
     }*/
 
-    // todo: 修改了
     @ApiOperation("自营-上架用户秒杀产品")
     @PostMapping(value = "/addUserFlashProduct")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "flashPromotionPdtId", value = "秒杀产品ID", dataType = "Long", required = true)
     })
-    public CommonResult<String> addUserFlashProduct(@RequestParam("flashPromotionPdtId") Long flashPromotionPdtId) {
-        CommonResult<String> result = flashPromotionProductService.addUserFlashProduct(flashPromotionPdtId);
-        return result;
+    public CommonResult<Boolean> addUserFlashProduct(@RequestParam("flashPromotionPdtId") Long flashPromotionPdtId) {
+        return flashPromotionProductService.addUserFlashProduct(flashPromotionPdtId);
     }
 
     @ApiOperation("首页秒杀活动全部翻页-DT")
     @GetMapping(value = "/getAllNewestSecondPage")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "flashPromotionId", value = "场次id,翻页的时候必须传", dataType = "Long", required = true),
-            @ApiImplicitParam(name = "flashPromotionPdtId", value = "秒杀id,用来翻页", dataType = "Long", required = true),
-            @ApiImplicitParam(name = "robBuyType", value = "0->公司,1->用户上架,null查所有", dataType = "Boolean")
+            @ApiImplicitParam(name = "flashPromotionId", value = "场次id，必传", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "flashPromotionPdtId", value = "秒杀id，用于翻页，不传默认为0", dataType = "Long"),
+            @ApiImplicitParam(name = "robBuyType", value = "0->公司，1->用户上架，不传默认查全部", dataType = "Boolean")
     })
-    public CommonResult<List<FlashPromotionProductBO>> getAllNewestSecondPage(@RequestParam("flashPromotionId") @NotBlank @Pattern(regexp = "^\\d{19}$") String flashPromotionId,
-                                                                              @RequestParam("flashPromotionPdtId") @NotBlank @Pattern(regexp = "^\\d{19}$") String flashPromotionPdtId,
-                                                                              @RequestParam(required = false) @Range(min = 0, max = 1) Byte robBuyType) {
+    public CommonResult<List<FlashPromotionProductBO>> getAllNewestSecondPage(@RequestParam("flashPromotionId")
+                                                                              @NotBlank @Pattern(regexp = "^\\d{19}$") String flashPromotionId,
+                                                                              @RequestParam(value = "flashPromotionPdtId", defaultValue = "0")
+                                                                              @NotBlank @BlankOrPattern(regexp = "^0|\\d{19}$") String flashPromotionPdtId,
+                                                                              @RequestParam(required = false) @Range(min = 0, max = 1) Byte robBuyType,
+                                                                              MapQuery query) {
 
-
-        List<FlashPromotionProductBO> bos = flashPromotionService.getAllNewestSecondPage(flashPromotionId, flashPromotionPdtId, robBuyType);
+        List<FlashPromotionProductBO> bos = flashPromotionService.getAllNewestSecondPage(flashPromotionId, flashPromotionPdtId, robBuyType, query);
         return CommonResult.success(bos);
     }
 

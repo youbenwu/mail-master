@@ -5,7 +5,7 @@ package com.ys.mail.enums;
  * @Author CRH
  * @Create 2022-02-14 15:16
  */
-public enum EnumSettingValueType {
+public enum SettingValueTypeEnum {
     STRING,
     INTEGER,
     DOUBLE,

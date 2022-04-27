@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
  * @author 007
  */
 @AllArgsConstructor
-public enum EnumImgPath implements IPairs<Integer, String, EnumImgPath> {
+public enum ImgPathEnum implements IPairs<Integer, String, ImgPathEnum> {
     /**
      * 开发测试，默认类型
      */
@@ -48,7 +48,11 @@ public enum EnumImgPath implements IPairs<Integer, String, EnumImgPath> {
     /**
      * 企业品牌
      */
-    BRAND_PATH(8, "/brand/");
+    BRAND_PATH(8, "/brand/"),
+    /**
+     * 用户店铺头像
+     */
+    STORE_PATH(9, "/store/");
 
     final Integer type;
     final String path;

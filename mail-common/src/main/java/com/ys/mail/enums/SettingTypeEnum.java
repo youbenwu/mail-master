@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @AllArgsConstructor
-public enum EnumSettingType implements IPairs<Integer, String, EnumSettingType> {
+public enum SettingTypeEnum implements IPairs<Integer, String, SettingTypeEnum> {
     zero(0),
     one(1),
     two(2),
@@ -133,8 +133,8 @@ public enum EnumSettingType implements IPairs<Integer, String, EnumSettingType> 
         return this.name();
     }
 
-    public static EnumSettingType getByType(String number) {
-        List<EnumSettingType> collect = Arrays.stream(EnumSettingType.values())
+    public static SettingTypeEnum getByType(String number) {
+        List<SettingTypeEnum> collect = Arrays.stream(SettingTypeEnum.values())
                                               .filter(s -> s.getType().toString().equals(number))
                                               .collect(Collectors.toList());
         if (BlankUtil.isNotEmpty(collect)) return collect.get(0);

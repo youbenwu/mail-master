@@ -8,9 +8,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RabbitMqSmsConfig;
 import com.ys.mail.constant.FigureConstant;
+import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.*;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
+import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.*;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.bo.GenerateOrderBO;
@@ -23,6 +26,7 @@ import com.ys.mail.model.query.QuickBuyProductQuery;
 import com.ys.mail.model.vo.OrderItemDetailsVO;
 import com.ys.mail.service.*;
 import com.ys.mail.util.*;
+import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +49,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -97,6 +104,10 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     private UmsIncomeMapper umsIncomeMapper;
     @Autowired
     private SmsFlashPromotionHistoryService historyService;
+    @Autowired
+    private SmsProductStoreService smsProductStoreService;
+    @Autowired
+    private RedisService redisService;
 
 
     @Value("${redis.database}")
@@ -124,16 +135,24 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Override
     public List<FlashPromotionProductDTO> getUserFlashProduct(Boolean more, Long integralId, Byte cpyType) {
 
-        return flashPromotionProductMapper.getUserFlashProduct(more, integralId, cpyType, UserUtil.getCurrentUser().getUserId());
+        return flashPromotionProductMapper.getUserFlashProduct(more, integralId, cpyType, UserUtil.getCurrentUser()
+                                                                                                  .getUserId());
     }
 
     @Override
-    public CommonResult<String> addUserFlashProduct(Long flashPromotionPdtId) {
-        SmsFlashPromotionProduct smsFlashPromotionProduct = flashPromotionProductMapper.selectById(flashPromotionPdtId);
-        // 秒杀状态为Null 或者 状态 为  1:已卖出 则不能上架
-        if (smsFlashPromotionProduct.getFlashProductStatus() == null || smsFlashPromotionProduct.getFlashProductStatus().equals(1)) {
-            return CommonResult.failed("error", "添加失败秒杀商品状态异常");
-        }
+    public CommonResult<Boolean> addUserFlashProduct(Long flashPromotionPdtId) {
+        // 所属用户和id校验
+        SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
+        wrapper.eq(SmsFlashPromotionProduct::getFlashPromotionPdtId, flashPromotionPdtId)
+               .eq(SmsFlashPromotionProduct::getUserId, UserUtil.getCurrentUser().getUserId());
+        SmsFlashPromotionProduct smsFlashPromotionProduct = flashPromotionProductMapper.selectOne(wrapper);
+        ApiAssert.noValue(smsFlashPromotionProduct, BusinessErrorCode.FLASH_PRODUCT_NO_EXIST);
+
+        // 状态校验：秒杀状态为Null 或者 状态 为  1:已卖出 则不能上架
+        Integer flashProductStatus = smsFlashPromotionProduct.getFlashProductStatus();
+        ApiAssert.isTrue(flashProductStatus == null || !flashProductStatus.equals(NumberConstant.THREE), CommonResultCode.ILLEGAL_REQUEST);
+
+        // 填充信息
         smsFlashPromotionProduct.setIsPublishStatus(true);
         // 秒杀商品状态为 3上架
         smsFlashPromotionProduct.setFlashProductStatus(2);
@@ -141,25 +160,37 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         smsFlashPromotionProduct.setPublisherId(smsFlashPromotionProduct.getUserId());
         // 平台
         Byte cpyType = smsFlashPromotionProduct.getCpyType();
-        // 查询最近
+
+        // 查询最近场次信息
         SecondProductDTO secondProductDTO = flashPromotionMapper.selectCpyTypeOne(cpyType);
         // 更新限时购表id
-        Boolean result = false;
+        boolean result = false;
         if (secondProductDTO != null) {
+            // 关联用户店铺信息
+            SmsProductStore reviewed = smsProductStoreService.getReviewed();
+            ProductStoreObjDTO storeObjDTO = new ProductStoreObjDTO();
+            BeanUtils.copyProperties(reviewed, storeObjDTO);
+            smsFlashPromotionProduct.setPdtStoreObj(JSON.toJSONString(storeObjDTO));
+
+            // 关联场次ID
             smsFlashPromotionProduct.setFlashPromotionId(secondProductDTO.getFlashPromotionId());
+
+            // 更新到数据库
             result = updateById(smsFlashPromotionProduct);
-            Set keys = redisTemplate.keys(redisDatabase + ":home:*");
-            if (!BlankUtil.isEmpty(keys)) {
-                redisTemplate.delete(keys);
-            }
+
+            // 清理缓存
+            redisService.keys(redisDatabase + ":home:*");
+
         }
+
         //返回结果
-        return result ? CommonResult.success("success", "添加成功") : CommonResult.failed("error", "添加失败");
+        return result ? CommonResult.success(true) : CommonResult.failed(false);
     }
 
     @Override
     public List<FlashPromotionProductDTO> getFlashProductMesg(Long integralId) {
-        List<FlashPromotionProductDTO> dto = flashPromotionProductMapper.getFlashProductMesg(integralId, UserUtil.getCurrentUser().getUserId());
+        List<FlashPromotionProductDTO> dto = flashPromotionProductMapper.getFlashProductMesg(integralId, UserUtil
+                .getCurrentUser().getUserId());
         QueryWrapper<SysTemSetting> qw = new QueryWrapper<>();
         qw.eq("tem_type", 0);
         SysTemSetting sysTemSetting = sysTemSettingMapper.selectOne(qw);
@@ -302,7 +333,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         order.setPartnerPrice(flashPromotionProduct.getPartnerPrice());
         order.setPayAmount(price);
         order.setOrderType(NumberUtils.INTEGER_ONE);
-        order.setAutoConfirmDay(param.getOrderSelect().equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
+        order.setAutoConfirmDay(param.getOrderSelect()
+                                     .equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
         order.setCpyType(param.getCpyType());
         order.setPartnerId(pmsProduct.getPartnerId());
         try {
@@ -311,18 +343,18 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
                 return CommonResult.failed(BusinessErrorCode.ORDER_STOCK_FAILED);
             }
             OmsOrderItem orderItem = OmsOrderItem.builder()
-                    .orderId(orderId)
-                    .productId(Long.valueOf(param.getProductId()))
-                    .orderItemId(IdWorker.generateId())
-                    .orderSn(orderSn)
-                    .productPic(param.getPic())
-                    .pdtCgyId(Long.valueOf(param.getPdtCgyId()))
-                    .productName(param.getProductName())
-                    .productPrice(price)
-                    .productQuantity(param.getQuantity())
-                    .productSkuId(Long.valueOf(param.getSkuStockId()))
-                    .productAttr(param.getSpData())
-                    .build();
+                                                 .orderId(orderId)
+                                                 .productId(Long.valueOf(param.getProductId()))
+                                                 .orderItemId(IdWorker.generateId())
+                                                 .orderSn(orderSn)
+                                                 .productPic(param.getPic())
+                                                 .pdtCgyId(Long.valueOf(param.getPdtCgyId()))
+                                                 .productName(param.getProductName())
+                                                 .productPrice(price)
+                                                 .productQuantity(param.getQuantity())
+                                                 .productSkuId(Long.valueOf(param.getSkuStockId()))
+                                                 .productAttr(param.getSpData())
+                                                 .build();
             if (!orderItemService.save(orderItem)) {
                 throw new ApiException(BusinessErrorCode.ORDER_STOCK_FAILED);
             }
@@ -593,10 +625,11 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             gameRecord.setRatio(0.005D);
         } else {
             ESGameRecord parse = JSON.parseObject(sourceAsString, ESGameRecord.class);
-            List<GameRecord> collect = parse.getEarnings().stream().filter(obj -> obj.getDate().equals(ym)).collect(Collectors.toList());
-            if(collect.size() == NumberUtils.INTEGER_ZERO){
+            List<GameRecord> collect = parse.getEarnings().stream().filter(obj -> obj.getDate().equals(ym))
+                                            .collect(Collectors.toList());
+            if (collect.size() == NumberUtils.INTEGER_ZERO) {
                 gameRecord.setRatio(0.005D);
-            }else{
+            } else {
                 gameRecord = collect.get(0);
             }
         }
@@ -646,7 +679,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
     // 合伙人二维码 确认收货逻辑
     public void confirmReceiptVerification(String orderSn, int symNum, boolean br) {
-        OmsVerificationOrder verificationOrder = verificationOrderMapper.selectOne(Wrappers.<OmsVerificationOrder>lambdaQuery().eq(OmsVerificationOrder::getOrderId, orderSn));
+        OmsVerificationOrder verificationOrder = verificationOrderMapper.selectOne(Wrappers
+                .<OmsVerificationOrder>lambdaQuery().eq(OmsVerificationOrder::getOrderId, orderSn));
         if (ObjectUtils.isNotEmpty(verificationOrder)) {
             Long verificationId = verificationOrder.getVerificationId();
             PmsVerificationCode verificationCode = verificationCodeMapper.selectById(verificationId);
@@ -683,9 +717,10 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Override
     public MyStorePO getMyStore(Integer pageSize, Byte cpyType) {
         return MyStorePO.builder()
-                .storeDtoS(flashPromotionProductMapper.selectMyStore(pageSize, UserUtil.getCurrentUser().getUserId(), cpyType))
-                .msgVO(historyService.getShopMsg())
-                .build();
+                        .storeDtoS(flashPromotionProductMapper.selectMyStore(pageSize, UserUtil.getCurrentUser()
+                                                                                               .getUserId(), cpyType))
+                        .msgVO(historyService.getShopMsg())
+                        .build();
     }
 
     @Override

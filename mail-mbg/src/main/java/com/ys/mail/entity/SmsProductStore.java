@@ -35,6 +35,9 @@ public class SmsProductStore implements Serializable {
     @ApiModelProperty(value = "用户id，商品售卖人，店铺所属用户")
     private Long userId;
 
+    @ApiModelProperty(value = "店铺Logo")
+    private String storeLogo;
+
     @ApiModelProperty(value = "店铺名称，自定义")
     private String storeName;
 
@@ -72,7 +75,7 @@ public class SmsProductStore implements Serializable {
     @AllArgsConstructor
     public enum ReviewState implements IPairs<Integer, String, ReviewState> {
         /**
-         *
+         * 审核状态
          */
         ZERO(0, "待审核"),
         ONE(1, "已通过"),

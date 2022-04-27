@@ -22,6 +22,10 @@ public class ProductStoreInsertParam implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Length(max = 100)
+    @ApiModelProperty(value = "店铺Logo")
+    private String storeLogo;
+
     @NotBlank
     @Length(min = 1, max = 50)
     @ApiModelProperty(value = "店铺名称", required = true)

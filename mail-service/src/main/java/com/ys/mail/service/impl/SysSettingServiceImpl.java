@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.SysSetting;
-import com.ys.mail.enums.EnumFormType;
-import com.ys.mail.enums.EnumSettingType;
-import com.ys.mail.enums.EnumSettingValueType;
+import com.ys.mail.enums.FormTypeEnum;
+import com.ys.mail.enums.SettingTypeEnum;
+import com.ys.mail.enums.SettingValueTypeEnum;
 import com.ys.mail.mapper.SysSettingMapper;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.SysSettingParam;
@@ -97,16 +97,16 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
 
         // 枚举检查
         if (!"-1".equals(settingType)) {
-            EnumSettingType enumByNumber = EnumSettingType.getByType(settingType);
+            SettingTypeEnum enumByNumber = SettingTypeEnum.getByType(settingType);
             if (BlankUtil.isEmpty(enumByNumber)) return CommonResult.failed("操作失败，该类型暂不能添加！", Boolean.FALSE);
             typeSetting = this.getOneByType(enumByNumber);
         }
 
         // 检查{值类型}是否正确
-        boolean contains = EnumUtil.contains(EnumSettingValueType.class, param.getSettingValueType());
+        boolean contains = EnumUtil.contains(SettingValueTypeEnum.class, param.getSettingValueType());
         if (!contains) return CommonResult.failed("操作失败，值类型不存在！", Boolean.FALSE);
         // 检查{表单类型}是否正确
-        contains = EnumUtil.contains(EnumFormType.class, param.getSettingFormType());
+        contains = EnumUtil.contains(FormTypeEnum.class, param.getSettingFormType());
         if (!contains) return CommonResult.failed("操作失败，表单类型不存在！", Boolean.FALSE);
         // 值与类型匹配检查：不通过则不能进行添加修改
         if (!ConvertTypeUtil.checkType(param.getSettingValue(), param.getSettingValueType()))
@@ -205,11 +205,11 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
     }
 
     @Override
-    public List<SysSetting> getMatchList(List<EnumSettingType> typeList) {
+    public List<SysSetting> getMatchList(List<SettingTypeEnum> typeList) {
         if (BlankUtil.isEmpty(typeList)) return null;
         List<SysSetting> allList = this.getCacheAll();
         List<SysSetting> collect = new ArrayList<>();
-        for (EnumSettingType item : typeList) {
+        for (SettingTypeEnum item : typeList) {
             List<SysSetting> temp = allList.stream().filter(s -> s.getSettingType().equals(item.getType()))
                                            .collect(Collectors.toList());
             SysSetting sysSetting = null;
@@ -220,7 +220,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
     }
 
     @Override
-    public SysSetting getOneByType(EnumSettingType settingType) {
+    public SysSetting getOneByType(SettingTypeEnum settingType) {
         if (BlankUtil.isEmpty(settingType)) return null;
         List<SysSetting> matchList = this.getMatchList(Collections.singletonList(settingType));
         if (BlankUtil.isNotEmpty(matchList)) return matchList.get(0);
@@ -233,14 +233,14 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
      * - 当值为空时，返回默认值
      * - 当被禁用时，返回null
      * <p>
-     * {@link EnumSettingValueType} 状态类型维护枚举
+     * {@link SettingValueTypeEnum} 状态类型维护枚举
      *
      * @param settingType 设置类型，枚举
      * @return 值，该值会自动转换类型，直接使用指定的{包装类型}接收即可
      * - 另外当允许禁用状态时，结果必须判空
      */
     @Override
-    public <V> V getSettingValue(EnumSettingType settingType) {
+    public <V> V getSettingValue(SettingTypeEnum settingType) {
         List<SysSetting> allList = this.getCacheAll();
         for (SysSetting item : allList) {
             if (!item.getEnable()) continue;
@@ -255,14 +255,14 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
 
     @Override
     public <V> V getSettingValue(SysSetting sysSetting) {
-        EnumSettingType settingType = EnumTool.getEnum(EnumSettingType.class, sysSetting.getSettingType());
+        SettingTypeEnum settingType = EnumTool.getEnum(SettingTypeEnum.class, sysSetting.getSettingType());
         return this.getSettingValue(settingType);
     }
 
     @Override
     public <V> V getSettingDefaultValue(SysSetting sysSetting) {
         if (BlankUtil.isEmpty(sysSetting)) return null;
-        SysSetting setting = this.getOneByType(EnumTool.getEnum(EnumSettingType.class, sysSetting.getSettingType()));
+        SysSetting setting = this.getOneByType(EnumTool.getEnum(SettingTypeEnum.class, sysSetting.getSettingType()));
         if (BlankUtil.isEmpty(setting)) return null;
         return ConvertTypeUtil.convert(setting.getSettingDefaultValue(), setting.getSettingValueType());
     }
@@ -273,13 +273,13 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
     }
 
     @Override
-    public Boolean isExist(EnumSettingType settingType) {
+    public Boolean isExist(SettingTypeEnum settingType) {
         SysSetting sysSetting = this.getOneByType(settingType);
         return BlankUtil.isNotEmpty(sysSetting);
     }
 
     @Override
-    public String getGroupNameByType(EnumSettingType settingType) {
+    public String getGroupNameByType(SettingTypeEnum settingType) {
         SysSetting sysSetting = this.getOneByType(settingType);
         if (BlankUtil.isEmpty(sysSetting)) return null;
         return sysSetting.getSettingGroupName();

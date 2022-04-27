@@ -4,7 +4,7 @@ import com.ys.mail.constant.FigureConstant;
 import com.ys.mail.entity.PcReview;
 import com.ys.mail.entity.PmsPartnerRe;
 import com.ys.mail.entity.UmsIncome;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
 import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
@@ -13,8 +13,6 @@ import com.ys.mail.model.vo.PartnerReIncomeVO;
 import com.ys.mail.service.*;
 import com.ys.mail.util.*;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
-import org.elasticsearch.search.aggregations.metrics.ParsedSingleValueNumericMetricsAggregation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -258,7 +256,7 @@ public class ScheduleTask {
             LOGGER.info("scheduledTask4单日没有返还给上级的分佣");
             return;
         }
-        Double reMoney=settingService.getSettingValue(EnumSettingType.twenty);
+        Double reMoney=settingService.getSettingValue(SettingTypeEnum.twenty);
         if(BlankUtil.isEmpty(reMoney)){
             LOGGER.info("scheduledTask4分佣已被管理员设置关闭");
             return;
@@ -312,7 +310,7 @@ public class ScheduleTask {
     public void scheduledTask5(){
         LOGGER.info("异步执行解冻创客返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
 
-        Integer day=settingService.getSettingValue(EnumSettingType.twenty_one);
+        Integer day=settingService.getSettingValue(SettingTypeEnum.twenty_one);
         if(BlankUtil.isEmpty(day)){
             LOGGER.info("scheduledTask5管理员设置未开启邀请创客返佣");
             return;

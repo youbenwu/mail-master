@@ -3,7 +3,7 @@ package com.ys.mail.service;
 import com.qcloud.cos.COSClient;
 import com.tencent.cloud.Credentials;
 import com.tencent.cloud.Response;
-import com.ys.mail.enums.EnumCosFolder;
+import com.ys.mail.enums.CosFolderEnum;
 
 import java.io.File;
 import java.net.URL;
@@ -41,7 +41,7 @@ public interface CosService {
      * @param file       文件
      * @return url
      */
-    URL upload(String bucketName, EnumCosFolder cosFolder, String key, File file);
+    URL upload(String bucketName, CosFolderEnum cosFolder, String key, File file);
 
     /**
      * 上传到默认桶的默认主目录
@@ -60,7 +60,7 @@ public interface CosService {
      * @param file      文件
      * @return url
      */
-    URL upload(EnumCosFolder cosFolder, String key, File file);
+    URL upload(CosFolderEnum cosFolder, String key, File file);
 
     /**
      * 异步上传
@@ -70,7 +70,7 @@ public interface CosService {
      * @param path      路径
      * @return url
      */
-    URL asyncUpload(File file, EnumCosFolder cosFolder, String path);
+    URL asyncUpload(File file, CosFolderEnum cosFolder, String path);
 
     /**
      * 获取OSS路径

@@ -2,7 +2,7 @@ package com.ys.mail.service.impl;
 
 import com.ys.mail.cache.RongCloudCache;
 import com.ys.mail.component.rongcloud.RongCloudClient;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.mapper.PcUserMapper;
 import com.ys.mail.model.admin.vo.UserImInfoVO;
@@ -72,7 +72,7 @@ public class RongCloudServiceImpl implements RongCloudService {
     @Override
     public List<UserImInfoVO> getStaff() {
         // 获取系统设置中的客服ID
-        String roleId = sysSettingService.getSettingValue(EnumSettingType.zero);
+        String roleId = sysSettingService.getSettingValue(SettingTypeEnum.zero);
         return pcUserMapper.getStaff(roleId);
     }
 }

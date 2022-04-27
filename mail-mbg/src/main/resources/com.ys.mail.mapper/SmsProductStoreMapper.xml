@@ -5,6 +5,7 @@
     <resultMap id="BaseResultMap" type="com.ys.mail.entity.SmsProductStore">
         <id column="pdt_store_id" property="pdtStoreId"/>
         <result column="user_id" property="userId"/>
+        <result column="store_logo" property="storeLogo"/>
         <result column="store_name" property="storeName"/>
         <result column="store_boss" property="storeBoss"/>
         <result column="store_phone" property="storePhone"/>
@@ -19,7 +20,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        pdt_store_id, user_id, store_name, store_boss, store_phone, store_address, create_time, update_time, deleted, pc_user_id, review_state, review_desc
+        pdt_store_id, user_id, store_logo, store_name, store_boss, store_phone, store_address, create_time, update_time, deleted, pc_user_id, review_state, review_desc
     </sql>
 
     <select id="getPage" resultType="com.ys.mail.model.admin.vo.SmsProductStoreVO">

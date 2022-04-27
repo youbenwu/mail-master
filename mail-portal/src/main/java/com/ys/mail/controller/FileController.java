@@ -2,7 +2,7 @@ package com.ys.mail.controller;
 
 
 import com.ys.mail.annotation.EnumContains;
-import com.ys.mail.enums.EnumImgPath;
+import com.ys.mail.enums.ImgPathEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.service.CosService;
 import com.ys.mail.service.FileService;
@@ -42,13 +42,18 @@ public class FileController {
         return CommonResult.success(cosPath);
     }
 
-    @ApiOperation(value = "图片上传-COS", notes = "上传到腾讯云COS")
+    @ApiOperation(value = "图片上传-COS", notes = "上传到腾讯云COS<br/>" +
+            "使用参考：https://cloud.tencent.com/document/product/460/36540 如下：<br/>" +
+            "1、直接使用原图：不带参数即可<br/>" +
+            "2、图片等比例缩放：?imageMogr2/thumbnail/100x<br/>" +
+            "3、图片为原图50%：?imageMogr2/thumbnail/!50p 等<br/>")
     @PostMapping(value = "/cos/upload")
-    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,7->融云聊天", required = true, dataType = "int")
+    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,7->融云聊天,9->用户店铺",
+            required = true, dataType = "int")
     public CommonResult<String> cosUpload(@RequestParam(name = "file") MultipartFile file,
                                           @RequestParam(name = "imgType")
-                                          @EnumContains(enumClass = EnumImgPath.class, exclude = {"0", "6", "8"}) Integer imgType) {
-        return fileService.imageUpload(file, EnumTool.getEnum(EnumImgPath.class, imgType));
+                                          @EnumContains(enumClass = ImgPathEnum.class, exclude = {"0", "6", "8"}) Integer imgType) {
+        return fileService.imageUpload(file, EnumTool.getEnum(ImgPathEnum.class, imgType));
     }
 
 }

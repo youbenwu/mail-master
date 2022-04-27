@@ -55,7 +55,7 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
      *
      * @return 返回值
      */
-    CommonResult<String> addUserFlashProduct(Long flashPromotionPdtId);
+    CommonResult<Boolean> addUserFlashProduct(Long flashPromotionPdtId);
 
     /**
      * 自营-秒杀产品详情

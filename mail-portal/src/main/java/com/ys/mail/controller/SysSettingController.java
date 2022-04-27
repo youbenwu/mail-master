@@ -1,7 +1,7 @@
 package com.ys.mail.controller;
 
 import com.ys.mail.entity.SysSetting;
-import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.service.SysSettingService;
 import com.ys.mail.util.EnumTool;
@@ -43,7 +43,7 @@ public class SysSettingController {
         Map<String, Object> resultMap = new LinkedHashMap<>();
         // 重新封装结果，简单形式，方便直接使用
         List<SysSetting> collect = list.stream().peek(s -> {
-            String key = EnumTool.getValue(EnumSettingType.class, s.getSettingType());
+            String key = EnumTool.getValue(SettingTypeEnum.class, s.getSettingType());
             resultMap.put(key, sysService.getSettingValue(s));
         }).collect(Collectors.toList());
         return CommonResult.success(resultMap);
@@ -55,10 +55,10 @@ public class SysSettingController {
      * @return 设置列表
      */
     private List<SysSetting> getGroupName() {
-        String groupName = sysService.getGroupNameByType(EnumSettingType.two);
+        String groupName = sysService.getGroupNameByType(SettingTypeEnum.two);
         List<SysSetting> availableList = sysService.getSettingByGroupName(groupName);
         return availableList.stream()
-                            .filter(s -> !s.getSettingType().equals(EnumSettingType.two.getType()))
+                            .filter(s -> !s.getSettingType().equals(SettingTypeEnum.two.getType()))
                             .collect(Collectors.toList());
     }
 }

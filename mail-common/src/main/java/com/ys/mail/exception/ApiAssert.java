@@ -1,6 +1,5 @@
 package com.ys.mail.exception;
 
-
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.IErrorCode;
 import com.ys.mail.util.BlankUtil;
@@ -10,25 +9,26 @@ import java.util.Objects;
 /**
  * 断言处理类
  *
- * @author ghdhj
+ * @author 007
  */
 public class ApiAssert {
 
+    /**
+     * 直接抛出
+     *
+     * @param message 内容
+     */
     public static void fail(String message) {
         throw new ApiException(message);
     }
 
+    /**
+     * 直接抛出
+     *
+     * @param errorCode 错误码
+     */
     public static void fail(IErrorCode errorCode) {
         throw new ApiException(errorCode);
-    }
-
-    public static <T> void fail(T t1, T t2, IErrorCode errorCode) {
-        if (BlankUtil.isEmpty(t1) || BlankUtil.isEmpty(t2)) {
-            throw new ApiException(BusinessErrorCode.NPE_PARAM);
-        }
-        if (!t1.equals(t2)) {
-            throw new ApiException(errorCode);
-        }
     }
 
     /**
