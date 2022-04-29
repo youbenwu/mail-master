@@ -25,6 +25,13 @@ public class RabbitMqSmsConfig {
     public static final String CHANGE_ACTIVE_QUEUE = "change.active.queue";
     public static final String CHANGE_ACTIVE_ROUTING_KEY = "change.active.routing.key";
 
+//    /**
+//     * 购物车
+//     */
+//    public static final String CHANGE_ACTIVE_CART = "change.active.cart";
+//    public static final String CHANGE_ACTIVE_CART_QUEUE = "change.active.cart.queue";
+//    public static final String CHANGE_ACTIVE_CART_KEY = "change.active.cart.key";
+
 
     /**
      * 死信队列
@@ -117,4 +124,20 @@ public class RabbitMqSmsConfig {
         return BindingBuilder.bind(changeActiveQueue())
                 .to(changeActiveExchange()).with(CHANGE_ACTIVE_ROUTING_KEY);
     }
+//
+//    @Bean
+//    public DirectExchange changeActiveCart() {
+//        return new DirectExchange(CHANGE_ACTIVE_CART, true, false);
+//    }
+//
+//    @Bean
+//    public Queue changeActiveCartQueue() {
+//        return new Queue(CHANGE_ACTIVE_CART_QUEUE, true, false, false);
+//    }
+//
+//    @Bean
+//    public Binding changeActiveCartKey() {
+//        return BindingBuilder.bind(changeActiveCartQueue())
+//                .to(changeActiveCart()).with(CHANGE_ACTIVE_CART_KEY);
+//    }
 }

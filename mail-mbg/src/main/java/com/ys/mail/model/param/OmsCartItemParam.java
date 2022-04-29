@@ -1,7 +1,12 @@
 package com.ys.mail.model.param;
 
+import com.ys.mail.annotation.BlankOrPattern;
+import com.ys.mail.entity.OmsCartItem;
+import com.ys.mail.util.BlankUtil;
+import com.ys.mail.util.IdWorker;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -20,29 +25,29 @@ public class OmsCartItemParam implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "商品id",required = true)
-    @NotBlank
-    @Pattern(regexp = "^\\d{19}$")
-    private String productId;
-
-    @ApiModelProperty(value = "商品图片",required = true)
-    @NotBlank
-    private String productPic;
-
-    @ApiModelProperty(value = "商品数量,默认为1")
     @NotNull
-    private Integer quantity = 1;
+    @BlankOrPattern(regexp = "^\\d{19}$",message = "请输入正确的id")
+    private Long productId;
 
-    @ApiModelProperty(value = "商品销售属性:[{\"key\":\"颜色\",\"value\":\"颜色\"},{\"key\":\"容量\",\"value\":\"4G\"}]",required = true)
-    @NotBlank
-    private String productAttr;
-
-    @ApiModelProperty(value = "商品价格",required = true)
-    @NotNull
-    @Min(value = 1)
-    private Long pic;
+    @ApiModelProperty(value = "商品数量,默认为1,可以不传,不传为null后台默认就是1件")
+    private Integer quantity;
 
     @ApiModelProperty(value = "商品skuId",required = true)
-    @NotBlank
-    @Pattern(regexp = "^\\d{19}$")
-    private String productSkuId;
+    @NotNull
+    @BlankOrPattern(regexp = "^\\d{19}$",message = "请输入正确的id")
+    private Long productSkuId;
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = BlankUtil.isEmpty(quantity) ? NumberUtils.INTEGER_ONE : quantity;
+    }
+
+    public OmsCartItem getParam(Long userId){
+        return OmsCartItem.builder()
+                .cartItemId(IdWorker.generateId())
+                .userId(userId)
+                .productId(productId)
+                .productSkuId(productSkuId)
+                .quantity(quantity)
+                .build();
+    }
 }

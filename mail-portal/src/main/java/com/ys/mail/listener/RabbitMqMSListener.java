@@ -11,6 +11,7 @@ import com.ys.mail.entity.*;
 import com.ys.mail.mapper.*;
 import com.ys.mail.model.dto.*;
 import com.ys.mail.model.mq.MSOrderCheckDTO;
+import com.ys.mail.service.OmsCartItemService;
 import com.ys.mail.service.OmsOrderItemService;
 import com.ys.mail.service.OmsOrderService;
 import com.ys.mail.util.BlankUtil;
@@ -35,8 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,6 +69,8 @@ public class RabbitMqMSListener {
     private OmsVerificationOrderMapper verificationOrderMapper;
     @Autowired
     private PmsVerificationCodeMapper verificationCodeMapper;
+    @Autowired
+    private OmsCartItemService cartItemService;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RabbitMqMSListener.class);
 
@@ -339,4 +344,25 @@ public class RabbitMqMSListener {
             e.printStackTrace();
         }
     }
+
+//    @Transactional(rollbackFor = Exception.class)
+//    @RabbitListener(queues = RabbitMqSmsConfig.CHANGE_ACTIVE_CART_QUEUE)
+//    public void listenerCart(Message msg, Channel channel, String id) {
+//        LOGGER.info("异步执行添加购物车基本信息开始----任务执行时间:{},线程名称:{}", LocalDateTime.now(),Thread.currentThread().getName());
+//        try{
+//        if(BlankUtil.isEmpty(id)){
+//            LOGGER.info("消息丢失");
+//            return;
+//        }
+//        OmsCartItem item=cartItemService.getByCartInfo(Long.valueOf(id));
+//        if(BlankUtil.isEmpty(item)){
+//            LOGGER.info("没有此购物车商品信息:{}",id);
+//            return;
+//        }
+//        cartItemService.updateById(item);
+//        channel.basicAck(msg.getMessageProperties().getDeliveryTag(),false);
+//        }catch (IOException e){
+//            e.printStackTrace();
+//        }
+//    }
 }

@@ -17,6 +17,7 @@
         <result column="update_time" property="updateTime" />
         <result column="product_name" property="productName"/>
         <result column="product_pic" property="productPic"/>
+        <result column="pdt_cgy_id" property="pdtCgyId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -33,4 +34,77 @@
     </update>
 
 
+    <select id="selectByCartInfo" resultMap="BaseResultMap">
+        SELECT
+            pss.product_id,
+            pss.sku_stock_id product_sku_id,
+            pss.price * #{quantity} AS price,
+            pss.sp_data product_attr,
+            pss.pic product_pic,
+            pp.product_name,
+            pp.pdt_cgy_id
+        FROM
+            pms_sku_stock pss
+            LEFT JOIN pms_product pp ON pss.product_id = pp.product_id
+        WHERE
+            pss.sku_stock_id = #{id};
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+            cart_item_id,
+            product_id,
+            product_sku_id,
+            user_id,
+            sum(quantity) quantity,
+            sum(price) price,
+            product_sku_code,
+            product_sn,
+            product_attr,
+            create_time,
+            update_time,
+            product_name,
+            product_pic,
+            pdt_cgy_id
+        FROM
+            oms_cart_item
+        WHERE
+            user_id = #{userId}
+        GROUP BY
+            user_id,
+            product_sku_id;
+    </select>
+
+    <delete id="removeBySkuId">
+        <foreach collection="ids" item="item" index="index" separator=";">
+            DELETE FROM oms_cart_item
+            <where>
+                <if test="item != null">
+                    product_sku_id = #{item}
+                </if>
+                <if test="userId != null">
+                    and user_id = #{userId}
+                </if>
+            </where>
+        </foreach>
+    </delete>
+
+    <select id="batchProduct" resultType="com.ys.mail.model.po.BuyProductPO">
+        select
+        product_id,
+        product_pic pic,
+        product_name,
+        product_sku_id sku_stock_id,
+        product_attr sp_data,
+        sum(price) price,
+        sum(quantity) quantity,
+        pdt_cgy_id
+        from oms_cart_item
+        where user_id = #{userId}
+        and product_sku_id in(
+            <foreach collection="ids" item="item" separator=",">
+                #{item}
+            </foreach>
+            ) GROUP BY product_sku_id
+    </select>
 </mapper>

@@ -7,8 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,7 +20,8 @@ import java.util.Date;
  * @author 070
  * @since 2021-11-16
  */
-@Data
+
+@Data@Builder@AllArgsConstructor@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(value="OmsCartItem对象", description="购物车表")
 public class OmsCartItem implements Serializable {
@@ -75,4 +75,7 @@ public class OmsCartItem implements Serializable {
 
     @ApiModelProperty(value = "商品图片")
     private String productPic;
+
+    @ApiModelProperty(value = "商品分类id")
+    private Long pdtCgyId;
 }

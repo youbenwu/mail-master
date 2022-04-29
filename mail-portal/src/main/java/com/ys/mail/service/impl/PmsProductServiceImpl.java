@@ -364,7 +364,7 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
 
             orderItemService.saveBatch(orderItems);
             //删除购物车的商品
-            omsCartItemService.batchDelCart(param.getOmsCartItemIds());
+            //omsCartItemService.batchDelCart(param.getOmsCartItemIds());
             save = orderService.save(order);
 
         } catch (Exception e) {
