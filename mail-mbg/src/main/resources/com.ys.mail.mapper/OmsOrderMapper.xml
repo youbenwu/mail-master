@@ -136,7 +136,7 @@
         <where>
             and pp.user_id = #{omsOrderDTO.userId}
             and pp.cpy_type = #{omsOrderDTO.cpyType}
-            and pp.order_type in(0,3)
+            and pp.order_type in(0,3,5)
             <if test="omsOrderDTO.orderStatus != -1">
                 and pp.order_status = #{omsOrderDTO.orderStatus}
             </if>
@@ -531,5 +531,31 @@
         and oo.total_amount <![CDATA[ >= ]]> 1680000
         and ppp.is_publish_status = 1
         GROUP BY uui.parent_id
+    </select>
+
+    <resultMap id="OReResultMap" type="com.ys.mail.model.admin.vo.OrdinaryReMoneyVO">
+        <id column="parent_id" property="parentId"/>
+        <result column="quantity" property="quantity"/>
+        <result column="total_amount" property="totalAmount"/>
+
+        <association property="umsIncome" javaType="com.ys.mail.entity.UmsIncome"
+                     column="parent_id" select="com.ys.mail.mapper.UmsIncomeMapper.selectNewestByUserId"/>
+    </resultMap>
+
+    <select id="selectByOrdinaryReMoney" resultMap="OReResultMap">
+        SELECT
+        count(*) quantity,
+        sum( oo.total_amount ) total_amount,
+        uui.parent_id
+        FROM
+        oms_order oo
+        LEFT JOIN ums_user_invite uui ON oo.user_id = uui.user_id
+        WHERE
+        oo.trans_id <![CDATA[ > ]]> 0
+        AND oo.order_type = #{ite}
+        AND TO_DAYS( NOW( ) ) - TO_DAYS( oo.payment_time ) <![CDATA[ <= ]]> 1
+        AND oo.pay_type > 0
+        GROUP BY
+        uui.parent_id
     </select>
 </mapper>

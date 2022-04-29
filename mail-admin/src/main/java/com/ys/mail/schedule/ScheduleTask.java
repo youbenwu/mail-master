@@ -1,11 +1,15 @@
 package com.ys.mail.schedule;
 
 import com.ys.mail.constant.FigureConstant;
+import com.ys.mail.entity.OmsOrder;
 import com.ys.mail.entity.PcReview;
 import com.ys.mail.entity.PmsPartnerRe;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.enums.SettingTypeEnum;
+import com.ys.mail.exception.ApiAssert;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
+import com.ys.mail.model.admin.vo.OrdinaryReMoneyVO;
 import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
 import com.ys.mail.model.unionPay.DateUtil;
@@ -88,15 +92,15 @@ public class ScheduleTask {
                         if (oldIncome.getUserId().equals(review.getUserId())) {
                             Long incomeId = incomeIds.get(i);
                             umsIncome = UmsIncome.builder().incomeId(incomeId).userId(oldIncome.getUserId())
-                                                 .income(review.getReviewMoney()).expenditure(NumberUtils.LONG_ZERO)
-                                                 .balance(oldIncome.getBalance() + review.getReviewMoney())
-                                                 .todayIncome(oldIncome.getTodayIncome())
-                                                 .allIncome(oldIncome.getAllIncome()) // 不计算入总流水
-                                                 .incomeType(UmsIncome.IncomeType.FIVE.key()) // 5->审核退还
-                                                 .incomeNo("").orderTradeNo("")
-                                                 .detailSource("系统退还审核金额:" + DecimalUtil.longToStrForDivider(review.getReviewMoney()) + "元")
-                                                 .payType(UmsIncome.PayType.THREE.key())
-                                                 .remark("系统定时调度触发").build();
+                                    .income(review.getReviewMoney()).expenditure(NumberUtils.LONG_ZERO)
+                                    .balance(oldIncome.getBalance() + review.getReviewMoney())
+                                    .todayIncome(oldIncome.getTodayIncome())
+                                    .allIncome(oldIncome.getAllIncome()) // 不计算入总流水
+                                    .incomeType(UmsIncome.IncomeType.FIVE.key()) // 5->审核退还
+                                    .incomeNo("").orderTradeNo("")
+                                    .detailSource("系统退还审核金额:" + DecimalUtil.longToStrForDivider(review.getReviewMoney()) + "元")
+                                    .payType(UmsIncome.PayType.THREE.key())
+                                    .remark("系统定时调度触发").build();
                             addIncomeList.add(umsIncome);
                             review.setReviewState(PcReview.ReviewState.MINUS_ONE.key());
                             review.setPcUserId(null);
@@ -149,7 +153,7 @@ public class ScheduleTask {
         List<PmsPartnerRe> partnerRes = new ArrayList<>();
         AtomicInteger num = new AtomicInteger();
         Integer reduce = vos.stream()
-                            .reduce(NumberUtils.INTEGER_ZERO, (sum, p) -> sum += p.getRePeriods(), Integer::sum);
+                .reduce(NumberUtils.INTEGER_ZERO, (sum, p) -> sum += p.getRePeriods(), Integer::sum);
         List<Long> ids = IdWorker.generateIds(reduce);
         vos.stream().filter(Objects::nonNull).forEach(vo -> {
             // 相等才会进来
@@ -157,17 +161,17 @@ public class ScheduleTask {
                 Integer rePeriods = vo.getRePeriods();
                 long partnerPrice = vo.getPartnerPrice() * vo.getProductQuantity();
                 BigDecimal periods = DecimalUtil.toBigDecimal(partnerPrice)
-                                                .divide(new BigDecimal(rePeriods), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
+                        .divide(new BigDecimal(rePeriods), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
                 BigDecimal divide = periods.divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
                 List<Date> dates = DateUtil.nextMonthFirstDates(rePeriods);
                 for (int i = NumberUtils.BYTE_ONE; i <= rePeriods; i++) {
                     num.incrementAndGet();
                     int i1 = i - NumberUtils.INTEGER_ONE;
                     partnerRes.add(PmsPartnerRe.builder().partnerReId(ids.get(num.get() - NumberUtils.INTEGER_ONE))
-                                               .userId(vo.getUserId()).orderId(vo.getOrderId()).periodsNum(i)
-                                               .periodsPrice(periods.longValue())
-                                               .descSour("用户:" + vo.getUserId() + "返还订单号:" + vo.getOrderId() + "金额:" + divide)
-                                               .periodsDate(dates.get(i1)).build());
+                            .userId(vo.getUserId()).orderId(vo.getOrderId()).periodsNum(i)
+                            .periodsPrice(periods.longValue())
+                            .descSour("用户:" + vo.getUserId() + "返还订单号:" + vo.getOrderId() + "金额:" + divide)
+                            .periodsDate(dates.get(i1)).build());
                 }
             }
         });
@@ -211,19 +215,19 @@ public class ScheduleTask {
                 if (BlankUtil.isNotEmpty(vo.getIncome()) && vo.getUserId().equals(vo.getIncome().getUserId())) {
                     UmsIncome income = vo.getIncome();
                     todayIncome = DateUtil.getDateFormat(income.getCreateTime(), DateUtil.DT_SHORT_)
-                                          .equals(format) ? (BlankUtil.isEmpty(income.getTodayIncome()) ? NumberUtils.LONG_ZERO + periodsPrice : income.getTodayIncome() + periodsPrice) : periodsPrice;
+                            .equals(format) ? (BlankUtil.isEmpty(income.getTodayIncome()) ? NumberUtils.LONG_ZERO + periodsPrice : income.getTodayIncome() + periodsPrice) : periodsPrice;
                     balance = income.getBalance() + periodsPrice;
                     allIncome = income.getAllIncome() + periodsPrice;
                 }
                 BigDecimal price = DecimalUtil.toBigDecimal(periodsPrice)
-                                              .divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
+                        .divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
                 incomes.add(UmsIncome.builder().incomeId(ids.get(num.get() - NumberUtils.INTEGER_ONE))
-                                     .userId(vo.getUserId()).income(vo.getPeriodsPrice())
-                                     .expenditure(NumberUtils.LONG_ZERO).balance(balance).allIncome(allIncome)
-                                     .todayIncome(todayIncome).incomeType(UmsIncome.IncomeType.EIGHT.key())
-                                     .detailSource("用户:" + vo.getUserId() + "返还合伙人商品金额:" + price + "总计数量:" + vo.getReNum())
-                                     .payType(UmsIncome.PayType.THREE.key()).incomeNo(FigureConstant.STRING_EMPTY)
-                                     .orderTradeNo(FigureConstant.STRING_EMPTY).build());
+                        .userId(vo.getUserId()).income(vo.getPeriodsPrice())
+                        .expenditure(NumberUtils.LONG_ZERO).balance(balance).allIncome(allIncome)
+                        .todayIncome(todayIncome).incomeType(UmsIncome.IncomeType.EIGHT.key())
+                        .detailSource("用户:" + vo.getUserId() + "返还合伙人商品金额:" + price + "总计数量:" + vo.getReNum())
+                        .payType(UmsIncome.PayType.THREE.key()).incomeNo(FigureConstant.STRING_EMPTY)
+                        .orderTradeNo(FigureConstant.STRING_EMPTY).build());
             }
         });
         try {
@@ -252,50 +256,50 @@ public class ScheduleTask {
         LOGGER.info("异步执行邀请创客返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
 
         List<PidPrPdtOrderVO> vos = omsOrderService.getByPidPrPdtOrder();
-        if(BlankUtil.isEmpty(vos)){
+        if (BlankUtil.isEmpty(vos)) {
             LOGGER.info("scheduledTask4单日没有返还给上级的分佣");
             return;
         }
-        Double reMoney=settingService.getSettingValue(SettingTypeEnum.twenty);
-        if(BlankUtil.isEmpty(reMoney)){
+        Double reMoney = settingService.getSettingValue(SettingTypeEnum.twenty);
+        if (BlankUtil.isEmpty(reMoney)) {
             LOGGER.info("scheduledTask4分佣已被管理员设置关闭");
             return;
         }
         List<Long> ids = IdWorker.generateIds(vos.size());
         List<UmsIncome> incomes = new ArrayList<>();
         AtomicInteger num = new AtomicInteger();
-        Integer integerZero = NumberUtils.INTEGER_ZERO;
+        Integer integerOne = NumberUtils.INTEGER_ONE;
         vos.stream().filter(Objects::nonNull).forEach(
-                vo->{
-                    if(BlankUtil.isNotEmpty(vo.getParentId())){
+                vo -> {
+                    if (BlankUtil.isNotEmpty(vo.getParentId())) {
                         num.incrementAndGet();
                         Integer quantity = vo.getProductQuantity();
                         long income = reMoney.longValue() * FigureConstant.INT_ONE_HUNDRED * quantity;
-                        long quReMoney = reMoney.longValue() * quantity;
+                        BigDecimal multiply = DecimalUtil.toBigDecimal(reMoney).multiply(new BigDecimal(quantity));
                         incomes.add(UmsIncome.builder()
-                                .incomeId(ids.get(num.get() -integerZero))
+                                .incomeId(ids.get(num.get() - integerOne))
                                 .userId(vo.getParentId())
                                 .income(income)
                                 .expenditure(NumberUtils.LONG_ZERO)
                                 .balance(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO : (BlankUtil.isEmpty(vo.getUmsIncome().getBalance()) ? NumberUtils.LONG_ZERO : vo.getUmsIncome().getBalance()))
                                 .allIncome(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO : (BlankUtil.isEmpty(vo.getUmsIncome().getAllIncome()) ? NumberUtils.LONG_ZERO : vo.getUmsIncome().getAllIncome()))
                                 .incomeType(UmsIncome.IncomeType.TWELVE.key())
-                                .detailSource("冻结邀请用户购买创客商品:"+ quReMoney)
-                                .remark("用户:"+vo.getUserId() + "购买创客商品返佣:" + quReMoney + "总计数量:" + quantity)
+                                .detailSource("冻结邀请用户购买创客商品:" + multiply)
+                                .remark("用户:" + vo.getUserId() + "购买创客商品返佣:" + multiply + "总计数量:" + quantity)
                                 .payType(UmsIncome.PayType.THREE.key())
                                 .incomeNo(FigureConstant.STRING_EMPTY)
                                 .orderTradeNo(FigureConstant.STRING_EMPTY)
                                 .build());
-                    }else{
-                        LOGGER.info("当前用户:{}没有上级用户,执行返佣为空",vo.getUserId());
+                    } else {
+                        LOGGER.info("当前用户:{}没有上级用户,执行返佣为空", vo.getUserId());
                     }
                 }
         );
-        try{
+        try {
             Optional<Long> reduce = incomes.stream().map(UmsIncome::getIncome).reduce(Long::sum);
             int save = umsIncomeService.insertBatch(incomes);
-            LOGGER.info("创建创客商品推荐人返佣数量:{},返还金额,{}",save,reduce);
-        }catch (Exception e){
+            LOGGER.info("创建创客商品推荐人返佣数量:{},返还金额,{}", save, reduce);
+        } catch (Exception e) {
             LOGGER.debug("scheduledTask4系统调度信息异常,单天执行的数量为0");
             e.printStackTrace();
         }
@@ -307,17 +311,17 @@ public class ScheduleTask {
      */
     @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "00 15 1 * * ?")
-    public void scheduledTask5(){
+    public void scheduledTask5() {
         LOGGER.info("异步执行解冻创客返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
 
-        Integer day=settingService.getSettingValue(SettingTypeEnum.twenty_one);
-        if(BlankUtil.isEmpty(day)){
+        Integer day = settingService.getSettingValue(SettingTypeEnum.twenty_one);
+        if (BlankUtil.isEmpty(day)) {
             LOGGER.info("scheduledTask5管理员设置未开启邀请创客返佣");
             return;
         }
         String format = new SimpleDateFormat(com.ys.mail.model.unionPay.DateUtil.DT_SHORT_).format(cn.hutool.core.date.DateUtil.offsetDay(new Date(), day));
-        List<FreezeReMoneyVO> vos=incomeService.getByFreezeReMoney(format);
-        if(BlankUtil.isEmpty(vos)){
+        List<FreezeReMoneyVO> vos = incomeService.getByFreezeReMoney(format);
+        if (BlankUtil.isEmpty(vos)) {
             LOGGER.info("scheduledTask5单日没有冻结创客返佣");
             return;
         }
@@ -326,19 +330,19 @@ public class ScheduleTask {
         AtomicInteger num = new AtomicInteger();
         Integer integerOne = NumberUtils.INTEGER_ONE;
         vos.stream().filter(Objects::nonNull).forEach(
-                vo->{
-                    if(vo.getUserId().equals(vo.getUmsIncome().getUserId())){
+                vo -> {
+                    if (vo.getUserId().equals(vo.getUmsIncome().getUserId())) {
                         num.incrementAndGet();
                         BigDecimal divide = DecimalUtil.toBigDecimal(vo.getIncome()).divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
                         incomes.add(UmsIncome.builder()
-                                .incomeId(ids.get(num.get() -integerOne))
+                                .incomeId(ids.get(num.get() - integerOne))
                                 .userId(vo.getUserId())
-                                .income(NumberUtils.LONG_ZERO)
+                                .income(vo.getIncome())
                                 .expenditure(NumberUtils.LONG_ZERO)
                                 .balance(vo.getUmsIncome().getBalance() + vo.getIncome())
-                                .allIncome(vo.getUmsIncome().getAllIncome())
+                                .allIncome(vo.getUmsIncome().getAllIncome() + vo.getIncome())
                                 .incomeType(UmsIncome.IncomeType.THIRTEEN.key())
-                                .detailSource("解冻邀请创客返佣:"+divide)
+                                .detailSource("解冻邀请创客返佣:" + divide)
                                 .incomeNo(FigureConstant.STRING_EMPTY)
                                 .orderTradeNo(FigureConstant.STRING_EMPTY)
                                 .payType(UmsIncome.PayType.THREE.key())
@@ -346,12 +350,100 @@ public class ScheduleTask {
                     }
                 }
         );
-        try{
+        try {
             int save = umsIncomeService.insertBatch(incomes);
-            LOGGER.info("创建创客商品推荐人冻结返佣数量:{},应返数量{}",vos.size(),save);
-        }catch (Exception e){
+            LOGGER.info("创建创客商品推荐人冻结返佣数量:{},应返数量{}", vos.size(), save);
+        } catch (Exception e) {
             LOGGER.debug("scheduledTask5系统调度信息异常,单天执行的数量为0");
+            e.printStackTrace();
         }
+    }
+
+
+    /**
+     * 接口单一职责性,凌晨一点二十,普通订单返还收益
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "00 20 1 * * ?")
+    public void scheduledTask6() {
+
+        LOGGER.info("异步执行普通订单的邀请人返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
+        Double ratio = settingService.getSettingValue(SettingTypeEnum.twenty_two);
+        if (BlankUtil.isEmpty(ratio)) {
+            LOGGER.info("scheduledTask6管理员设置未开启邀请普通订单返佣");
+            return;
+        }
+        List<OrdinaryReMoneyVO> vos = omsOrderService.getByOrdinaryReMoney(NumberUtils.INTEGER_ZERO);
+        if (BlankUtil.isEmpty(vos)) {
+            LOGGER.info("scheduledTask6单日没有普通订单返佣");
+            return;
+        }
+        try {
+            int save = umsIncomeService.insertBatch(rebate(OmsOrder.OrderType.ZERO.value(), vos, ratio));
+            LOGGER.info("创建普通订单数量:{},应返数量{}", save, vos.size());
+        } catch (Exception e) {
+            LOGGER.debug("scheduledTask6系统调度信息异常,单天执行的数量为0");
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 会员订单返还收益
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "00 25 1 * * ?")
+    public void scheduledTask7() {
+        LOGGER.info("异步执行普通订单的邀请人返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
+        Double ratio = settingService.getSettingValue(SettingTypeEnum.twenty_three);
+        if (BlankUtil.isEmpty(ratio)) {
+            LOGGER.info("scheduledTask7管理员设置未开启邀请普通订单返佣");
+            return;
+        }
+        List<OrdinaryReMoneyVO> vos = omsOrderService.getByOrdinaryReMoney(OmsOrder.OrderType.FIVE.key());
+        if (BlankUtil.isEmpty(vos)) {
+            LOGGER.info("scheduledTask7单日没有会员订单返佣");
+            return;
+        }
+        try {
+            int save = umsIncomeService.insertBatch(rebate(OmsOrder.OrderType.FIVE.value(), vos, ratio));
+            LOGGER.info("创建会员订单数量:{},应返数量{}", save, vos.size());
+        } catch (Exception e) {
+            LOGGER.debug("scheduledTask7系统调度信息异常,单天执行的数量为0");
+            e.printStackTrace();
+        }
+    }
+
+
+    private List<UmsIncome> rebate(String msg, List<OrdinaryReMoneyVO> vos, Double ratio) {
+        List<Long> ids = IdWorker.generateIds(vos.size());
+        List<UmsIncome> incomes = new ArrayList<>();
+        AtomicInteger num = new AtomicInteger();
+        Integer integerOne = NumberUtils.INTEGER_ONE;
+        vos.stream().filter(Objects::nonNull).forEach(
+                vo -> {
+                    long reMoney = new Double(vo.getTotalAmount() * ratio).longValue();
+                    BigDecimal divide = DecimalUtil.toBigDecimal(reMoney).divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
+                    if (BlankUtil.isNotEmpty(vo.getParentId()) && reMoney > NumberUtils.LONG_ZERO) {
+                        num.incrementAndGet();
+                        incomes.add(UmsIncome.builder()
+                                .incomeId(ids.get(num.get() - integerOne))
+                                .userId(vo.getParentId())
+                                .income(reMoney)
+                                .expenditure(NumberUtils.LONG_ZERO)
+                                .balance(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO + reMoney : vo.getUmsIncome().getBalance() + reMoney)
+                                .allIncome(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO + reMoney : vo.getUmsIncome().getAllIncome() + reMoney)
+                                .incomeType(UmsIncome.IncomeType.THREE.key())
+                                .detailSource(msg + "返回收益" + divide)
+                                .incomeNo(FigureConstant.STRING_EMPTY)
+                                .orderTradeNo(FigureConstant.STRING_EMPTY)
+                                .remark("用户下级" + msg + "收益" + divide + " 总计数量:" + vo.getQuantity())
+                                .payType(UmsIncome.PayType.THREE.key())
+                                .build());
+                    }
+                }
+        );
+        return incomes;
     }
 
 }

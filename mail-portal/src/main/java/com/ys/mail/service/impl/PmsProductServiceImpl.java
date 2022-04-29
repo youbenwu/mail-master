@@ -211,9 +211,11 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
         Optional.ofNullable(po).orElseThrow(() -> new ApiException(BusinessErrorCode.GOODS_NOT_EXIST));
         UmsUser user = UserUtil.getCurrentUser();
         Long price = param.getPrice() * param.getQuantity();
+        int orderType = 0;
         if (BlankUtil.isNotEmpty(param.getFlag()) && param.getFlag()) {
             if (user.getRoleId().equals(NumberUtils.INTEGER_ONE)) {
                 BigDecimal multiply = po.getDisCount().multiply(new BigDecimal(po.getPrice()));
+                orderType = 5;
                 if (multiply.compareTo(new BigDecimal(param.getMebPrice())) != NumberUtils.INTEGER_ZERO) {
                     return CommonResult.failed(BusinessErrorCode.ERR_PRODUCT_PRICE);
                 }
@@ -242,6 +244,7 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
         order.setOrderType(NumberUtils.INTEGER_ZERO);
         order.setAutoConfirmDay(param.getOrderSelect()
                                      .equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
+        order.setOrderType(orderType);
         try {
             // 为true生成item的子订单
             if (!orderService.save(order)) {

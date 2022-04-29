@@ -10,6 +10,7 @@ import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.dto.ExportOrderDTO;
 import com.ys.mail.model.admin.param.ExportOrderParam;
 import com.ys.mail.model.admin.query.OmsOrderQuery;
+import com.ys.mail.model.admin.vo.OrdinaryReMoneyVO;
 import com.ys.mail.model.admin.vo.PcUserOrderVO;
 import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
@@ -119,6 +120,11 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     @Override
     public List<PidPrPdtOrderVO> getByPidPrPdtOrder() {
         return omsOrderMapper.selectByPidPrPdtOrder();
+    }
+
+    @Override
+    public List<OrdinaryReMoneyVO> getByOrdinaryReMoney(Integer ite) {
+        return omsOrderMapper.selectByOrdinaryReMoney(ite);
     }
 
 }

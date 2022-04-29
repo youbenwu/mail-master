@@ -136,9 +136,15 @@ public class IPUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(getHostIp());
-        System.out.println(getLocalIp());
-        System.out.println(getIpAddress());
+//        System.out.println(getHostIp());
+//        System.out.println(getLocalIp());
+//        System.out.println(getIpAddress());
+        double d = 0.05;
+        double d1 = 0.5;
+        long l = new Double(d).longValue();
+        long l1 = new Double(d1).longValue();
+        System.out.println(l);
+        System.out.println(l1);
     }
 
 }

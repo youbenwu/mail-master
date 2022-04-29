@@ -83,7 +83,7 @@ public interface SysSettingService extends IService<SysSetting> {
 
     /**
      * 根据类型获取组名
-     * - eg：sysSettingService.getGroupNameByType(EnumSettingType.two);
+     * - eg：sysSettingService.getGroupNameByType(SettingTypeEnum.two);
      *
      * @param settingType 设置类型，枚举
      * @return 组名

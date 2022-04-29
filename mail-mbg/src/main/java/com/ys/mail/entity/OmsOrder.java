@@ -83,7 +83,7 @@ public class OmsOrder implements Serializable {
     /**
      * 使用枚举 {@link OrderType}
      */
-    @ApiModelProperty(value = "订单类型：0->正常订单；1->秒杀订单;2->拼团订单;3->付费会员订单;4->创客订单")
+    @ApiModelProperty(value = "订单类型：0->正常订单；1->秒杀订单;2->拼团订单;3->付费会员订单;4->创客订单;5->会员订单")
     private Integer orderType;
 
     @ApiModelProperty(value = "物流公司(配送方式)")
@@ -242,6 +242,7 @@ public class OmsOrder implements Serializable {
         TWO(2, "拼团订单"),
         THREE(3, "付费会员订单"),
         FOUR(4, "创客订单"),
+        FIVE(5,"会员订单"),
         ;
         final Integer type;
         final String name;

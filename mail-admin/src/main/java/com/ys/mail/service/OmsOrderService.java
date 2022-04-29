@@ -7,6 +7,7 @@ import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.dto.ExportOrderDTO;
 import com.ys.mail.model.admin.param.ExportOrderParam;
 import com.ys.mail.model.admin.query.OmsOrderQuery;
+import com.ys.mail.model.admin.vo.OrdinaryReMoneyVO;
 import com.ys.mail.model.admin.vo.PcUserOrderVO;
 import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
@@ -54,4 +55,11 @@ public interface OmsOrderService extends IService<OmsOrder> {
      * @return 返回值
      */
     List<PidPrPdtOrderVO> getByPidPrPdtOrder();
+
+    /**
+     * 普通订单和会员订单返佣共用
+     * @param ite 类型区分
+     * @return 返回值
+     */
+    List<OrdinaryReMoneyVO> getByOrdinaryReMoney(Integer ite);
 }

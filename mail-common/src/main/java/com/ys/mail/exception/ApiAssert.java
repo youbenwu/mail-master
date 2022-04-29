@@ -1,8 +1,11 @@
 package com.ys.mail.exception;
 
+
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.IErrorCode;
 import com.ys.mail.util.BlankUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -12,6 +15,8 @@ import java.util.Objects;
  * @author 007
  */
 public class ApiAssert {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiAssert.class);
 
     /**
      * 直接抛出

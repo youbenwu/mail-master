@@ -152,7 +152,7 @@
         <result column="comment_sum" property="commentSum"/>
         <result column="meb_price" property="mebPrice"/>
         <result column="dis_count" property="disCount"/>
-        
+
         <collection property="pmsProductAttributes" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="pdt_attribute_cgy_id"
             select="com.ys.mail.mapper.PmsProductAttributeMapper.selectByPdtAttributeCgyId"
         />
