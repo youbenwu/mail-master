@@ -24,7 +24,7 @@ spring:
     cache: true   #页面不加载缓存，修改即时生效
   redis:
     host: localhost # Redis服务器地址
-    database: 0 # Redis数据库索引（默认为0）
+    database: 1 # Redis数据库索引（默认为0）
     port: 6379 # Redis服务器连接端口
     password: LzLW3k7aw5 #Redis服务器连接密码（默认为空）
     timeout: 600000ms # 连接超时时间（毫秒）
