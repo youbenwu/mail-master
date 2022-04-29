@@ -93,7 +93,7 @@ public class test {
        /* String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(AlipayConstant.APP_CERT_PATH)).getPath();
         Thread.currentThread().getContextClassLoader().getResource(AlipayConstant.APP_CERT_PATH).getContent();
         System.out.println(path);*/
-
+        // 测试jekines
         Resource resource = resourceLoader.getResource("classpath:" + AlipayConstant.APP_CERT_PATH);
         InputStream is = resource.getInputStream();
         InputStreamReader isr = new InputStreamReader(is);
