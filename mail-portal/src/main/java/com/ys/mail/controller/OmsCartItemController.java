@@ -37,13 +37,13 @@ public class OmsCartItemController {
     @Autowired
     private OmsCartItemService cartItemService;
 
-    @ApiOperation("购物车列表删除商品")
+    @ApiOperation("购物车列表删除商品-已修改")
     @PostMapping(value = "/batchDel")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ids", value = "skuId", dataType = "Long", required = true,allowMultiple = true)
+            @ApiImplicitParam(name = "ids", value = "购物车主键id", dataType = "Long", required = true,allowMultiple = true)
     })
     public CommonResult<Boolean> batchDel(@RequestParam("ids") @NotEmpty List<Long> ids) {
-        boolean result = cartItemService.removeBySkuId(ids);
+        boolean result = cartItemService.removeByIds(ids);
         return result ? CommonResult.success(Boolean.TRUE) : CommonResult.failed(Boolean.FALSE);
     }
 
@@ -60,15 +60,28 @@ public class OmsCartItemController {
         return CommonResult.success(cartItemService.list(UserUtil.getCurrentUser().getUserId()));
     }
 
-    @ApiOperation("从购物车批量添加商品到订单")
+    @ApiOperation("从购物车批量添加商品到订单-已修改")
     @PostMapping(value = "/batchProduct")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ids", value = "skuId", dataType = "Long", required = true,allowMultiple = true)
+            @ApiImplicitParam(name = "ids", value = "购物车主键id", dataType = "Long", required = true,allowMultiple = true)
     })
     public CommonResult<BatchBuyProductDTO> batchProduct(@RequestParam("ids") @NotEmpty List<Long> ids) {
         // TODO 用户地址,商品订单集合,定义一个这样的规则,在会员专区马上购买的就是会员价,如果是加入购物车就是sku的价格,要不然改动非常的大
         return CommonResult.success(cartItemService.batchProduct(ids));
     }
+
+    @ApiOperation("购物车加减数量")
+    @PutMapping(value = "/{skuId:^\\d{19}$}/{num:^?[1-9]\\d*$}")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "skuId", value = "购物车主键id", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "num", value = "数量,传几就是设置为几,不能为0和负数", dataType = "Integer", required = true)
+    })
+    public CommonResult<Boolean> update(@PathVariable Long skuId,
+                                        @PathVariable Integer num){
+        boolean update = cartItemService.update(skuId, num);
+        return update ? CommonResult.success(Boolean.TRUE) : CommonResult.failed(Boolean.FALSE);
+    }
+
 
     @ApiOperation("购物车生成订单")
     @PostMapping(value = "/createOrder")
@@ -77,7 +90,8 @@ public class OmsCartItemController {
         // 订单地址保存,其实传入一个收货地址,另外,有的是只买入一件了,件数,同时支持他的件数可以修改,比如
         // 一个skuId他,数量不让他修改,那提交订单就是一个收货地址,加上,前端计算好一个总价格,与后台进行匹配
         // 生成订单需要删除购物车中的数据,这个交给异步Mq进行计算,异步删除单中的订单商品,
-        // 收货地址+,数量,拓展功能,因为没做数量上的加减,那么就只需要一个集合id,和总价
+        // 收货地址+,数量,拓展功能,因为没做数量上的加减,那么就只需要一个集合id,和总价,显示的话就是三个详情,显示多一张图片
+        // 普通订单查询修改,显示多图片点开不一样就好了,一个订单,多图片List<product>,生成一个订单,这样就可以接绝了
         return null;
     }
 

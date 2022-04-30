@@ -78,4 +78,9 @@ public class OmsCartItem implements Serializable {
 
     @ApiModelProperty(value = "商品分类id")
     private Long pdtCgyId;
+
+    /**
+     * 无用字段->做插入和新增用,不用放入mybatis中
+     */
+    private Integer count;
 }
