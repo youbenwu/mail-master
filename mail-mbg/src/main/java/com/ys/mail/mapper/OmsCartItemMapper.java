@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -58,4 +59,28 @@ public interface OmsCartItemMapper extends BaseMapper<OmsCartItem> {
      * @return 返回值
      */
     List<BuyProductPO> batchProduct(@Param("ids") List<Long> ids,@Param("userId") Long userId);
+
+    /**
+     * 查询库存
+     * @param skuId id
+     * @param num 数量
+     * @return 返回值
+     */
+    Integer selectByNum(@Param("skuId") Long skuId,@Param("num") Integer num);
+
+    /**
+     * 修改库存
+     * @param skuId skuId
+     * @param num 数量
+     * @param userId 用户id
+     * @return 返回值
+     */
+    boolean update(@Param("skuId") Long skuId,@Param("num") Integer num,@Param("userId") Long userId);
+
+    /**
+     * 新增或修改
+     * @param item 参数对象
+     * @return 返回值
+     */
+    boolean insertOrUpdate(@Param("item") OmsCartItem item);
 }

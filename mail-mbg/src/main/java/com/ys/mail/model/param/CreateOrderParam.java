@@ -47,14 +47,21 @@ public class CreateOrderParam implements Serializable {
 
     @ApiModelProperty(value = "前端计算好的总价格",required = true)
     @NotNull
-    @Range(min = 1,message = "请输入正确的地址")
+    @Range(min = 1,message = "请输入正确的金额")
     private Long totalPrice;
 
-    @ApiModelProperty(value = "集合skuId",required = true)
-    @NotEmpty
-    private List<Long> ids;
+    @ApiModelProperty(value = "集合商品")
+    private List<CartProduct> carts;
 
-    //如果是生成三笔订单,
+    @Data
+    private static class CartProduct{
 
+        @ApiModelProperty(value = "skuId",required = true)
+        private Long skuId;
+
+        @ApiModelProperty(value = "留言,可以不填")
+        private String orderNote;
+
+    }
 
 }

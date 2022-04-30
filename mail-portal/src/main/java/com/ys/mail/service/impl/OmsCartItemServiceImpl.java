@@ -2,20 +2,27 @@ package com.ys.mail.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.OmsCartItem;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.mapper.OmsCartItemMapper;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.dto.BatchBuyProductDTO;
+import com.ys.mail.model.dto.HasSoldProductDTO;
 import com.ys.mail.service.OmsCartItemService;
+import com.ys.mail.service.PmsSkuStockService;
 import com.ys.mail.service.UmsAddressService;
+import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdWorker;
 import com.ys.mail.util.UserUtil;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -52,7 +59,7 @@ public class OmsCartItemServiceImpl extends ServiceImpl<OmsCartItemMapper, OmsCa
         item.setCartItemId(IdWorker.generateId());
         item.setUserId(UserUtil.getCurrentUser().getUserId());
         item.setQuantity(quantity);
-        return save(item) ? CommonResult.success(Boolean.TRUE) : CommonResult.failed(Boolean.FALSE);
+        return cartItemMapper.insertOrUpdate(item) ? CommonResult.success(Boolean.TRUE) : CommonResult.failed(Boolean.FALSE);
     }
 
 //    @Override
@@ -82,6 +89,13 @@ public class OmsCartItemServiceImpl extends ServiceImpl<OmsCartItemMapper, OmsCa
         return new BatchBuyProductDTO(addressService.getByUserId(userId),
                 cartItemMapper.batchProduct(ids, userId));
 
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean update(Long skuId,Integer num) {
+        ApiAssert.noValue(cartItemMapper.selectByNum(skuId,num),BusinessErrorCode.GOODS_STOCK_EMPTY);
+        return cartItemMapper.update(skuId,num,UserUtil.getCurrentUser().getUserId());
     }
 
 }

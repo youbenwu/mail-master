@@ -139,12 +139,23 @@ public class IPUtil {
 //        System.out.println(getHostIp());
 //        System.out.println(getLocalIp());
 //        System.out.println(getIpAddress());
-        double d = 0.05;
-        double d1 = 0.5;
-        long l = new Double(d).longValue();
-        long l1 = new Double(d1).longValue();
-        System.out.println(l);
-        System.out.println(l1);
+//        double d = 0.05;
+//        double d1 = 0.5;
+//        long l = new Double(d).longValue();
+//        long l1 = new Double(d1).longValue();
+//        System.out.println(l);
+//        System.out.println(l1);
+        String reg = "^?[1-9]\\d*$";
+        String str = "-1";
+        String str2 = "1";
+        String str3 = "-1000";
+        String str4 = "1000";
+        String str5 = "0";
+        System.out.println(str.matches(reg));
+        System.out.println(str2.matches(reg));
+        System.out.println(str3.matches(reg));
+        System.out.println(str4.matches(reg));
+        System.out.println(str5.matches(reg));
     }
 
 }

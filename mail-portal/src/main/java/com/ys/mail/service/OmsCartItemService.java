@@ -55,4 +55,12 @@ public interface OmsCartItemService extends IService<OmsCartItem> {
      * @return 返回值
      */
     BatchBuyProductDTO batchProduct(List<Long> ids);
+
+    /**
+     * 修改库存数量
+     * @param skuId 购物车主键id
+     * @param num 数量
+     * @return 返回值
+     */
+    boolean update(Long skuId,Integer num);
 }

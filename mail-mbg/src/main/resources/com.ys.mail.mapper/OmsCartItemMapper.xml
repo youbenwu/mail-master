@@ -38,7 +38,7 @@
         SELECT
             pss.product_id,
             pss.sku_stock_id product_sku_id,
-            pss.price * #{quantity} AS price,
+            pss.price,
             pss.sp_data product_attr,
             pss.pic product_pic,
             pp.product_name,
@@ -56,8 +56,8 @@
             product_id,
             product_sku_id,
             user_id,
-            sum(quantity) quantity,
-            sum(price) price,
+            quantity,
+            price,
             product_sku_code,
             product_sn,
             product_attr,
@@ -69,10 +69,7 @@
         FROM
             oms_cart_item
         WHERE
-            user_id = #{userId}
-        GROUP BY
-            user_id,
-            product_sku_id;
+            user_id = #{userId};
     </select>
 
     <delete id="removeBySkuId">
@@ -96,15 +93,54 @@
         product_name,
         product_sku_id sku_stock_id,
         product_attr sp_data,
-        sum(price) price,
-        sum(quantity) quantity,
+        price,
+        quantity,
         pdt_cgy_id
         from oms_cart_item
         where user_id = #{userId}
-        and product_sku_id in(
+        and cart_item_id in(
             <foreach collection="ids" item="item" separator=",">
                 #{item}
             </foreach>
-            ) GROUP BY product_sku_id
+            ) ;
     </select>
+
+    <select id="selectByNum" resultType="java.lang.Integer">
+        SELECT
+            stock
+        FROM
+            pms_sku_stock
+        WHERE
+            sku_stock_id = #{skuId}
+          AND stock <![CDATA[ >= ]]> #{num};
+    </select>
+
+    <update id="update">
+        update oms_cart_item
+        set update_time = now(),
+            quantity = #{num}
+        where user_id = #{userId} and product_sku_id = #{skuId};
+    </update>
+
+    <update id="insertOrUpdate" parameterType="com.ys.mail.entity.OmsCartItem">
+        <selectKey keyProperty="count" resultType="int" order="BEFORE">
+            select count(1) from oms_cart_item where user_id = #{item.userId} and product_sku_id = #{item.productSkuId}
+        </selectKey>
+        <if test="count > 0">
+            update oms_cart_item
+            <set>
+                <if test="item.quantity != null">
+                    quantity= quantity + #{item.quantity},
+                    update_time = now(),
+                </if>
+            </set>
+            where user_id = #{item.userId} and product_sku_id = #{item.productSkuId}
+        </if>
+        <if test="count==0">
+            insert into oms_cart_item(cart_item_id,product_id,product_sku_id,user_id,quantity,
+            price,product_attr,create_time,product_name,product_pic,pdt_cgy_id)
+            values(#{item.cartItemId},#{item.productId},#{item.productSkuId},#{item.userId},#{item.quantity},
+            #{item.price},#{item.productAttr},now(),#{item.productName},#{item.productPic},#{item.pdtCgyId})
+        </if>
+    </update>
 </mapper>
