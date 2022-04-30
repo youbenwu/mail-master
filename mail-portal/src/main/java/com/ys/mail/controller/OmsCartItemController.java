@@ -4,7 +4,9 @@ package com.ys.mail.controller;
 import com.ys.mail.annotation.LocalLockAnn;
 import com.ys.mail.entity.OmsCartItem;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.bo.GenerateOrderBO;
 import com.ys.mail.model.dto.BatchBuyProductDTO;
+import com.ys.mail.model.param.CreateOrderParam;
 import com.ys.mail.service.OmsCartItemService;
 import com.ys.mail.service.PmsProductService;
 import com.ys.mail.service.PmsSkuStockService;
@@ -86,13 +88,8 @@ public class OmsCartItemController {
     @ApiOperation("购物车生成订单")
     @PostMapping(value = "/createOrder")
     @LocalLockAnn(key = "cartItemCreateOrder:arg[0]")
-    public CommonResult<String> createOrder(){
-        // 订单地址保存,其实传入一个收货地址,另外,有的是只买入一件了,件数,同时支持他的件数可以修改,比如
-        // 一个skuId他,数量不让他修改,那提交订单就是一个收货地址,加上,前端计算好一个总价格,与后台进行匹配
-        // 生成订单需要删除购物车中的数据,这个交给异步Mq进行计算,异步删除单中的订单商品,
-        // 收货地址+,数量,拓展功能,因为没做数量上的加减,那么就只需要一个集合id,和总价,显示的话就是三个详情,显示多一张图片
-        // 普通订单查询修改,显示多图片点开不一样就好了,一个订单,多图片List<product>,生成一个订单,这样就可以接绝了
-        return null;
+    public CommonResult<GenerateOrderBO> createOrder(@Validated @RequestBody CreateOrderParam param){
+        return CommonResult.success(cartItemService.createOrder(param));
     }
 
 

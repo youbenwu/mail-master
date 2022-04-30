@@ -1,6 +1,8 @@
 package com.ys.mail.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.util.BlankUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
@@ -192,5 +194,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadPaddingException.class)
     public CommonResult<String> badPaddingException(BadPaddingException e) {
         return CommonResult.errBadPadding(e.getMessage());
+    }
+
+
+    @ResponseBody
+    @ExceptionHandler(JsonMappingException.class)
+    public CommonResult<String> jsonMappingException(JsonMappingException e){
+        return CommonResult.failed(BlankUtil.isEmpty(e) ? null : e.getMessage());
     }
 }

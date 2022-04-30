@@ -153,12 +153,12 @@ public class PmsProductController {
         return CommonResult.success(result);
     }
 
-    @ApiOperation("购物车商品生成订单")
-    @PostMapping(value = "/bathGenerateOrder")
-    @LocalLockAnn(key = "bathGenerateOrder:arg[0]")
-    public CommonResult<Boolean> bathGenerateOrder(@Validated @RequestBody BathGenerateOrderParam param) {
-        return productService.bathGenerateOrder(param);
-    }
+//    @ApiOperation("购物车商品生成订单")
+//    @PostMapping(value = "/bathGenerateOrder")
+//    @LocalLockAnn(key = "bathGenerateOrder:arg[0]")
+//    public CommonResult<Boolean> bathGenerateOrder(@Validated @RequestBody BathGenerateOrderParam param) {
+//        return productService.bathGenerateOrder(param);
+//    }
 
     @ApiOperation("查看礼品")
     @GetMapping(value = "/getGift")
