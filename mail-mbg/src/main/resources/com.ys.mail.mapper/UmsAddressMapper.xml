@@ -27,6 +27,24 @@
     <sql id="Base_Column_List">
         address_id, user_id, contacts, phone, province_code, province, city_code, city, county_code, county, client_address,latitude,longitude, is_default_status, label, create_time, update_time
     </sql>
+
+    <!-- 地图距离计算SQL，需传入经纬度对象 mapQuery-->
+    <sql id="Map_Distance_SQL">
+        IFNULL(ROUND(
+             6378.138*2*ASIN(
+                 SQRT(
+                     POW(
+                         SIN(( #{mapQuery.lat}*PI()/180 - latitude*PI()/180)/2),2) +
+                        COS( #{mapQuery.lat}*PI()/180) *
+                        COS( latitude*PI()/180) *
+                        POW( SIN(( #{mapQuery.lng}*PI()/180-longitude*PI()/180)/2),2
+                        )
+                    )
+                )*1000,2
+            ),
+        0) AS distance
+    </sql>
+
     <update id="updateAsIsDefault">
         <foreach collection="addresses" item="item" index="index" separator=";">
             update ums_address
@@ -64,17 +82,7 @@
     <select id="selectRecentAddress" resultMap="BaseResultMap">
         SELECT
                 <include refid="Base_Column_List"/>,
-                ROUND(
-                    6378.138*2*ASIN(
-                        SQRT(
-                            POW(
-                                SIN(( #{lat}*PI()/180 - latitude*PI()/180)/2),2) +
-                                COS( #{lat}*PI()/180) *
-                                COS( latitude*PI()/180) *
-                                POW( SIN(( #{lng}*PI()/180-longitude*PI()/180)/2),2)
-                        )
-                    )*1000,2
-                ) AS distance
+                <include refid="Map_Distance_SQL"/>
         FROM
                 ums_address
         WHERE

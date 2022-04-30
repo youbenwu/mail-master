@@ -15,6 +15,7 @@ import com.ys.mail.service.OmsOrderItemService;
 import com.ys.mail.service.OmsOrderService;
 import com.ys.mail.service.PmsSkuStockService;
 import com.ys.mail.service.SmsFlashPromotionService;
+import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdGenerator;
 import com.ys.mail.util.IdWorker;
 import com.ys.mail.util.UserUtil;
@@ -72,11 +73,18 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     private Long redisExpireHomePage;
 
     @Override
-    public List<FlashPromotionProductPO> getAllNewestSecond(Byte robBuyType) {
+    public List<FlashPromotionProductPO> getAllNewestSecond(Byte robBuyType, MapQuery mapQuery) {
         // TODO,所有的商品加入到秒杀中,秒杀完用户删除redis中的,但是数据库中会增加一条数据进行下一轮key秒杀,
         // 那么这条秒杀就进不去了,那就有问题了,必须从数据库中才能刷新出来,这中间就有个bug了
         // 翻页id,场次id,场次id传0,第一次我给他全部查询出来
-        return flashPromotionMapper.selectAllNewestSecond(robBuyType);
+
+        if (BlankUtil.isNotEmpty(mapQuery)) {
+            if (BlankUtil.isEmpty(mapQuery.getLat()) || BlankUtil.isEmpty(mapQuery.getLng())) {
+                mapQuery = MapQuery.getDefaultCentrePoint();
+            }
+        }
+
+        return flashPromotionMapper.selectAllNewestSecond(robBuyType, mapQuery);
     }
 
 
@@ -145,7 +153,12 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
 
     @Override
     public List<FlashPromotionProductBO> getAllNewestSecondPage(String flashPromotionId, String flashPromotionPdtId, Byte robBuyType, MapQuery mapQuery) {
-        return flashPromotionMapper.selectAllNewestSecondPage(Long.valueOf(flashPromotionId), Long.valueOf(flashPromotionPdtId), robBuyType, mapQuery);
+        if (BlankUtil.isNotEmpty(mapQuery)) {
+            if (BlankUtil.isEmpty(mapQuery.getLat()) || BlankUtil.isEmpty(mapQuery.getLng())) {
+                mapQuery = MapQuery.getDefaultCentrePoint();
+            }
+        }
+        return flashPromotionMapper.selectAllNewestSecondPage(Long.valueOf(flashPromotionId), Long.valueOf(flashPromotionPdtId), robBuyType, mapQuery, true);
     }
 
 }

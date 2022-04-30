@@ -82,3 +82,4 @@ task:
 redis:
   key:
     inviteUser: 'ums:invite:user' # 用户个人邀请，map结构
+    geo: 'geo:secKill' # 用于存储用户秒杀商品的店铺地理信息，提供计算

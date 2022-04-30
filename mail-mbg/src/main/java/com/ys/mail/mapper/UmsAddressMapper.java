@@ -2,6 +2,7 @@ package com.ys.mail.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ys.mail.entity.UmsAddress;
+import com.ys.mail.model.admin.query.MapQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -36,12 +37,11 @@ public interface UmsAddressMapper extends BaseMapper<UmsAddress> {
     /**
      * 获取当前用户的最近的收货地址
      *
-     * @param userId 用户ID
-     * @param lat    纬度
-     * @param lng    经度
+     * @param userId   用户ID
+     * @param mapQuery 经纬度
      * @return 最近的地址，没有则为空
      */
-    UmsAddress selectRecentAddress(@Param("userId") Long userId, @Param("lat") double lat, @Param("lng") double lng);
+    UmsAddress selectRecentAddress(@Param("userId") Long userId, @Param("mapQuery") MapQuery mapQuery);
 
     /**
      * 查询用户收货地址列表

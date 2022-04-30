@@ -47,7 +47,7 @@ public class SmsProductStoreServiceImpl extends ServiceImpl<SmsProductStoreMappe
     @Override
     public boolean updateReviewState(SmsProductStoreParam param) {
         // 店铺ID校验
-        String pdtStoreId = param.getPdtStoreId();
+        Long pdtStoreId = param.getPdtStoreId();
         SmsProductStore smsProductStore = this.getById(pdtStoreId);
         ApiAssert.noValue(smsProductStore, CommonResultCode.ID_NO_EXIST);
         // 状态校验

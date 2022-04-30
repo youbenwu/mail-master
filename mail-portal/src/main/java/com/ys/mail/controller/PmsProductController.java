@@ -53,7 +53,7 @@ public class PmsProductController {
     @GetMapping(value = "/getProductInfo/{productId:^\\d{19}$}")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "productId", value = "商品id", dataType = "Long", required = true),
-            @ApiImplicitParam(name = "flag", value = "传值null或者false不会查出会员价,传true就有会员价,会员专区传", dataType = "Boolean")
+            @ApiImplicitParam(name = "flag", value = "true->会员价，默认无会员价，会员专区传", dataType = "Boolean")
     })
     public CommonResult<ProductInfoDTO> getProductInfo(@PathVariable Long productId,
                                                        @RequestParam(value = "flag", required = false) Boolean flag) {

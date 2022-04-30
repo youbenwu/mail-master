@@ -23,8 +23,6 @@
         <result column="parent_id" property="parentId" />
         <result column="pdt_cgy_name" property="pdtCgyName" />
         <result column="level" property="level" />
-        <result column="is_nav_status" property="navStatus" />
-        <result column="is_show_status" property="showStatus" />
         <result column="sort" property="sort" />
         <result column="icon" property="icon" />
         <result column="description" property="description" />
@@ -124,6 +122,15 @@
             </otherwise>
         </choose>
 
+    </select>
+
+    <select id="getNavCategory" resultType="com.ys.mail.model.dto.NavCategoryDTO">
+        SELECT
+                pdt_cgy_id,pdt_cgy_name
+        FROM
+                pms_product_category
+        WHERE
+                is_nav_status = 1 AND deleted = 0 ORDER BY sort
     </select>
 
 </mapper>

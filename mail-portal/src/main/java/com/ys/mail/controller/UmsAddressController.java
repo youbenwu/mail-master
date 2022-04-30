@@ -55,7 +55,7 @@ public class UmsAddressController {
         return CommonResult.success(result);
     }
 
-    @ApiOperation("用户设计收货地址是否为默认")
+    @ApiOperation("用户设置收货地址是否为默认")
     @PostMapping(value = "/createAsIsDefault/{addressId:^\\d{19}$}")
     public CommonResult<Boolean> createAsIsDefault(@PathVariable Long addressId) {
         return addressService.createAsIsDefault(addressId);
@@ -69,9 +69,9 @@ public class UmsAddressController {
 
     @ApiOperation(value = "获取最近的收货地址", notes = "当经纬度为空则返回默认的地址")
     @GetMapping(value = "/getRecentAddress")
-    public CommonResult<UmsAddress> getRecentAddress(@Validated MapQuery query) {
+    public CommonResult<UmsAddress> getRecentAddress(@Validated MapQuery mapQuery) {
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsAddress result = addressService.getRecentAddressOrDefault(userId, query.getLat(), query.getLng());
+        UmsAddress result = addressService.getRecentAddressOrDefault(userId, mapQuery);
         return CommonResult.success(result);
     }
 }

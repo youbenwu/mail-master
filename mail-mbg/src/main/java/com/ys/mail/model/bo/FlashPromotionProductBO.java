@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ys.mail.annotation.BlankOrPattern;
+import com.ys.mail.enums.RegularEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -65,5 +67,21 @@ public class FlashPromotionProductBO implements Serializable {
 
     @ApiModelProperty(value = "距离，单位m")
     private Double distance;
+
+    @ApiModelProperty(value = "纬度")
+    private Double lat;
+
+    @ApiModelProperty(value = "经度")
+    private Double lng;
+
+    @ApiModelProperty(value = "创建时间")
+    @TableField(fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    private Date createTime;
+
+    @ApiModelProperty(value = "修改时间")
+    @TableField(fill = FieldFill.UPDATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    private Date updateTime;
 
 }

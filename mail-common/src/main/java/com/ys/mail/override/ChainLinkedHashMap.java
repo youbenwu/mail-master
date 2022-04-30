@@ -6,9 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @Desc 扩展链式Map，支持链式调用、按条件按顺序添加元素
- * @Author CRH
- * @Create 2022-04-01 10:12
+ * 扩展链式Map，支持链式调用、按条件按顺序添加元素
+ *
+ * @author CRH
+ * @date 2022-4-28 16:50
+ * @since 1.0
  */
 @NoArgsConstructor
 public class ChainLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements Map<K, V> {

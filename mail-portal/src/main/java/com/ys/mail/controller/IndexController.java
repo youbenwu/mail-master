@@ -94,19 +94,11 @@ public class IndexController {
         return CommonResult.success(result);
     }
 
-
-    /**
-     * 三个值可以传为json了,能后是秒杀
-     */
-    @ApiOperation("重写精选...生活")
-    @PostMapping(value = "/searchAllPdtType")
-    public CommonResult<List<ProductPO>> searchAllPdtType(@Validated @RequestBody ProductParam param) {
+    @ApiOperation("首页、会员专享")
+    @GetMapping(value = "/searchAllPdtType")
+    public CommonResult<List<ProductPO>> searchAllPdtType(@Validated ProductParam param) {
         List<ProductPO> result = productService.searchAllPdtType(param);
         return CommonResult.success(result);
     }
-
-    /**
-     * 普通详情页,传null过去,会员传true过来,没有影响,null值,flag传入则是有值
-     */
 
 }

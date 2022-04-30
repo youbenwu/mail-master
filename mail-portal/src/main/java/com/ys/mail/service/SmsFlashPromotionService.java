@@ -25,7 +25,7 @@ public interface SmsFlashPromotionService extends IService<SmsFlashPromotion> {
      * @param robBuyType 类型
      * @return 返回值
      */
-    List<FlashPromotionProductPO> getAllNewestSecond(Byte robBuyType);
+    List<FlashPromotionProductPO> getAllNewestSecond(Byte robBuyType,MapQuery mapQuery);
 
     /**
      * 生成秒杀订单

@@ -28,9 +28,11 @@ public interface SmsFlashPromotionMapper extends BaseMapper<SmsFlashPromotion> {
      * 首页秒杀活动全部
      *
      * @param robBuyType 类型
+     * @param mapQuery   经纬度
      * @return 返回值
      */
-    List<FlashPromotionProductPO> selectAllNewestSecond(@Param("robBuyType") Byte robBuyType);
+    List<FlashPromotionProductPO> selectAllNewestSecond(@Param("robBuyType") Byte robBuyType,
+                                                        @Param("mapQuery") MapQuery mapQuery);
 
     /**
      * 查询首页中限时抢购的商品
@@ -46,12 +48,15 @@ public interface SmsFlashPromotionMapper extends BaseMapper<SmsFlashPromotion> {
      * @param flashPromotionId    场次id
      * @param flashPromotionPdtId 翻页id
      * @param robBuyType          类型
+     * @param mapQuery            经纬度
+     * @param isOpenPage          是否开启分页
      * @return 返回值
      */
     List<FlashPromotionProductBO> selectAllNewestSecondPage(@Param("flashPromotionId") Long flashPromotionId,
                                                             @Param("flashPromotionPdtId") Long flashPromotionPdtId,
                                                             @Param("robBuyType") Byte robBuyType,
-                                                            @Param("mapQuery") MapQuery mapQuery);
+                                                            @Param("mapQuery") MapQuery mapQuery,
+                                                            @Param("isOpenPage") boolean isOpenPage);
 
     String selectByEndTime(@Param("flashPromotionId") Long flashPromotionId);
 

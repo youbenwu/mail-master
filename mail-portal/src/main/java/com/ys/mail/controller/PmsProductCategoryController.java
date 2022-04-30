@@ -3,6 +3,7 @@ package com.ys.mail.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.dto.NavCategoryDTO;
 import com.ys.mail.model.dto.SearchProductDTO;
 import com.ys.mail.model.query.CategorySearchQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
@@ -43,5 +44,12 @@ public class PmsProductCategoryController {
         //条件:查找商品，价格升和降,综合查全部,新品查是否是新品,keyword查,翻页条数
         Page<SearchProductDTO> result = productCategoryService.search(query);
         return BlankUtil.isEmpty(result) ? CommonResult.failed(BusinessErrorCode.NOT_PDT_CATEGORY) : CommonResult.success(result);
+    }
+
+    @ApiOperation("获取导航分类列表")
+    @GetMapping(value = "/getNavCategory")
+    public CommonResult<List<NavCategoryDTO>> getNavCategory() {
+        List<NavCategoryDTO> navCategory = productCategoryService.getNavCategory();
+        return CommonResult.success(navCategory);
     }
 }

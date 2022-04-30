@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RabbitMqSmsConfig;
+import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.FigureConstant;
 import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.*;
@@ -16,13 +17,17 @@ import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.*;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
+import com.ys.mail.model.bo.FlashPromotionProductBO;
 import com.ys.mail.model.bo.GenerateOrderBO;
 import com.ys.mail.model.dto.*;
+import com.ys.mail.model.map.RedisGeoDTO;
 import com.ys.mail.model.mq.MSOrderCheckDTO;
 import com.ys.mail.model.param.GenerateOrderParam;
 import com.ys.mail.model.po.MyStorePO;
 import com.ys.mail.model.query.QueryQuickBuy;
 import com.ys.mail.model.query.QuickBuyProductQuery;
+import com.ys.mail.model.vo.NearbyStoreProductVO;
 import com.ys.mail.model.vo.OrderItemDetailsVO;
 import com.ys.mail.service.*;
 import com.ys.mail.util.*;
@@ -41,6 +46,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,10 +55,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -101,6 +104,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Autowired
     private UmsPartnerMapper partnerMapper;
     @Autowired
+    private UmsPartnerService umsPartnerService;
+    @Autowired
     private UmsIncomeMapper umsIncomeMapper;
     @Autowired
     private SmsFlashPromotionHistoryService historyService;
@@ -108,6 +113,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     private SmsProductStoreService smsProductStoreService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private RedisConfig redisConfig;
 
 
     @Value("${redis.database}")
@@ -676,7 +683,6 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         return CommonResult.success("退回成功");
     }
 
-
     // 合伙人二维码 确认收货逻辑
     public void confirmReceiptVerification(String orderSn, int symNum, boolean br) {
         OmsVerificationOrder verificationOrder = verificationOrderMapper.selectOne(Wrappers
@@ -728,4 +734,84 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         Long id = BlankUtil.isEmpty(flashPromotionPdtId) ? null : Long.valueOf(flashPromotionPdtId);
         return flashPromotionProductMapper.selectAllProduct(cpyType, id, UserUtil.getCurrentUser().getUserId());
     }
+
+    @Override
+    public NearbyStoreProductVO getNearbyStore(Long flashPromotionId, Integer productType, Double radius, MapQuery mapQuery, Long partnerId) {
+        String fullKey = redisConfig.fullKey(redisConfig.getKey().getGeo() + ":" + flashPromotionId);
+        NearbyStoreProductVO vo = new NearbyStoreProductVO();
+        vo.setGeoList(new ArrayList<>());
+        vo.setProductList(new ArrayList<>());
+
+        // 查询当前场次所有秒杀商品
+        List<FlashPromotionProductBO> boList = flashPromotionMapper.selectAllNewestSecondPage(flashPromotionId, NumberUtils.LONG_ZERO, productType.byteValue(), mapQuery, false);
+        if (BlankUtil.isEmpty(boList)) {
+            return null;
+        }
+        // 构造Redis GEO列表
+        loadFlashInfoToRedisGeo(fullKey, boList);
+
+        // 从redis中计算出附近符合条件的列表
+        if (BlankUtil.isEmpty(radius)) {
+            radius = 5000d;
+        }
+        List<RedisGeoDTO> list = redisService.gRadius(fullKey, mapQuery.getLng(), mapQuery.getLat(), radius);
+        if (BlankUtil.isNotEmpty(list)) {
+            // 获取默认店铺
+            RedisGeoDTO redisGeoDTO = list.get(0);
+            if (BlankUtil.isNotEmpty(partnerId)) {
+                redisGeoDTO = getGeoById(list, partnerId);
+                list.remove(redisGeoDTO);
+                list.add(0, redisGeoDTO);
+            }
+            Long id = redisGeoDTO.getId();
+            Double distance = redisGeoDTO.getDistance();
+
+            // 根据供应商ID获取信息
+            PartnerUserDTO partnerUserDTO = partnerMapper.getPartnerInfoById(id);
+            if (BlankUtil.isNotEmpty(partnerUserDTO)) {
+                partnerUserDTO.setDistance(distance);
+            }
+            // 根据供应商ID获取当场上架的产品信息
+            List<FlashPromotionProductBO> collect = boList.stream()
+                                                          .filter(bo -> BlankUtil.isNotEmpty(bo.getPartnerId()))
+                                                          .filter(bo -> bo.getPartnerId().equals(id))
+                                                          .collect(Collectors.toList());
+            // 封装结果
+            vo.setPartnerInfo(partnerUserDTO);
+            vo.setProductList(collect);
+            vo.setGeoList(list);
+        }
+        return vo;
+    }
+
+    private RedisGeoDTO getGeoById(List<RedisGeoDTO> list, Long id) {
+        for (RedisGeoDTO redisGeoDTO : list) {
+            if (redisGeoDTO.getId().equals(id)) {
+                return redisGeoDTO;
+            }
+        }
+        return new RedisGeoDTO();
+    }
+
+    /**
+     * 加载秒杀信息到Redis中
+     *
+     * @param fullKey key
+     * @param boList  列表数据
+     */
+    private void loadFlashInfoToRedisGeo(String fullKey, List<FlashPromotionProductBO> boList) {
+        Map<Object, Point> geoMap = new HashMap<>(100);
+        for (FlashPromotionProductBO bo : boList) {
+            Double lat = bo.getLat();
+            Double lng = bo.getLng();
+            if (BlankUtil.isNotEmpty(lat) && BlankUtil.isNotEmpty(lng)) {
+                Point point = new Point(lng, lat);
+                geoMap.put(bo.getPartnerId(), point);
+            }
+        }
+        // 将经纬度数据加载到Redis中，并设置过期时间
+        redisService.gAdd(fullKey, geoMap);
+        redisService.expire(fullKey, redisConfig.getExpire().getMinute());
+    }
+
 }

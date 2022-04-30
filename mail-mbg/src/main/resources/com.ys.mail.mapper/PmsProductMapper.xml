@@ -439,32 +439,28 @@
                 pic,
                 product_name,
                 price,
-                <if test="param.flag == 1">
+                <if test="param.flag">
                     meb_price,
                 </if>
                 sale
         FROM
                 pms_product
         <where>
+            deleted = 0
+            AND is_publish_status = 1
+            <if test="param.productId != null">
+                AND product_id <![CDATA[ < ]]>  #{param.productId}
+            </if>
             <choose>
-                <when test="param.hType == null or param.hType == 1">
-                    is_handpick_status = 1
-                </when>
-                <when test="param.hType == 2">
-                    is_delicacy_status = 1
-                </when>
-                <when test="param.hType == 3">
-                    is_style_status = 1
+                <when test="param.pdtCgyId == null or param.pdtCgyId ==''">
+                    AND pdt_cgy_id IN (
+                        SELECT pdt_cgy_id FROM pms_product_category WHERE parent_id = #{param.pdtCgyId}
+                    )
                 </when>
                 <otherwise>
-                    is_live_status = 1
+                    AND pdt_cgy_id = #{param.pdtCgyId}
                 </otherwise>
             </choose>
-            <if test="param.productId != null">
-                and product_id <![CDATA[ < ]]>  #{param.productId}
-            </if>
-            and deleted = 0
-            and is_publish_status = 1
         </where>
         order by product_id desc
         limit 20;

@@ -3,12 +3,14 @@ package com.ys.mail.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.SmsFlashPromotionProduct;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.bo.GenerateOrderBO;
 import com.ys.mail.model.dto.*;
 import com.ys.mail.model.param.GenerateOrderParam;
 import com.ys.mail.model.po.MyStorePO;
 import com.ys.mail.model.query.QueryQuickBuy;
 import com.ys.mail.model.query.QuickBuyProductQuery;
+import com.ys.mail.model.vo.NearbyStoreProductVO;
 
 import java.io.IOException;
 import java.util.List;
@@ -130,4 +132,15 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
      * @return 返回值
      */
     List<MyStoreDTO> getAllProduct(Byte cpyType, String flashPromotionPdtId);
+
+    /**
+     * 获取附近店铺信息
+     *
+     * @param flashPromotionId 秒杀场次ID
+     * @param productType      商品类型：如：0->公司，1->用户上架
+     * @param radius           半径，默认5公里
+     * @param mapQuery         经纬度
+     * @return 结果
+     */
+    NearbyStoreProductVO getNearbyStore(Long flashPromotionId, Integer productType, Double radius, MapQuery mapQuery,Long partnerId);
 }

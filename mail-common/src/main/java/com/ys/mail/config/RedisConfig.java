@@ -67,6 +67,7 @@ public class RedisConfig {
         private String monitorServers;
         private String localLockAnn;
         private String inviteUser;
+        private String geo;
     }
 
     @Getter
