@@ -10,6 +10,7 @@ import com.ys.mail.model.admin.dto.excel.OrderCollectDTO;
 import com.ys.mail.model.admin.dto.excel.UserOrderDetailsDTO;
 import com.ys.mail.model.admin.param.ExportOrderParam;
 import com.ys.mail.model.admin.vo.PcUserOrderVO;
+import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
 import com.ys.mail.model.dto.OmsOrderDTO;
 import com.ys.mail.model.dto.OrderInfoDTO;
@@ -21,6 +22,7 @@ import com.ys.mail.model.vo.PartnerTodayResultsVO;
 import com.ys.mail.model.vo.UserOrderVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
 
 import java.util.List;
 
@@ -135,4 +137,10 @@ public interface OmsOrderMapper extends BaseMapper<OmsOrder> {
      * @return 结果
      */
     List<UserOrderDetailsDTO> getUserOrderDetailsData(@Param("userId") Long userId);
+
+    /**
+     * 查询出创客待返还给推荐人
+     * @return 返回值
+     */
+    List<PidPrPdtOrderVO> selectByPidPrPdtOrder();
 }

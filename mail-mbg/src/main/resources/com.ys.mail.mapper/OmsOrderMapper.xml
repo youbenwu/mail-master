@@ -492,4 +492,44 @@
                      LEFT JOIN oms_order_item ooi ON oo.order_id = ooi.order_id
         WHERE oo.user_id = #{userId}
     </select>
+
+    <resultMap id="PidPrPdtResultMap" type="com.ys.mail.model.admin.vo.PidPrPdtOrderVO">
+        <id column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="product_quantity" property="productQuantity"/>
+        <result column="partner_pdt_id" property="partnerPdtId"/>
+        <result column="partner_name" property="partnerName"/>
+        <result column="partner_price" property="partnerPrice"/>
+        <result column="re_periods" property="rePeriods"/>
+        <result column="parent_id" property="parentId"/>
+
+        <association property="umsIncome" javaType="com.ys.mail.entity.UmsIncome"
+                     column="parent_id" select="com.ys.mail.mapper.UmsIncomeMapper.selectNewestByUserId"/>
+    </resultMap>
+
+    <select id="selectByPidPrPdtOrder" resultMap="PidPrPdtResultMap">
+        select
+        oo.order_id,
+        oo.user_id,
+        sum(oo.total_amount) total_amount,
+        sum(ooi.product_quantity) product_quantity,
+        ppp.partner_pdt_id,
+        ppp.partner_name,
+        ppp.partner_price,
+        ppp.earnest_money,
+        ppp.total_price,
+        ppp.re_periods,
+        uui.parent_id
+        from oms_order oo
+        left join oms_order_item ooi on oo.order_id = ooi.order_id
+        left join pms_partner_product ppp on ooi.partner_pdt_id = ppp.partner_pdt_id
+        left join ums_user_invite uui on oo.user_id = uui.user_id
+        where oo.order_type = 4
+        and oo.trans_id <![CDATA[ > ]]> 0
+        and TO_DAYS( NOW( ) ) - TO_DAYS(oo.payment_time) <![CDATA[ <= ]]> 1
+        and oo.total_amount <![CDATA[ >= ]]> 1680000
+        and ppp.is_publish_status = 1
+        GROUP BY uui.parent_id
+    </select>
 </mapper>

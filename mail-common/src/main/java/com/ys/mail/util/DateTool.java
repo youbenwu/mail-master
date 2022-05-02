@@ -134,9 +134,13 @@ public class DateTool {
     }
 
     public static void main(String[] args) {
-        System.out.println(localTimeIsBetween("14:17:00", "14:40:05"));
-        System.out.println(localTimeIsAfter("14:32:20"));
-        System.out.println(localTimeIsBefore("14:32:20"));
+//        System.out.println(localTimeIsBetween("14:17:00", "14:40:05"));
+//        System.out.println(localTimeIsAfter("14:32:20"));
+//        System.out.println(localTimeIsBefore("14:32:20"));
+
+        //DateTime dateTime = DateUtil.offsetDay(new Date(), -7);
+        String format = new SimpleDateFormat(com.ys.mail.model.unionPay.DateUtil.DT_SHORT_).format(DateUtil.offsetDay(new Date(), -7));
+        System.out.println(format);
     }
 
 }

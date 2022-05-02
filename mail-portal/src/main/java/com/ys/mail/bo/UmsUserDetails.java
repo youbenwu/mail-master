@@ -40,7 +40,7 @@ public class UmsUserDetails implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 返回当前用户的权限,LOGIN代表登录就可以操作
-        return Arrays.asList(new SimpleGrantedAuthority("LOGIN"));
+        return Collections.singletonList(new SimpleGrantedAuthority("LOGIN"));
     }
 
     @Override

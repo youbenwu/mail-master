@@ -11,10 +11,12 @@ import com.ys.mail.model.admin.dto.ExportOrderDTO;
 import com.ys.mail.model.admin.param.ExportOrderParam;
 import com.ys.mail.model.admin.query.OmsOrderQuery;
 import com.ys.mail.model.admin.vo.PcUserOrderVO;
+import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
 import com.ys.mail.service.OmsOrderService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.JavaForDateUtil;
+import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,6 +114,11 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     @Override
     public List<PrPdtOrderVO> getByPrPdtOrder() {
         return omsOrderMapper.selectByPrPdtOrder();
+    }
+
+    @Override
+    public List<PidPrPdtOrderVO> getByPidPrPdtOrder() {
+        return omsOrderMapper.selectByPidPrPdtOrder();
     }
 
 }

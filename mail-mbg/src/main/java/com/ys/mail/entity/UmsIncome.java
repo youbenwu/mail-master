@@ -58,7 +58,7 @@ public class UmsIncome implements Serializable {
      * 系统扣除：-，系统补还：+，payType为 3
      */
     @ApiModelProperty(value = "收益类型:-2->系统补还,-1->系统扣除,0->邀请收益,1->秒杀收益，2->余额提现，3->普通收益，" +
-            "4->审核资金，5->审核退还，6->分佣收益，7->商家收益,8->创客收益,9->余额支付,10->扣除服务费,11->退还服务费")
+            "4->审核资金，5->审核退还，6->分佣收益，7->商家收益,8->创客收益,9->余额支付,10->扣除服务费,11->退还服务费,12->邀请创客冻结收益,13->解冻邀请创客冻结收益")
     private Integer incomeType;
 
     /**
@@ -117,6 +117,8 @@ public class UmsIncome implements Serializable {
         NINE(9, "余额支付"),
         TEN(10, "扣除服务费"),
         ELEVEN(11, "退还服务费"),
+        TWELVE(12,"邀请创客冻结收益"),
+        THIRTEEN(13,"解冻邀请创客冻结收益"),
         ;
         final Integer type;
         final String name;

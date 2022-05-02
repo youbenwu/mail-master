@@ -4,12 +4,17 @@ import com.ys.mail.constant.FigureConstant;
 import com.ys.mail.entity.PcReview;
 import com.ys.mail.entity.PmsPartnerRe;
 import com.ys.mail.entity.UmsIncome;
+import com.ys.mail.enums.EnumSettingType;
+import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
+import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
 import com.ys.mail.model.unionPay.DateUtil;
 import com.ys.mail.model.vo.PartnerReIncomeVO;
 import com.ys.mail.service.*;
 import com.ys.mail.util.*;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
+import org.elasticsearch.search.aggregations.metrics.ParsedSingleValueNumericMetricsAggregation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,8 @@ public class ScheduleTask {
     private PmsPartnerReService partnerReService;
     @Autowired
     private IncomeService incomeService;
+    @Autowired
+    private SysSettingService settingService;
 
     /**
      * 每天晚上23:50:00 时间点：将当天所有未进行审核的数据置为[已失效]数据
@@ -230,6 +237,122 @@ public class ScheduleTask {
         } catch (Exception e) {
             LOGGER.info("scheduledTask3系统调度信息异常,当月1号执行的数量为0");
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 创客返还收益->
+     * 逻辑:单日有没有产生创客订单,没有直接结束方法,
+     * 单日用户买的创客订单,有没有推荐人,有推荐人则给这些这些推荐人执行返现,冻结收益,7天之后才可以返现,
+     * 时间是以服务器上的时间为准,ums_income加上类型,冻结邀请创客收益,3000元,7天之后恢复收益到ums_income中来
+     * ums_income解冻后恢复金额到结余中去,
+     * 判空可以抽到公共类中去
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "00 05 1 * * ?")
+    public void scheduledTask4() {
+        LOGGER.info("异步执行邀请创客返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
+
+        List<PidPrPdtOrderVO> vos = omsOrderService.getByPidPrPdtOrder();
+        if(BlankUtil.isEmpty(vos)){
+            LOGGER.info("scheduledTask4单日没有返还给上级的分佣");
+            return;
+        }
+        Double reMoney=settingService.getSettingValue(EnumSettingType.twenty);
+        if(BlankUtil.isEmpty(reMoney)){
+            LOGGER.info("scheduledTask4分佣已被管理员设置关闭");
+            return;
+        }
+        List<Long> ids = IdWorker.generateIds(vos.size());
+        List<UmsIncome> incomes = new ArrayList<>();
+        AtomicInteger num = new AtomicInteger();
+        Integer integerZero = NumberUtils.INTEGER_ZERO;
+        vos.stream().filter(Objects::nonNull).forEach(
+                vo->{
+                    if(BlankUtil.isNotEmpty(vo.getParentId())){
+                        num.incrementAndGet();
+                        Integer quantity = vo.getProductQuantity();
+                        long income = reMoney.longValue() * FigureConstant.INT_ONE_HUNDRED * quantity;
+                        long quReMoney = reMoney.longValue() * quantity;
+                        incomes.add(UmsIncome.builder()
+                                .incomeId(ids.get(num.get() -integerZero))
+                                .userId(vo.getParentId())
+                                .income(income)
+                                .expenditure(NumberUtils.LONG_ZERO)
+                                .balance(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO : (BlankUtil.isEmpty(vo.getUmsIncome().getBalance()) ? NumberUtils.LONG_ZERO : vo.getUmsIncome().getBalance()))
+                                .allIncome(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO : (BlankUtil.isEmpty(vo.getUmsIncome().getAllIncome()) ? NumberUtils.LONG_ZERO : vo.getUmsIncome().getAllIncome()))
+                                .incomeType(UmsIncome.IncomeType.TWELVE.key())
+                                .detailSource("冻结邀请用户购买创客商品:"+ quReMoney)
+                                .remark("用户:"+vo.getUserId() + "购买创客商品返佣:" + quReMoney + "总计数量:" + quantity)
+                                .payType(UmsIncome.PayType.THREE.key())
+                                .incomeNo(FigureConstant.STRING_EMPTY)
+                                .orderTradeNo(FigureConstant.STRING_EMPTY)
+                                .build());
+                    }else{
+                        LOGGER.info("当前用户:{}没有上级用户,执行返佣为空",vo.getUserId());
+                    }
+                }
+        );
+        try{
+            Optional<Long> reduce = incomes.stream().map(UmsIncome::getIncome).reduce(Long::sum);
+            int save = umsIncomeService.insertBatch(incomes);
+            LOGGER.info("创建创客商品推荐人返佣数量:{},返还金额,{}",save,reduce);
+        }catch (Exception e){
+            LOGGER.debug("scheduledTask4系统调度信息异常,单天执行的数量为0");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 七天冻结金额返还
+     * 查询出来有多少给创客返佣的,不会出现多个,一个是待返的金额,一一对应的,
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "00 15 1 * * ?")
+    public void scheduledTask5(){
+        LOGGER.info("异步执行解冻创客返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
+
+        Integer day=settingService.getSettingValue(EnumSettingType.twenty_one);
+        if(BlankUtil.isEmpty(day)){
+            LOGGER.info("scheduledTask5管理员设置未开启邀请创客返佣");
+            return;
+        }
+        String format = new SimpleDateFormat(com.ys.mail.model.unionPay.DateUtil.DT_SHORT_).format(cn.hutool.core.date.DateUtil.offsetDay(new Date(), day));
+        List<FreezeReMoneyVO> vos=incomeService.getByFreezeReMoney(format);
+        if(BlankUtil.isEmpty(vos)){
+            LOGGER.info("scheduledTask5单日没有冻结创客返佣");
+            return;
+        }
+        List<Long> ids = IdWorker.generateIds(vos.size());
+        List<UmsIncome> incomes = new ArrayList<>();
+        AtomicInteger num = new AtomicInteger();
+        Integer integerOne = NumberUtils.INTEGER_ONE;
+        vos.stream().filter(Objects::nonNull).forEach(
+                vo->{
+                    if(vo.getUserId().equals(vo.getUmsIncome().getUserId())){
+                        num.incrementAndGet();
+                        BigDecimal divide = DecimalUtil.toBigDecimal(vo.getIncome()).divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
+                        incomes.add(UmsIncome.builder()
+                                .incomeId(ids.get(num.get() -integerOne))
+                                .userId(vo.getUserId())
+                                .income(NumberUtils.LONG_ZERO)
+                                .expenditure(NumberUtils.LONG_ZERO)
+                                .balance(vo.getUmsIncome().getBalance() + vo.getIncome())
+                                .allIncome(vo.getUmsIncome().getAllIncome())
+                                .incomeType(UmsIncome.IncomeType.THIRTEEN.key())
+                                .detailSource("解冻邀请创客返佣:"+divide)
+                                .incomeNo(FigureConstant.STRING_EMPTY)
+                                .orderTradeNo(FigureConstant.STRING_EMPTY)
+                                .payType(UmsIncome.PayType.THREE.key())
+                                .build());
+                    }
+                }
+        );
+        try{
+            int save = umsIncomeService.insertBatch(incomes);
+            LOGGER.info("创建创客商品推荐人冻结返佣数量:{},应返数量{}",vos.size(),save);
+        }catch (Exception e){
+            LOGGER.debug("scheduledTask5系统调度信息异常,单天执行的数量为0");
         }
     }
 

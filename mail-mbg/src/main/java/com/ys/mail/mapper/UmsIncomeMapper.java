@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.model.admin.dto.excel.IncomeCollectDTO;
 import com.ys.mail.model.admin.dto.excel.UserBalanceDTO;
+import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
 import com.ys.mail.model.admin.vo.UmsIncomeVO;
 import com.ys.mail.model.vo.UmsIncomeSumVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -79,4 +80,10 @@ public interface UmsIncomeMapper extends BaseMapper<UmsIncome> {
      */
     List<UserBalanceDTO> getUserBalance();
 
+    /**
+     * 查询待返还的数量
+     * @param format 天数
+     * @return 返回值
+     */
+    List<FreezeReMoneyVO> selectByFreezeReMoney(@Param("format") String format);
 }

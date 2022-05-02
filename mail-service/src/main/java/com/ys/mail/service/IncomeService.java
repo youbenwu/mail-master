@@ -2,6 +2,7 @@ package com.ys.mail.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.UmsIncome;
+import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -58,4 +59,10 @@ public interface IncomeService extends IService<UmsIncome> {
      */
     BigDecimal calcuCharges(Long money);
 
+    /**
+     * 查询待返还的数量
+     * @param format 返还时间
+     * @return 返回值
+     */
+    List<FreezeReMoneyVO> getByFreezeReMoney(String format);
 }

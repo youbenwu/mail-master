@@ -8,7 +8,9 @@ import com.ys.mail.model.admin.dto.ExportOrderDTO;
 import com.ys.mail.model.admin.param.ExportOrderParam;
 import com.ys.mail.model.admin.query.OmsOrderQuery;
 import com.ys.mail.model.admin.vo.PcUserOrderVO;
+import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
 import com.ys.mail.model.admin.vo.PrPdtOrderVO;
+import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
 
 import java.util.List;
 
@@ -46,4 +48,10 @@ public interface OmsOrderService extends IService<OmsOrder> {
      * @return
      */
     List<PrPdtOrderVO> getByPrPdtOrder();
+
+    /**
+     * 查询当天下的创客订单返还给邀请人
+     * @return 返回值
+     */
+    List<PidPrPdtOrderVO> getByPidPrPdtOrder();
 }

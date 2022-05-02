@@ -8,6 +8,7 @@ import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.enums.EnumSettingType;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.mapper.UmsIncomeMapper;
+import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
 import com.ys.mail.service.IncomeService;
 import com.ys.mail.service.SysSettingService;
 import com.ys.mail.util.BlankUtil;
@@ -153,5 +154,10 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
             return rate;
         }
         return null;
+    }
+
+    @Override
+    public List<FreezeReMoneyVO> getByFreezeReMoney(String format) {
+        return umsIncomeMapper.selectByFreezeReMoney(format);
     }
 }

@@ -146,4 +146,17 @@
         FROM ums_income
         WHERE income_id IN (SELECT MAX(income_id) FROM ums_income WHERE deleted = 0 GROUP BY user_id)
     </select>
+
+    <resultMap id="freezeReMoneyResultMap" type="com.ys.mail.model.admin.vo.FreezeReMoneyVO" extends="BaseResultMap">
+        <association property="umsIncome" javaType="com.ys.mail.entity.UmsIncome"
+        column="user_id" select="com.ys.mail.mapper.UmsIncomeMapper.selectNewestByUserId"/>
+    </resultMap>
+
+    <select id="selectByFreezeReMoney" resultMap="freezeReMoneyResultMap">
+        select <include refid="Base_Column_List"/>
+        from ums_income
+        where income_type = 12
+        and DATE_FORMAT(`create_time`, '%Y-%m-%d') = #{format}
+        order by income_id desc
+    </select>
 </mapper>

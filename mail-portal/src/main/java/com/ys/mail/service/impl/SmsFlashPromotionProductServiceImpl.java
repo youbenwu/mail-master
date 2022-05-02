@@ -460,8 +460,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             sfpp.setIsPublishStatus(false);
             // 1卖出 2秒杀 3上架
             sfpp.setFlashProductStatus(3);
-            // 确认平台
-            sfpp.setCpyType((byte) (1 - orderInfo.getCpyType()));
+            // 所有确认收货到我的店铺都是卖乐吧,卖乐吧就是1
+            sfpp.setCpyType(NumberUtils.BYTE_ONE);
             // 保存订单id做查询用
             sfpp.setOrderId(orderInfo.getOrderId());
             // 合伙人原价格      如果置换-则拿  置换后产品价格  否则 拿订单的合伙人原价格
@@ -509,8 +509,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
     @Override
     public SmsFlashPromotionDTO currentPlatformPromotionId(Byte cpyType) {
-        SmsFlashPromotionDTO smsFlashPromotionDTO = flashPromotionMapper.currentPlatformPromotionId(cpyType);
-        return smsFlashPromotionDTO;
+        return flashPromotionMapper.currentPlatformPromotionId(cpyType);
     }
 
     @Override
