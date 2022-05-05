@@ -75,7 +75,7 @@ public class OmsCartItemController {
     @ApiOperation("购物车加减数量")
     @PutMapping(value = "/{skuId:^\\d{19}$}/{num:^?[1-9]\\d*$}")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "skuId", value = "购物车主键id", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "skuId", value = "skuId", dataType = "Long", required = true),
             @ApiImplicitParam(name = "num", value = "数量,传几就是设置为几,不能为0和负数", dataType = "Integer", required = true)
     })
     public CommonResult<Boolean> update(@PathVariable Long skuId,

@@ -163,8 +163,9 @@
         from oms_cart_item
         where user_id = #{userId}
         AND product_sku_id in(
-        <foreach collection="carts" item="item" separator=",">
-            #{item.skuId}
+        <foreach collection="carts" item="item" index="index" separator=",">
+            (select sku_stock_id from pms_sku_stock where sku_stock_id = #{item.skuId}
+            AND stock <![CDATA[ >= ]]> #{item.num} HAVING sku_stock_id IS NOT NULL)
         </foreach>
         ) ;
     </select>
