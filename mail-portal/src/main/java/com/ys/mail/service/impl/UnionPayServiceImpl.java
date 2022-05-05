@@ -341,10 +341,10 @@ public class UnionPayServiceImpl implements UnionPayService {
 
     @Override
     public synchronized CommonResult<String> aliPayBuyProduct(AliBuyProductParam param) throws AlipayApiException {
-        BusinessErrorCode repBuyProduct = repBuyProduct(param.getOrderSn(), param.getAmount());
-        if (repBuyProduct.getCode() != BusinessErrorCode.RESPONSE_SUCCESS.getCode()) {
-            return CommonResult.failed(repBuyProduct);
-        }
+//        BusinessErrorCode repBuyProduct = repBuyProduct(param.getOrderSn(), param.getAmount());
+//        if (repBuyProduct.getCode() != BusinessErrorCode.RESPONSE_SUCCESS.getCode()) {
+//            return CommonResult.failed(repBuyProduct);
+//        }
         AlipayTradeAppPayResponse response = repAlipay(param);
         String body = response.getBody();
         return response.isSuccess() ? CommonResult.success(body) : CommonResult.failed(body);
