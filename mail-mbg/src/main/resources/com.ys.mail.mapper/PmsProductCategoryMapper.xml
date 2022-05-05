@@ -127,7 +127,7 @@
     <!-- 获取导航分类 -->
     <select id="getNavCategory" resultType="com.ys.mail.model.dto.NavCategoryDTO">
         SELECT
-                pdt_cgy_id,pdt_cgy_name
+                pdt_cgy_id,pdt_cgy_name,icon
         FROM
                 pms_product_category
         WHERE
@@ -137,7 +137,7 @@
     <!-- 根据导航分类ID查询下级分类 -->
     <select id="getSubNavCategory" resultType="com.ys.mail.model.dto.NavCategoryDTO">
         SELECT
-                pdt_cgy_id,pdt_cgy_name
+                pdt_cgy_id,pdt_cgy_name,icon
         FROM
                 pms_product_category
         WHERE

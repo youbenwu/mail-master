@@ -31,7 +31,7 @@ public class CgyProductQuery implements Serializable {
     @BlankOrPattern(regEnum = RegularEnum.KEY)
     private String pdtCgyId;
 
-    @ApiModelProperty(value = "标记,默认是首页数据,true->表示会员专享数据")
+    @ApiModelProperty(value = "会员标记,默认是首页数据,true->表示会员专享数据")
     private Boolean member;
 
 }
