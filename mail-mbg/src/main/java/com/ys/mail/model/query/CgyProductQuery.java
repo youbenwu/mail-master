@@ -23,7 +23,7 @@ public class CgyProductQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotBlank
-    @ApiModelProperty(value = "父级导航分类ID，必传", required = true)
+    @ApiModelProperty(value = "父级导航分类ID")
     @BlankOrPattern(regEnum = RegularEnum.KEY)
     private String parentId;
 

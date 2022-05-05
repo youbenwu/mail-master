@@ -30,7 +30,7 @@ public class PmsProductCategory implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long pdtCgyId;
 
-    @ApiModelProperty(value = "上机分类的编号：0表示一级分类")
+    @ApiModelProperty(value = "上级分类的编号：0表示一级分类")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long parentId;
 
@@ -50,6 +50,10 @@ public class PmsProductCategory implements Serializable {
     @ApiModelProperty(value = "显示状态：0->不显示；1->显示")
     @TableField("is_show_status")
     private Boolean showStatus;
+
+    @ApiModelProperty(value = "是否默认显示首页：0->不显示；1->显示")
+    @TableField("is_default_status")
+    private Boolean defaultStatus;
 
     @ApiModelProperty(value = "排序")
     private Integer sort;

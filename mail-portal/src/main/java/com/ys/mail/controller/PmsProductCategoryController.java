@@ -2,8 +2,6 @@ package com.ys.mail.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ys.mail.annotation.BlankOrPattern;
-import com.ys.mail.enums.RegularEnum;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.query.MapQuery;
@@ -16,15 +14,12 @@ import com.ys.mail.model.query.PageQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
 import com.ys.mail.service.PmsProductCategoryService;
 import com.ys.mail.util.BlankUtil;
-import com.ys.mail.util.NumberUtil;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -61,15 +56,6 @@ public class PmsProductCategoryController {
     public CommonResult<List<NavCategoryDTO>> getNavCategory() {
         List<NavCategoryDTO> navCategory = productCategoryService.getNavCategory();
         return CommonResult.success(navCategory);
-    }
-
-    @ApiOperation("获取下级导航分类列表")
-    @GetMapping(value = "/getSubNavCategory")
-    @ApiImplicitParam(name = "parentId", value = "商品分类ID")
-    public CommonResult<List<NavCategoryDTO>> getSubNavCategory(@RequestParam("parentId") @NotBlank
-                                                                @BlankOrPattern(regEnum = RegularEnum.KEY) String parentId) {
-        List<NavCategoryDTO> subNavCategory = productCategoryService.getSubNavCategory(NumberUtil.longOf(parentId));
-        return CommonResult.success(subNavCategory);
     }
 
     @ApiOperation("根据分类ID查询商品列表")

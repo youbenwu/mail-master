@@ -38,19 +38,11 @@ public interface PmsProductCategoryService extends IService<PmsProductCategory> 
     Page<SearchProductDTO> search(CategorySearchQuery query);
 
     /**
-     * 获取导航分类
+     * 获取导航分类，树形结构
      *
      * @return 分类列表
      */
     List<NavCategoryDTO> getNavCategory();
-
-    /**
-     * 获取下级导航分类
-     *
-     * @param parentId 分类ID
-     * @return 分类列表
-     */
-    List<NavCategoryDTO> getSubNavCategory(Long parentId);
 
     /**
      * 根据分类ID获取商品列表
