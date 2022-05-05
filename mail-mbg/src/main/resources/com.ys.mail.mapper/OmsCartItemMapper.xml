@@ -23,7 +23,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         cart_item_id, product_id, product_sku_id, user_id, quantity, price, product_sku_code,
-        product_sn, product_attr, create_time, update_time,product_name,product_pic
+        product_sn, product_attr, create_time, update_time,product_name,product_pic,pdt_cgy_id
     </sql>
 
     <update id="updateQuantity">
@@ -143,4 +143,38 @@
             #{item.price},#{item.productAttr},now(),#{item.productName},#{item.productPic},#{item.pdtCgyId})
         </if>
     </update>
+
+    <select id="selectBySkuId" resultMap="BaseResultMap">
+        select
+        cart_item_id,
+        product_id,
+        product_sku_id,
+        user_id,
+        quantity,
+        price * quantity as price,
+        product_sku_code,
+        product_sn,
+        product_attr,
+        create_time,
+        update_time,
+        product_name,
+        product_pic,
+        pdt_cgy_id
+        from oms_cart_item
+        where user_id = #{userId}
+        AND product_sku_id in(
+        <foreach collection="carts" item="item" separator=",">
+            #{item.skuId}
+        </foreach>
+        ) ;
+    </select>
+
+    <insert id="insertOrder" useGeneratedKeys="true">
+        insert into oms_order
+        (order_id,user_id,order_sn,total_amount,pay_amount,order_type,receiver_name,receiver_phone,receiver_province,
+        receiver_city,receiver_region,receiver_address,create_time,cpy_type,order_note)
+        values (#{order.orderId},#{order.userId},#{order.orderSn}
+        #{order.totalAmount},#{order.payAmount},#{order.orderType},#{address.contacts},#{address.phone},
+        #{address.province},#{address.city},#{address.county},#{address.clientAddress},now(),0,#{order.orderNote});
+    </insert>
 </mapper>

@@ -3,6 +3,7 @@ package com.ys.mail.controller;
 import com.ys.mail.annotation.ApiBlock;
 import com.ys.mail.annotation.BlankOrPattern;
 import com.ys.mail.annotation.LocalLockAnn;
+import com.ys.mail.enums.RegularEnum;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.query.MapQuery;
@@ -14,6 +15,7 @@ import com.ys.mail.model.po.FlashPromotionProductPO;
 import com.ys.mail.model.po.MyStorePO;
 import com.ys.mail.model.query.QueryQuickBuy;
 import com.ys.mail.model.query.QuickBuyProductQuery;
+import com.ys.mail.model.vo.NearbyStoreProductVO;
 import com.ys.mail.model.vo.ShoppingMsgVO;
 import com.ys.mail.service.SmsFlashPromotionHistoryService;
 import com.ys.mail.service.SmsFlashPromotionProductService;
@@ -29,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.util.List;
@@ -61,10 +64,11 @@ public class SmsFlashPromotionProductController {
     @ApiOperation("首页秒杀活动全部-DT")
     @GetMapping(value = "/getAllNewestSecond")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "robBuyType", value = "0->公司,1->用户上架,null查所有", dataType = "Boolean"),
+            @ApiImplicitParam(name = "robBuyType", value = "0->公司，1->用户上架，默认查所有", dataType = "Boolean")
     })
-    public CommonResult<List<FlashPromotionProductPO>> getAllNewestSecond(@RequestParam(required = false) @Range(min = 0, max = 1) Byte robBuyType) {
-        List<FlashPromotionProductPO> result = flashPromotionService.getAllNewestSecond(robBuyType);
+    public CommonResult<List<FlashPromotionProductPO>> getAllNewestSecond(@RequestParam(required = false) @Range(min = 0, max = 1) Byte robBuyType,
+                                                                          MapQuery mapQuery) {
+        List<FlashPromotionProductPO> result = flashPromotionService.getAllNewestSecond(robBuyType, mapQuery);
         return CommonResult.success(result);
     }
 
@@ -110,7 +114,7 @@ public class SmsFlashPromotionProductController {
         return flashPromotionProductService.addUserFlashProduct(flashPromotionPdtId);
     }
 
-    @ApiOperation("首页秒杀活动全部翻页-DT")
+    @ApiOperation(value = "首页秒杀活动全部翻页-DT", notes = "当经纬度为空时则默认以北京天安门为中心点计算：[39.909652,116.404177]")
     @GetMapping(value = "/getAllNewestSecondPage")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "flashPromotionId", value = "场次id，必传", dataType = "Long", required = true),
@@ -122,9 +126,9 @@ public class SmsFlashPromotionProductController {
                                                                               @RequestParam(value = "flashPromotionPdtId", defaultValue = "0")
                                                                               @NotBlank @BlankOrPattern(regexp = "^0|\\d{19}$") String flashPromotionPdtId,
                                                                               @RequestParam(required = false) @Range(min = 0, max = 1) Byte robBuyType,
-                                                                              MapQuery query) {
+                                                                              MapQuery mapQuery) {
 
-        List<FlashPromotionProductBO> bos = flashPromotionService.getAllNewestSecondPage(flashPromotionId, flashPromotionPdtId, robBuyType, query);
+        List<FlashPromotionProductBO> bos = flashPromotionService.getAllNewestSecondPage(flashPromotionId, flashPromotionPdtId, robBuyType, mapQuery);
         return CommonResult.success(bos);
     }
 
@@ -245,6 +249,25 @@ public class SmsFlashPromotionProductController {
     public CommonResult<List<ShoppingMsgVO>> getAllHistory(@RequestParam(value = "histroyId", required = false) @Pattern(regexp = "\\d{19}$") String histroyId) {
         List<ShoppingMsgVO> result = historyService.getAllHistory(histroyId);
         return CommonResult.success(result);
+    }
+
+    @ApiOperation(value = "附近秒杀店铺定位", notes = "当经纬度为空时则默认以北京天安门为中心点计算：[39.909652,116.404177]")
+    @GetMapping(value = "/getNearbyStore")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "flashPromotionId", value = "场次id，必传", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "productType", value = "产品类型：0->公司、供应商，1->用户上架", dataType = "int", required = true),
+            @ApiImplicitParam(name = "radius", value = "以定位为中心点的半径范围，单位m，默认：500000，表示500公里", dataType = "double"),
+            @ApiImplicitParam(name = "partnerId", value = "店铺ID，默认为最近的店铺ID", dataType = "Long")
+    })
+    public CommonResult<NearbyStoreProductVO> getNearbyStore(@RequestParam("flashPromotionId")
+                                                             @NotNull @BlankOrPattern(regEnum = RegularEnum.ID) Long flashPromotionId,
+                                                             @RequestParam(value = "productType") Integer productType,
+                                                             @RequestParam(value = "radius", required = false) Double radius,
+                                                             @RequestParam(value = "partnerId", required = false)
+                                                             @BlankOrPattern(regEnum = RegularEnum.ID) Long partnerId,
+                                                             MapQuery mapQuery) {
+        NearbyStoreProductVO vo = flashPromotionProductService.getNearbyStore(flashPromotionId, productType, radius, mapQuery, partnerId);
+        return CommonResult.success(vo);
     }
 
 }

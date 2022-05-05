@@ -3,6 +3,7 @@ package com.ys.mail.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ys.mail.entity.UmsPartner;
 import com.ys.mail.model.dto.PartnerAddressDTO;
+import com.ys.mail.model.dto.PartnerUserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,12 @@ public interface UmsPartnerMapper extends BaseMapper<UmsPartner> {
      * @return 地址信息
      */
     PartnerAddressDTO getAddressByProductId(@Param("productId") Long productId);
+
+    /**
+     * 根据供应商ID获取供应商信息和用户信息
+     *
+     * @param partnerId 供应商ID
+     * @return 结果
+     */
+    PartnerUserDTO getPartnerInfoById(@Param("partnerId") Long partnerId);
 }

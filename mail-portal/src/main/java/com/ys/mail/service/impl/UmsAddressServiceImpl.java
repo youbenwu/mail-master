@@ -7,6 +7,7 @@ import com.ys.mail.entity.UmsUser;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.UmsAddressMapper;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.map.MapDataDTO;
 import com.ys.mail.model.param.UmsAddressParam;
 import com.ys.mail.service.UmsAddressService;
@@ -130,16 +131,18 @@ public class UmsAddressServiceImpl extends ServiceImpl<UmsAddressMapper, UmsAddr
     }
 
     @Override
-    public UmsAddress getRecentAddress(Long userId, double lat, double lng) {
-        return addressMapper.selectRecentAddress(userId, lat, lng);
+    public UmsAddress getRecentAddress(Long userId, MapQuery mapQuery) {
+        return addressMapper.selectRecentAddress(userId, mapQuery);
     }
 
     @Override
-    public UmsAddress getRecentAddressOrDefault(Long userId, Double lat, Double lng) {
+    public UmsAddress getRecentAddressOrDefault(Long userId, MapQuery mapQuery) {
         // 获取最近的个人地址
         UmsAddress umsAddress;
-        if (BlankUtil.isNotEmpty(lat) && BlankUtil.isNotEmpty(lng)) {
-            umsAddress = this.getRecentAddress(userId, lat, lng);
+        if (BlankUtil.isNotEmpty(mapQuery) &&
+                BlankUtil.isNotEmpty(mapQuery.getLat()) &&
+                BlankUtil.isNotEmpty(mapQuery.getLng())) {
+            umsAddress = this.getRecentAddress(userId, mapQuery);
         } else {
             // 经纬度为空则返回默认的
             umsAddress = this.getByUserId(userId);

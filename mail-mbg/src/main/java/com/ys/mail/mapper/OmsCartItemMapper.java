@@ -2,7 +2,11 @@ package com.ys.mail.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ys.mail.entity.OmsCartItem;
+import com.ys.mail.entity.OmsOrder;
+import com.ys.mail.entity.OmsOrderItem;
+import com.ys.mail.entity.UmsAddress;
 import com.ys.mail.model.dto.BatchBuyProductDTO;
+import com.ys.mail.model.param.CreateOrderParam;
 import com.ys.mail.model.po.BuyProductPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -83,4 +87,21 @@ public interface OmsCartItemMapper extends BaseMapper<OmsCartItem> {
      * @return 返回值
      */
     boolean insertOrUpdate(@Param("item") OmsCartItem item);
+
+    /**
+     * 根据skuId查询出购物车的基本信息
+     * @param carts 集合
+     * @param userId 用户id
+     * @return
+     */
+    List<OmsCartItem> selectBySkuId(@Param("carts") List<CreateOrderParam.Cart> carts, @Param("userId") Long userId);
+
+    /**
+     * 插入购物车订单
+     * @param address 地址对象
+     * @param items 集合对象
+     * @param order 参数
+     * @return
+     */
+    boolean insertOrder(@Param("address") UmsAddress address, @Param("items") List<OmsOrderItem> items, @Param("order") OmsOrder order);
 }

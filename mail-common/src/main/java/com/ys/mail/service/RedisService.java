@@ -1,5 +1,9 @@
 package com.ys.mail.service;
 
+import com.ys.mail.model.map.RedisGeoDTO;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Point;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -322,6 +326,47 @@ public interface RedisService {
      * @return 返回值
      */
     Long keys(String s);
+
+    /**
+     * 添加元素到GEO结构中
+     *
+     * @param key key
+     * @param lat 纬度
+     * @param lng 经度
+     * @param id  id
+     * @return 结果
+     */
+    Long gAdd(String key, double lat, double lng, Object id);
+
+    /**
+     * 批量添加元素到GEO结构中
+     *
+     * @param key    key
+     * @param member 成员对象
+     * @return 结果
+     */
+    Long gAdd(String key, Map<Object, Point> member);
+
+    /**
+     * 计算两点之间的距离
+     *
+     * @param key    key
+     * @param pointA A点
+     * @param pointB B点
+     * @return 距离
+     */
+    Distance gDistance(String key, Object pointA, Object pointB);
+
+    /**
+     * 获取中心点半径内的坐标列表
+     *
+     * @param key    key
+     * @param lng    中心点经度
+     * @param lat    中心点纬度
+     * @param radius 半径
+     * @return 匹配到的坐标列表
+     */
+    List<RedisGeoDTO> gRadius(String key, double lng, double lat, double radius);
 
     /**
      * 清空当前数据库：一般情况下不建议使用

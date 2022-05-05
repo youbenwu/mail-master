@@ -1,13 +1,18 @@
 package com.ys.mail.service.impl;
 
 
+import com.ys.mail.model.map.RedisGeoDTO;
 import com.ys.mail.service.RedisService;
 import com.ys.mail.util.BlankUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.*;
+import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -205,6 +210,62 @@ public class RedisServiceImpl implements RedisService {
     public Long keys(String s) {
         Set<String> keys = redisTemplate.keys(s);
         return BlankUtil.isEmpty(keys) ? NumberUtils.LONG_ZERO : redisTemplate.delete(keys);
+    }
+
+    @Override
+    public Long gAdd(String key, double lat, double lng, Object id) {
+        RedisGeoCommands.GeoLocation<Object> geoLocation = new RedisGeoCommands.GeoLocation<>(id, new Point(lat, lng));
+        return redisTemplate.opsForGeo().add(key, geoLocation);
+    }
+
+    @Override
+    public Long gAdd(String key, Map<Object, Point> member) {
+        return redisTemplate.opsForGeo().add(key, member);
+    }
+
+    @Override
+    public Distance gDistance(String key, Object pointA, Object pointB) {
+        return null;
+    }
+
+    @Override
+    public List<RedisGeoDTO> gRadius(String key, double lng, double lat, double radius) {
+        GeoOperations<String, Object> geoOperations = redisTemplate.opsForGeo();
+        RedisGeoCommands.GeoRadiusCommandArgs geoRadiusCommandArgs = RedisGeoCommands.GeoRadiusCommandArgs
+                .newGeoRadiusArgs().includeDistance()
+                .includeCoordinates().sortAscending();
+        Point point = new Point(lng, lat);
+        Distance distance = new Distance(radius, Metrics.NEUTRAL);
+        Circle circle = new Circle(point, distance);
+        GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults = geoOperations.radius(key, circle, geoRadiusCommandArgs);
+        return calculateResult(geoResults);
+
+    }
+
+    /**
+     * 计算结果
+     *
+     * @param geoResults 匹配结果
+     */
+    private List<RedisGeoDTO> calculateResult(GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults) {
+        List<RedisGeoDTO> list = new ArrayList<>();
+        if (geoResults != null) {
+            for (GeoResult<RedisGeoCommands.GeoLocation<Object>> geoResult : geoResults) {
+                // 与目标点相距的距离信息
+                Distance geoResultDistance = geoResult.getDistance();
+                // 该点的信息
+                RedisGeoCommands.GeoLocation<Object> geoResultContent = geoResult.getContent();
+                // 经纬度
+                Point point = geoResultContent.getPoint();
+                RedisGeoDTO redisGeoDTO = new RedisGeoDTO();
+                redisGeoDTO.setLng(point.getX());
+                redisGeoDTO.setLat(point.getY());
+                redisGeoDTO.setDistance(geoResultDistance.getValue());
+                redisGeoDTO.setId(Long.valueOf(geoResultContent.getName().toString()));
+                list.add(redisGeoDTO);
+            }
+        }
+        return list;
     }
 
     @Override

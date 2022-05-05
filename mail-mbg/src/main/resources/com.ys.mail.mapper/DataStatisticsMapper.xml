@@ -46,9 +46,9 @@
     <!-- 按订单类型分组统计数据 -->
     <select id="getOrderDataByDate" resultType="com.ys.mail.model.admin.vo.statistics.PcOrderCollectDataVo">
         SELECT
-        order_type,
-        COUNT(1) orderNumber,
-        SUM(pay_amount) orderAmount
+            order_type,
+            COUNT(1) orderNumber,
+            SUM(pay_amount) orderAmount
         FROM
         oms_order
         <where>

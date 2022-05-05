@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.PmsProductCategory;
 import com.ys.mail.mapper.PmsProductCategoryMapper;
-import com.ys.mail.mapper.PmsProductMapper;
-import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.dto.NavCategoryDTO;
 import com.ys.mail.model.dto.SearchProductDTO;
 import com.ys.mail.model.query.CategorySearchQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
@@ -31,10 +30,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class PmsProductCategoryServiceImpl extends ServiceImpl<PmsProductCategoryMapper, PmsProductCategory> implements PmsProductCategoryService {
 
-   @Autowired
-   private PmsProductCategoryMapper productCategoryMapper;
-   @Autowired
-   private RedisTemplate redisTemplate;
+    @Autowired
+    private PmsProductCategoryMapper productCategoryMapper;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Value("${redis.database}")
     private String redisDatabase;
@@ -48,12 +47,12 @@ public class PmsProductCategoryServiceImpl extends ServiceImpl<PmsProductCategor
         String key = redisDatabase
                 + ":"
                 + redisKeyPdtCategory;
-        List<ProductCategoryTree> trees = redisTemplate.opsForList().range(key,0,100);
-        if(BlankUtil.isEmpty(trees)){
-            trees =  TreeUtil.toTree(productCategoryMapper.selectCategoryTree(),"pdtCgyId","parentId","children",ProductCategoryTree.class);
-            if(! BlankUtil.isEmpty(trees)){
-                redisTemplate.opsForList().rightPushAll(key,trees);
-                redisTemplate.expire(key,redisExpireDistrict, TimeUnit.DAYS);
+        List<ProductCategoryTree> trees = redisTemplate.opsForList().range(key, 0, 100);
+        if (BlankUtil.isEmpty(trees)) {
+            trees = TreeUtil.toTree(productCategoryMapper.selectCategoryTree(), "pdtCgyId", "parentId", "children", ProductCategoryTree.class);
+            if (!BlankUtil.isEmpty(trees)) {
+                redisTemplate.opsForList().rightPushAll(key, trees);
+                redisTemplate.expire(key, redisExpireDistrict, TimeUnit.DAYS);
             }
         }
         return trees;
@@ -61,7 +60,12 @@ public class PmsProductCategoryServiceImpl extends ServiceImpl<PmsProductCategor
 
     @Override
     public Page<SearchProductDTO> search(CategorySearchQuery query) {
-        Page<T> page = new Page<>(query.getPageNum(),query.getPageSize());
-        return productCategoryMapper.selectSearch(page,query);
+        Page<T> page = new Page<>(query.getPageNum(), query.getPageSize());
+        return productCategoryMapper.selectSearch(page, query);
+    }
+
+    @Override
+    public List<NavCategoryDTO> getNavCategory() {
+        return productCategoryMapper.getNavCategory();
     }
 }

@@ -12,6 +12,7 @@ import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.PmsProductMapper;
 import com.ys.mail.mapper.UmsPartnerMapper;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.bo.GenerateOrderBO;
 import com.ys.mail.model.dto.BuyProductDTO;
 import com.ys.mail.model.dto.ProductCollectDTO;
@@ -154,7 +155,7 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
             umsAddress = addressService.getById(addressId);
         }
         if (BlankUtil.isEmpty(umsAddress)) {
-            umsAddress = addressService.getRecentAddressOrDefault(userId, null, null);
+            umsAddress = addressService.getRecentAddressOrDefault(userId, new MapQuery());
         }
 
         // 返回结果

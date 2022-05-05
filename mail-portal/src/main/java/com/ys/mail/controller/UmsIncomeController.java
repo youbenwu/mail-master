@@ -73,7 +73,7 @@ public class UmsIncomeController {
                                                                             @RequestParam(value = "endTime", required = false)
                                                                             @DateValidator(dft = DateValidator.DFT.PATTERN, pattern = RegularUtil.DATE_REGEX) String endTime,
                                                                             @RequestParam(value = "lastIncomeId", required = false) Long lastIncomeId,
-                                                                            @RequestParam(value = "lately", required = false, defaultValue = "0") String lately,
+                                                                            @RequestParam(value = "lately", required = false, defaultValue = "1") String lately,
                                                                             @RequestParam(name = "pageSize", defaultValue = "10") @Range(min = 1, max = 50, message = "分页大小范围为1-50条") String pageSize) {
         return umsIncomeService.getUmsIncomeByDimension(beginTime, endTime, lastIncomeId, lately, pageSize);
     }

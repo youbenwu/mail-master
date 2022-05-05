@@ -47,4 +47,18 @@
         WHERE pp.product_id = #{productId}
     </select>
 
+    <select id="getPartnerInfoById" resultType="com.ys.mail.model.dto.PartnerUserDTO">
+        SELECT
+                t1.partner_id,
+                t1.corporate_name,
+                t1.phone,
+                t1.province,
+                t1.city,
+                t1.region,
+                t1.address,
+                t2.head_portrait
+        FROM ums_partner t1,ums_user t2
+        WHERE t1.user_id = t2.user_id AND t1.partner_id = #{partnerId}
+    </select>
+
 </mapper>

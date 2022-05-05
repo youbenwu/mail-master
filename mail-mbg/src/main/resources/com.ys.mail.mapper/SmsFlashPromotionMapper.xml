@@ -76,6 +76,9 @@
             <result column="create_time" property="createTime" />
             <result column="update_time" property="updateTime" />
             <result column="partner_id" property="partnerId"/>
+            <result column="distance" property="distance"/>
+            <result column="lat" property="lat"/>
+            <result column="lng" property="lng"/>
         </collection>
     </resultMap>
 
@@ -91,8 +94,10 @@
         <result column="product_name" property="productName"/>
         <result column="pic" property="pic"/>
         <result column="price" property="price"/>
-        <result column="partner_id" property="partnerId"/>
         <result column="distance" property="distance"/>
+        <result column="partner_id" property="partnerId"/>
+        <result column="lat" property="lat"/>
+        <result column="lng" property="lng"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -101,35 +106,55 @@
         end_time, is_publish_status, create_time, update_time,is_home_status,cpy_type
     </sql>
 
+    <sql id="Map_Distance_SQL">
+        IFNULL(ROUND(
+             6378.138*2*ASIN(
+                 SQRT(
+                     POW(
+                         SIN(( #{mapQuery.lat}*PI()/180 - latitude*PI()/180)/2),2) +
+                COS( #{mapQuery.lat}*PI()/180) *
+                COS( latitude*PI()/180) *
+                POW( SIN(( #{mapQuery.lng}*PI()/180-longitude*PI()/180)/2),2
+                )
+                )
+                )*1000,2
+             ),
+        0) AS fpp_distance
+    </sql>
+
 
     <select id="selectAllNewestSecond" resultMap="PoResultMap">
         <!-- 实现思路,使用mybatis映射-->
         select sfp.flash_promotion_id,
-        sfp.flash_promotion_title,
-        sfp.start_time,
-        sfp.end_time,
-        sfp.is_publish_status,
-        sfp.create_time,
-        sfp.update_time,
-        sfp.is_home_status,
-        fpp.flash_promotion_pdt_id fpp_flash_promotion_pdt_id,
-        fpp.flash_promotion_id fpp_flash_promotion_id,
-        fpp.flash_promotion_sn_id fpp_flash_promotion_sn_id,
-        fpp.flash_promotion_price fpp_flash_promotion_price,
-        SUM(fpp.flash_promotion_count) fpp_flash_promotion_count,
-        fpp.flash_promotion_limit fpp_flash_promotion_limit,
-        fpp.sort fpp_sort,
-        fpp.create_time fpp_create_time,
-        fpp.update_time fpp_update_time,
-        pp.product_id fpp_product_id,
-        pp.product_name fpp_product_name,
-        pp.partner_id fpp_partner_id,
-        pp.pic fpp_pic,
-        pp.price fpp_price,
-        pp.partner_id
+            sfp.flash_promotion_title,
+            sfp.start_time,
+            sfp.end_time,
+            sfp.is_publish_status,
+            sfp.create_time,
+            sfp.update_time,
+            sfp.is_home_status,
+            fpp.flash_promotion_pdt_id fpp_flash_promotion_pdt_id,
+            fpp.flash_promotion_id fpp_flash_promotion_id,
+            fpp.flash_promotion_sn_id fpp_flash_promotion_sn_id,
+            fpp.flash_promotion_price fpp_flash_promotion_price,
+            SUM(fpp.flash_promotion_count) fpp_flash_promotion_count,
+            fpp.flash_promotion_limit fpp_flash_promotion_limit,
+            fpp.sort fpp_sort,
+            fpp.create_time fpp_create_time,
+            fpp.update_time fpp_update_time,
+            pp.product_id fpp_product_id,
+            pp.product_name fpp_product_name,
+            pp.partner_id fpp_partner_id,
+            pp.pic fpp_pic,
+            pp.price fpp_price,
+            pp.partner_id,
+            up.latitude fpp_lat,
+            up.longitude fpp_lng,
+            <include refid="Map_Distance_SQL"/>
         from sms_flash_promotion sfp left join sms_flash_promotion_product fpp
         on sfp.flash_promotion_id = fpp.flash_promotion_id
         left join pms_product pp on pp.product_id = fpp.product_id
+        LEFT JOIN ums_partner up ON pp.partner_id = up.partner_id
         <where>
             sfp.is_publish_status = 1 and fpp.flash_product_status = 2
             <choose>
@@ -142,7 +167,7 @@
             </choose>
         </where>
         GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
-        order by fpp.flash_promotion_pdt_id desc
+        ORDER BY fpp_distance,fpp.flash_promotion_pdt_id DESC
         limit 20;
     </select>
 
@@ -168,17 +193,9 @@
             pp.pic,
             pp.price,
             pp.partner_id,
-            ROUND(
-                6378.138*2*ASIN(
-                SQRT(
-                    POW(
-                        SIN(( #{mapQuery.lat}*PI()/180 - up.latitude*PI()/180)/2),2) +
-                        COS( #{mapQuery.lat}*PI()/180) *
-                        COS( up.latitude*PI()/180) *
-                        POW( SIN(( #{mapQuery.lng}*PI()/180-up.longitude*PI()/180)/2),2)
-                    )
-                )*1000,2
-            ) AS distance
+            up.latitude lat,
+            up.longitude lng,
+            <include refid="com.ys.mail.mapper.UmsAddressMapper.Map_Distance_SQL"/>
         from  sms_flash_promotion_product fpp
         left join pms_product pp on pp.product_id = fpp.product_id
         LEFT JOIN ums_partner up ON pp.partner_id = up.partner_id
@@ -198,8 +215,11 @@
             and fpp.flash_product_status = 2
         </where>
         GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
-        ORDER BY distance DESC,fpp.flash_promotion_pdt_id DESC
-        limit 20;
+        ORDER BY distance,fpp.flash_promotion_pdt_id DESC
+        <if test="isOpenPage">
+            limit 20;
+        </if>
+
     </select>
 
     <select id="selectByEndTime" resultType="java.lang.String">

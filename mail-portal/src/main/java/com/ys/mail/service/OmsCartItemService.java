@@ -3,7 +3,9 @@ package com.ys.mail.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.OmsCartItem;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.bo.GenerateOrderBO;
 import com.ys.mail.model.dto.BatchBuyProductDTO;
+import com.ys.mail.model.param.CreateOrderParam;
 import com.ys.mail.model.param.OmsCartItemParam;
 import com.ys.mail.model.vo.OmsCartItemVO;
 
@@ -63,4 +65,11 @@ public interface OmsCartItemService extends IService<OmsCartItem> {
      * @return 返回值
      */
     boolean update(Long skuId,Integer num);
+
+    /**
+     * 购物车创建订单
+     * @param param 参数
+     * @return 返回值
+     */
+    GenerateOrderBO createOrder(CreateOrderParam param);
 }

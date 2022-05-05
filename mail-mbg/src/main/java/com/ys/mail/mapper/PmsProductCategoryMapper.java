@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.entity.PmsProductCategory;
 import com.ys.mail.model.admin.tree.PcProductCategoryTree;
+import com.ys.mail.model.dto.NavCategoryDTO;
 import com.ys.mail.model.dto.SearchProductDTO;
 import com.ys.mail.model.query.CategorySearchQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
@@ -25,23 +26,31 @@ import java.util.List;
 public interface PmsProductCategoryMapper extends BaseMapper<PmsProductCategory> {
     /**
      * 查询所有的列表
+     *
      * @return 返回值
      */
     List<PcProductCategoryTree> selectTree();
 
     /**
      * 查询出一颗分类商品的树
+     *
      * @return 返回值
      */
     List<ProductCategoryTree> selectCategoryTree();
+
     /**
      * 分类搜索
+     *
      * @param query 查询参数
-     * @param page 翻页
+     * @param page  翻页
      * @return 返回值
      */
     Page<SearchProductDTO> selectSearch(@Param("page") Page<T> page, @Param("query") CategorySearchQuery query);
 
-
-
+    /**
+     * 获取导航分类列表
+     *
+     * @return 结果
+     */
+    List<NavCategoryDTO> getNavCategory();
 }

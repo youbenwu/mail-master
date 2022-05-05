@@ -78,6 +78,9 @@ public enum BusinessErrorCode implements IErrorCode {
     USER_STORE_REVIEWING(400228, "店铺信息审核中"),
     USER_STORE_REVIEWED(400229, "当天已经审核过"),
     USER_STORE_NO_PASS(400230, "店铺信息审核不通过"),
+    SKU_ID_NULL(400231, "skuId不能为空"),
+    ERR_SKU_ID(400232,"请输入正确的skuId"),
+    ADDRESS_NULL(400233,"收货地址不存在"),
 
     ;
 
