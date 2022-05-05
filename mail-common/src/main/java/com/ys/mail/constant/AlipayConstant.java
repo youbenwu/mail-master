@@ -121,8 +121,8 @@ public class AlipayConstant implements Serializable {
     /**
      * 支付宝支付成功后的回调地址,自由切换,可以配置生产和测试自由切换
      */
-    public static final String NOTIFY_URL = "http://8.134.35.199:8019/unionPay/aliPayNotify";
-    /*public static final String NOTIFY_URL = "http://yyy.yyy.yyy:8019/unionPay/aliPayNotify";*/
+//    public static final String NOTIFY_URL = "http://8.134.35.199:8019/unionPay/aliPayNotify";
+    public static final String NOTIFY_URL = "http://101.35.185.82:8019/unionPay/aliPayNotify";
     /*public static final String NOTIFY_URL = "http://daweihu.natapp1.cc/unionPay/aliPayNotify";*/
 
     /**
