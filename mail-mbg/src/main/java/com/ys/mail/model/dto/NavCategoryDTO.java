@@ -26,4 +26,7 @@ public class NavCategoryDTO implements Serializable {
 
     @ApiModelProperty(value = "商品分类名称")
     private String pdtCgyName;
+
+    @ApiModelProperty(value = "商品分类图标")
+    private String icon;
 }
