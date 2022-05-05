@@ -22,7 +22,7 @@ public class ProductCategoryParam implements Serializable {
     @NotNull
     private Long pdtCgyId;
 
-    @ApiModelProperty(value = "上机分类的编号：0表示一级分类",required = true)
+    @ApiModelProperty(value = "上级分类的编号：0表示一级分类",required = true)
     @NotNull
         private Long parentId;
 
@@ -43,6 +43,11 @@ public class ProductCategoryParam implements Serializable {
     @TableField("is_show_status")
     @NotNull
     private Boolean showStatus;
+
+    @ApiModelProperty(value = "是否默认显示首页，只有一个生效：0->不显示；1->显示")
+    @NotNull
+    @TableField("is_default_status")
+    private Boolean defaultStatus;
 
     @ApiModelProperty(value = "排序")
     @NotNull

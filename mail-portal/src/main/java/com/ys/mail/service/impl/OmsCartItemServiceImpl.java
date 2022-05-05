@@ -64,6 +64,8 @@ public class OmsCartItemServiceImpl extends ServiceImpl<OmsCartItemMapper, OmsCa
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult<Boolean> add(Long skuId, Integer quantity) {
+        // TODO 添加商品进入,改动比较小,一种情况
+        ApiAssert.noValue(cartItemMapper.selectByNum(skuId,quantity),BusinessErrorCode.GOODS_STOCK_EMPTY);
         OmsCartItem item = cartItemMapper.selectByCartInfo(skuId, quantity);
         ApiAssert.noValue(item, BusinessErrorCode.GOODS_NOT_EXIST);
         item.setCartItemId(IdWorker.generateId());
@@ -111,12 +113,13 @@ public class OmsCartItemServiceImpl extends ServiceImpl<OmsCartItemMapper, OmsCa
     @Transactional(rollbackFor = Exception.class)
     @Override
     public GenerateOrderBO createOrder(CreateOrderParam param) {
-        // 已经判断好了,第一判断金额是否一致,第二判断,查默认地址,查集合价格
+        // 已经判断好了,第一判断金额是否一致,第二判断,查默认地址,查集合价格,生成订单接口需要再判断下库存,查询出来只要有一个为null就是库存不足
         Long userId = UserUtil.getCurrentUser().getUserId();
-        UmsAddress address = addressService.getByUserId(userId);
+        UmsAddress address = addressService.getById(param.getAddressId());
         ApiAssert.noValue(address,BusinessErrorCode.ADDRESS_NULL);
         List<OmsCartItem> items=cartItemMapper.selectBySkuId(param.getCarts(),userId);
-        ApiAssert.noValue(items,BusinessErrorCode.GOODS_NOT_EXIST);
+        ApiAssert.noValue(items,BusinessErrorCode.GOODS_NOT_NUM_EXIST);
+        ApiAssert.noEq(items.size(),param.getCarts().size(),BusinessErrorCode.GOODS_STOCK_EMPTY);
         Long sumPrice = items.stream().filter(Objects::nonNull).reduce(NumberUtils.LONG_ZERO, (sum, p) -> sum += p.getPrice(), Long::sum);
         Long totalAmount = param.getTotalAmount();
         ApiAssert.noEq(totalAmount,sumPrice,BusinessErrorCode.ERR_PRODUCT_PRICE);

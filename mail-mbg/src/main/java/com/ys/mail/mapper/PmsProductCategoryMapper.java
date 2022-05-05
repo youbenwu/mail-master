@@ -59,14 +59,6 @@ public interface PmsProductCategoryMapper extends BaseMapper<PmsProductCategory>
     List<NavCategoryDTO> getNavCategory();
 
     /**
-     * 获取子级导航分类列表
-     *
-     * @param parentId 商品分类ID
-     * @return 结果
-     */
-    List<NavCategoryDTO> getSubNavCategory(@Param("parentId") Long parentId);
-
-    /**
      * 根据分类ID获取商品列表
      *
      * @param page     分页查询条件
