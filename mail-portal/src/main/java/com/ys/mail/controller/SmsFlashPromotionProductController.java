@@ -159,7 +159,7 @@ public class SmsFlashPromotionProductController {
         return BlankUtil.isEmpty(result) || BlankUtil.isEmpty(result.getPo()) ? CommonResult.failed(BusinessErrorCode.GOODS_NOT_EXIST) : CommonResult.success(result);
     }
 
-    @ApiBlock
+    //@ApiBlock
     @ApiOperation("秒杀生成订单-DT")
     @PostMapping(value = "/quickGenerateOrder")
     @LocalLockAnn(key = "quickGenerateOrder:arg[0]")
