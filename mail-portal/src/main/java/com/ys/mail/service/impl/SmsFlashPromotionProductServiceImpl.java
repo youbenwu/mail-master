@@ -752,7 +752,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
         // 从redis中计算出附近符合条件的列表
         if (BlankUtil.isEmpty(radius)) {
-            radius = 5000d;
+            radius = 500000d;
         }
         List<RedisGeoDTO> list = redisService.gRadius(fullKey, mapQuery.getLng(), mapQuery.getLat(), radius);
         if (BlankUtil.isNotEmpty(list)) {
