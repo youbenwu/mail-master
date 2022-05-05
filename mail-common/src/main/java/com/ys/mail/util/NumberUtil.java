@@ -44,9 +44,13 @@ public class NumberUtil {
     public static Integer minMissNumber(Collection<Integer> oldNumbers, Integer min, Integer max) {
         // 结果
         List<Integer> missNumberList = minMissNumberList(oldNumbers, min, max);
-        // 获取最小值
-        if (BlankUtil.isNotEmpty(missNumberList)) return Collections.min(missNumberList);
-        else return Collections.max(oldNumbers) + 1; // 如果没有空缺则返回旧数组中最大+1的数字
+        if (BlankUtil.isNotEmpty(missNumberList)) {
+            // 获取最小值
+            return Collections.min(missNumberList);
+        } else {
+            // 如果没有空缺则返回旧数组中最大+1的数字
+            return Collections.max(oldNumbers) + 1;
+        }
     }
 
     /**
@@ -157,6 +161,33 @@ public class NumberUtil {
      */
     public static double ifNullDefaultValue(Double d) {
         return BlankUtil.isEmpty(d) ? NumberUtils.DOUBLE_ZERO : d;
+    }
+
+    /**
+     * 值转换，当值为空时不进行转换
+     *
+     * @param str 目标字符串
+     * @return 转换结果
+     */
+    public static Long longOf(String str) {
+        if (BlankUtil.isNotEmpty(str)) {
+            return Long.valueOf(str);
+        }
+        return null;
+    }
+
+    public static Integer integerOf(String str) {
+        if (BlankUtil.isNotEmpty(str)) {
+            return Integer.valueOf(str);
+        }
+        return null;
+    }
+
+    public static Double doubleOf(String str) {
+        if (BlankUtil.isNotEmpty(str)) {
+            return Double.valueOf(str);
+        }
+        return null;
     }
 
     public static void main(String[] args) {

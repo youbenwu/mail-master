@@ -1,22 +1,19 @@
 package com.ys.mail;
 
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ys.mail.config.CfrConfig;
+import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.AlipayConstant;
-import com.ys.mail.entity.*;
+import com.ys.mail.entity.PmsProduct;
+import com.ys.mail.entity.UmsIncome;
+import com.ys.mail.entity.UmsUserInvite;
 import com.ys.mail.mapper.SmsFlashPromotionProductMapper;
 import com.ys.mail.mapper.UmsUserInviteMapper;
-import com.ys.mail.model.po.MebSkuPO;
+import com.ys.mail.model.map.RedisGeoDTO;
 import com.ys.mail.model.po.UmsUserInviteNumberPO;
 import com.ys.mail.model.po.UmsUserInviterPO;
-import com.ys.mail.service.PmsProductService;
-import com.ys.mail.service.PmsSkuStockService;
-import com.ys.mail.service.UmsIncomeService;
-import com.ys.mail.service.UmsUserInviteService;
+import com.ys.mail.service.*;
 import com.ys.mail.util.BlankUtil;
+import com.ys.mail.util.GeoUtil;
 import com.ys.mail.util.HttpUtil;
 import com.ys.mail.util.IdWorker;
 import org.junit.Test;
@@ -35,8 +32,10 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author 070
@@ -73,6 +72,10 @@ public class test {
 
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private RedisConfig redisConfig;
+    @Autowired
+    private RedisService redisService;
 
     @Autowired
     private PmsProductService productService;
@@ -194,7 +197,7 @@ public class test {
     }
 
     @Test
-    public void test13(){
+    public void test13() {
         UmsUserInvite userInvite = new UmsUserInvite();
         userInvite.setUserInviteId(IdWorker.generateId());
         userInvite.setUserId(1502509791602413568L);
@@ -204,7 +207,7 @@ public class test {
     }
 
     @Test
-    public void test14(){
+    public void test14() {
         UmsIncome income = UmsIncome.builder()
                 .incomeId(IdWorker.generateId())
                 .userId(6458605727202545664L)
@@ -222,21 +225,21 @@ public class test {
         boolean save = incomeService.save(income);
         System.out.println(save);
     }
-    
+
     @Test
-    public void test15(){
+    public void test15() {
         // 调度测试用
         List<PmsProduct> list = productService.selectMebs();
         list.stream().
-                filter(Objects::nonNull).
-                filter(x -> BlankUtil.isNotEmpty(x.getPrice()))
-                .forEach(
-                        x -> {
-                            x.setMebPrice(new Double(x.getPrice() * 0.5).longValue());
-                            x.setPromotionType(2);
-                            x.setDisCount(new BigDecimal("0.5"));
-                        }
-                );
+            filter(Objects::nonNull).
+            filter(x -> BlankUtil.isNotEmpty(x.getPrice()))
+            .forEach(
+                    x -> {
+                        x.setMebPrice(new Double(x.getPrice() * 0.5).longValue());
+                        x.setPromotionType(2);
+                        x.setDisCount(new BigDecimal("0.5"));
+                    }
+            );
         boolean b = productService.updateBatchById(list);
 
     }
@@ -248,5 +251,31 @@ public class test {
         ///System.out.println(byId);
         System.out.println(po);
     }*/
+
+    @Autowired
+    private GeoUtil geoUtil;
+
+    @Test
+    public void testRedisGeo() {
+        String fullKey = redisConfig.fullKey(redisConfig.getKey().getGeo());
+        geoUtil.geoAdd(fullKey, "北京西站", 116.328103, 39.900835);
+        geoUtil.geoAdd(fullKey, "北京南站", 116.385488, 39.87128);
+        geoUtil.geoAdd(fullKey, "北京西站-南广场", 116.327766, 39.898944);
+        geoUtil.geoAdd(fullKey, "北京西站-南进站口", 116.327765, 39.899347);
+        geoUtil.geoAdd(fullKey, "中铁设计大厦", 116.328628, 39.896485);
+        geoUtil.geoAdd(fullKey, "瑞海大厦", 116.326661, 39.903778);
+
+        // redisService.expire(fullKey, redisConfig.getExpire().getAnHour());
+
+        // 计算北京南站与北京西站之间的距离
+        double distance = geoUtil.distanceBetween(fullKey, "北京西站", "北京南站");
+        // 5898.4001
+        System.out.println(distance);
+
+        // 查询距离北京西站5000米范围内的地方
+        List<RedisGeoDTO> list = redisService.gRadius(fullKey, 116.328103, 39.900835, 5000);
+        System.out.println(list);
+
+    }
 
 }

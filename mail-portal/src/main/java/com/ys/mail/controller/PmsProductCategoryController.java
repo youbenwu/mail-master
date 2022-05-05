@@ -1,20 +1,30 @@
 package com.ys.mail.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ys.mail.annotation.BlankOrPattern;
+import com.ys.mail.enums.RegularEnum;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.admin.query.MapQuery;
+import com.ys.mail.model.dto.CgyProductDTO;
 import com.ys.mail.model.dto.NavCategoryDTO;
 import com.ys.mail.model.dto.SearchProductDTO;
 import com.ys.mail.model.query.CategorySearchQuery;
+import com.ys.mail.model.query.CgyProductQuery;
+import com.ys.mail.model.query.PageQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
 import com.ys.mail.service.PmsProductCategoryService;
 import com.ys.mail.util.BlankUtil;
+import com.ys.mail.util.NumberUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -22,10 +32,10 @@ import java.util.List;
  * @version 1.0
  * @date 2021-11-15 11:27
  */
-@RestController
-@RequestMapping("/product/category")
 @Validated
+@RestController
 @Api(tags = "商品分类管理")
+@RequestMapping("/product/category")
 public class PmsProductCategoryController {
 
     @Autowired
@@ -51,5 +61,21 @@ public class PmsProductCategoryController {
     public CommonResult<List<NavCategoryDTO>> getNavCategory() {
         List<NavCategoryDTO> navCategory = productCategoryService.getNavCategory();
         return CommonResult.success(navCategory);
+    }
+
+    @ApiOperation("获取下级导航分类列表")
+    @GetMapping(value = "/getSubNavCategory")
+    @ApiImplicitParam(name = "parentId", value = "商品分类ID")
+    public CommonResult<List<NavCategoryDTO>> getSubNavCategory(@RequestParam("parentId") @NotBlank
+                                                                @BlankOrPattern(regEnum = RegularEnum.KEY) String parentId) {
+        List<NavCategoryDTO> subNavCategory = productCategoryService.getSubNavCategory(NumberUtil.longOf(parentId));
+        return CommonResult.success(subNavCategory);
+    }
+
+    @ApiOperation("根据分类ID查询商品列表")
+    @GetMapping(value = "/getProductById")
+    public CommonResult<IPage<CgyProductDTO>> getProductById(CgyProductQuery query, MapQuery mapQuery, PageQuery pageQuery) {
+        IPage<CgyProductDTO> list = productCategoryService.getProductById(query, mapQuery, pageQuery);
+        return CommonResult.success(list);
     }
 }

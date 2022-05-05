@@ -124,6 +124,7 @@
 
     </select>
 
+    <!-- 获取导航分类 -->
     <select id="getNavCategory" resultType="com.ys.mail.model.dto.NavCategoryDTO">
         SELECT
                 pdt_cgy_id,pdt_cgy_name
@@ -131,6 +132,46 @@
                 pms_product_category
         WHERE
                 is_nav_status = 1 AND deleted = 0 ORDER BY sort
+    </select>
+
+    <!-- 根据导航分类ID查询下级分类 -->
+    <select id="getSubNavCategory" resultType="com.ys.mail.model.dto.NavCategoryDTO">
+        SELECT
+                pdt_cgy_id,pdt_cgy_name
+        FROM
+                pms_product_category
+        WHERE
+                deleted = 0 AND parent_id = #{parentId} ORDER BY sort
+    </select>
+
+    <!-- 根据分类ID查询商品列表信息 -->
+    <select id="getProductById" resultType="com.ys.mail.model.dto.CgyProductDTO">
+        SELECT
+                t1.product_id,
+                t1.pdt_cgy_id,
+                t1.pic,
+                t1.product_name,
+                t1.price,
+                <if test="query.member">
+                    t1.meb_price,
+                </if>
+                t1.sale,
+                <include refid="com.ys.mail.mapper.UmsAddressMapper.Map_Distance_SQL"/>
+        FROM
+                pms_product t1 LEFT JOIN ums_partner t2 ON t1.partner_id = t2.partner_id
+        WHERE
+                t1.deleted = 0
+                AND t1.is_publish_status = 1
+                <if test="query.member">
+                    AND t1.meb_price > 0
+                </if>
+                AND t1.pdt_cgy_id IN (
+                    SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND parent_id = #{query.parentId}
+                    <if test="query.pdtCgyId != 0 and query.pdtCgyId !=null">
+                        AND pdt_cgy_id = #{query.pdtCgyId}
+                    </if>
+                )
+        ORDER BY distance
     </select>
 
 </mapper>
