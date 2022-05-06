@@ -177,7 +177,7 @@ public class OssTest {
         for (String s : albumPicsArray) {
             System.out.println(getPicNameByURI(s));
         }
-        // 重新打包
+        // 重新打包,再试一下
     }
 
 }
