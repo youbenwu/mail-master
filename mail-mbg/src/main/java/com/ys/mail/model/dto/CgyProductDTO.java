@@ -1,6 +1,7 @@
 package com.ys.mail.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -26,6 +27,7 @@ public class CgyProductDTO implements Serializable {
     private Double price;
 
     @ApiModelProperty(value = "商品会员价格")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double mebPrice;
 
     @ApiModelProperty(value = "销量")

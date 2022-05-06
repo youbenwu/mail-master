@@ -2,6 +2,10 @@ package com.ys.mail.component;
 
 import com.shuyuanwl.sms.api.bean.DownRes;
 import com.shuyuanwl.sms.api.core.ApiSender;
+import com.ys.mail.constant.FigureConstant;
+import com.ys.mail.exception.ApiAssert;
+import com.ys.mail.exception.code.BusinessErrorCode;
+import com.ys.mail.util.BlankUtil;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,14 +27,14 @@ public class SmsClient {
     private static final String CONTENT = "您的短信验证码为.";
 
     /**
-     * 鸿盛源登录账号
+     * 轻创营登录账号
      */
-    private static final String JIH_ACCOUNT = "hsy@fhkjgd";
+    private static final String JIH_ACCOUNT = "qcy@fhkjgd";
 
     /**
-     * 广盛源登录账号
+     * 卖乐吧登录账号
      */
-    private static final String JUH_ACCOUNT = "gsy@fhkjgd";
+    private static final String JUH_ACCOUNT = "mlb@fhkjgd";
 
     /**
      * 扩展码
@@ -48,8 +52,9 @@ public class SmsClient {
     private static final String BATCH_NO = "";
 
 
-    public void sendRegisterVerify(String phone, String verifyCode,Byte type){
+    public void sendRegisterVerify(String phone, String verifyCode, Byte type) {
         String key = type == 0 ? JIH_ACCOUNT : JUH_ACCOUNT;
-        ApiSender.send(URL, key, PASSWORD, phone, CONTENT+verifyCode, EXT_NO,BATCH_NO);
+        DownRes send = ApiSender.send(URL, key, PASSWORD, phone, CONTENT + verifyCode, EXT_NO, BATCH_NO);
+        ApiAssert.noEq(BlankUtil.isEmpty(send) ? null : send.getCode(), FigureConstant.SUCCESS, BusinessErrorCode.ERR_SMS_MISTAKE);
     }
 }

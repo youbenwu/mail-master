@@ -71,12 +71,8 @@ public class PmsProductCategoryServiceImpl extends ServiceImpl<PmsProductCategor
 
     @Override
     public List<NavCategoryDTO> getNavCategory() {
-        return productCategoryMapper.getNavCategory();
-    }
-
-    @Override
-    public List<NavCategoryDTO> getSubNavCategory(Long parentId) {
-        return productCategoryMapper.getSubNavCategory(parentId);
+        List<NavCategoryDTO> trees = productCategoryMapper.getNavCategory();
+        return TreeUtil.toTree(trees, "pdtCgyId", "parentId", "children", NavCategoryDTO.class);
     }
 
     @Override
