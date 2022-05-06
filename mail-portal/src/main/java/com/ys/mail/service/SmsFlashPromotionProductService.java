@@ -140,7 +140,8 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
      * @param productType      商品类型：如：0->公司，1->用户上架
      * @param radius           半径，默认5公里
      * @param mapQuery         经纬度
+     * @param partnerId        合伙人ID，以该店铺为中心
      * @return 结果
      */
-    NearbyStoreProductVO getNearbyStore(Long flashPromotionId, Integer productType, Double radius, MapQuery mapQuery,Long partnerId);
+    NearbyStoreProductVO getNearbyStore(Long flashPromotionId, Integer productType, Double radius, MapQuery mapQuery, Long partnerId);
 }

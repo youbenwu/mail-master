@@ -11,6 +11,7 @@
         <result column="product_count" property="productCount" />
         <result column="is_nav_status" property="navStatus" />
         <result column="is_show_status" property="showStatus" />
+        <result column="is_default_status" property="defaultStatus" />
         <result column="sort" property="sort" />
         <result column="icon" property="icon" />
         <result column="description" property="description" />
@@ -44,6 +45,7 @@
         <result column="product_count" property="productCount" />
         <result column="is_nav_status" property="navStatus" />
         <result column="is_show_status" property="showStatus" />
+        <result column="is_default_status" property="defaultStatus" />
         <result column="sort" property="sort" />
         <result column="icon" property="icon" />
         <result column="description" property="description" />
@@ -54,7 +56,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         pdt_cgy_id, parent_id, pdt_cgy_name, `level`, product_count,
-        is_nav_status, is_show_status, sort, icon, description, create_time, update_time,deleted
+        is_nav_status, is_show_status,is_default_status, sort, icon, description, create_time, update_time,deleted
     </sql>
 
     <select id="selectTree" resultMap="SearchTreeMap">
@@ -124,13 +126,84 @@
 
     </select>
 
+    <!-- 获取导航分类 -->
     <select id="getNavCategory" resultType="com.ys.mail.model.dto.NavCategoryDTO">
         SELECT
-                pdt_cgy_id,pdt_cgy_name
+                pdt_cgy_id,
+                pdt_cgy_name,
+                icon,
+                parent_id,
+                sort
         FROM
-                pms_product_category
+                (
+                    (
+                        SELECT
+                                t1.pdt_cgy_id,
+                                t1.pdt_cgy_name,
+                                t1.icon,
+                                t1.parent_id,
+                                t1.sort
+                        FROM
+                                pms_product_category t1
+                                        LEFT JOIN pms_product_category t2 ON t1.parent_id = t2.pdt_cgy_id
+                        WHERE
+                                t1.deleted = 0
+                          AND t2.parent_id = 0
+                          AND t2.is_nav_status = 1
+                          AND t2.deleted = 0
+                    ) UNION
+                    (
+                        SELECT
+                                t1.pdt_cgy_id,
+                                t1.pdt_cgy_name,
+                                t1.icon,
+                                t1.parent_id,
+                                t1.sort
+                        FROM
+                                pms_product_category t1
+                        WHERE
+                                t1.is_nav_status = 1
+                          AND t1.parent_id = 0
+                          AND t1.deleted = 0
+                    )
+                ) t ORDER BY sort
+    </select>
+
+    <!-- 根据分类ID查询商品列表信息 -->
+    <select id="getProductById" resultType="com.ys.mail.model.dto.CgyProductDTO">
+        SELECT
+                t1.product_id,
+                t1.pdt_cgy_id,
+                t1.pic,
+                t1.product_name,
+                t1.price,
+                <if test="query.member">
+                    t1.meb_price,
+                </if>
+                t1.sale,
+                <include refid="com.ys.mail.mapper.UmsAddressMapper.Map_Distance_SQL"/>
+        FROM
+                pms_product t1 LEFT JOIN ums_partner t2 ON t1.partner_id = t2.partner_id
         WHERE
-                is_nav_status = 1 AND deleted = 0 ORDER BY sort
+                t1.deleted = 0
+                AND t1.is_publish_status = 1
+                <if test="query.member">
+                    AND t1.meb_price > 0
+                </if>
+                AND t1.pdt_cgy_id IN (
+                    <if test="query.parentId != 0 and query.parentId !=null">
+                        SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND parent_id = #{query.parentId}
+                    </if>
+                    <if test="query.parentId == 0 or query.parentId ==null">
+                        SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND parent_id = (
+                            SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND is_default_status = 1 LIMIT 1
+                        )
+                    </if>
+                    <if test="query.pdtCgyId != 0 and query.pdtCgyId !=null">
+                        AND pdt_cgy_id = #{query.pdtCgyId}
+                    </if>
+                )
+        ORDER BY distance
     </select>
 
 </mapper>

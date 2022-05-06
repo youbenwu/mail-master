@@ -52,12 +52,12 @@ public class UmsUserController {
     @GetMapping(value = "/getAuthCode")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "phone", value = "手机号发送验证码", dataType = "String"),
-            @ApiImplicitParam(name = "type", value = "类型:0大尾狐->吉狐科技,1呼啦兔->桔狐科技", dataType = "Byte")
+            @ApiImplicitParam(name = "type", value = "类型:0->轻创营,1卖乐吧", dataType = "Byte")
     })
     @BlackListPhone
     @LocalLockAnn(key = "getAuthCode:arg[0]", expire = 60)
-    public CommonResult<String> getAuthCode(@RequestParam("phone") @NotBlank @Pattern(regexp = "^[1][3-9][0-9]{9}$") String phone,
-                                            @RequestParam("type") @NotNull @Range(min = 0, max = 1) Byte type
+    public CommonResult<String> getAuthCode(@RequestParam("phone") @Pattern(regexp = "^[1][3-9][0-9]{9}$") String phone,
+                                            @RequestParam(value = "type", defaultValue = "0") @Range(min = 0, max = 1) Byte type
     ) {
         return userService.getAuthCode(phone, type);
     }
@@ -176,7 +176,7 @@ public class UmsUserController {
         QueryWrapper<UmsUser> qwp = new QueryWrapper<>();
         // 获取最新支付会员
         qwp.eq("role_id", NumberUtils.INTEGER_ONE).eq("deleted", NumberUtils.INTEGER_ZERO)
-           .orderByDesc("create_time,update_time").last("limit 1");
+                .orderByDesc("create_time,update_time").last("limit 1");
         UmsUser user = userService.getOne(qwp);
 
         // 封装结果

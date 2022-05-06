@@ -225,6 +225,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Distance gDistance(String key, Object pointA, Object pointB) {
+        // TODO 暂未实现
         return null;
     }
 
