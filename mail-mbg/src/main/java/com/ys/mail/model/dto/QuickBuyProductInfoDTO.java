@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * 秒杀商品详情页面-单一规格
+ *
  * @author DT
  * @version 1.0
  * @date 2021-12-20 10:31
@@ -121,17 +122,20 @@ public class QuickBuyProductInfoDTO {
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
     @TableField(fill = FieldFill.UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     @ApiModelProperty(value = "订单id")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long orderId;
+
+    @ApiModelProperty(value = "用户商品店铺对象，记录当时最新的数据")
+    private String pdtStoreObj;
 
     @ApiModelProperty(value = "秒杀场次对象")
     private SmsFlashPromotion flashPromotion;

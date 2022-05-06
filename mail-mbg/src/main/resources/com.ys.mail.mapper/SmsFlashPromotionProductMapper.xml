@@ -100,6 +100,7 @@
         <result column="is_publish_status" property="publishStatus"/>
         <result column="flash_product_status" property="flashProductStatus"/>
         <result column="order_id" property="orderId"/>
+        <result column="pdt_store_obj" property="pdtStoreObj"/>
         <result column="product_id" property="productId"/>
         <result column="brand_id" property="brandId"/>
         <result column="pdt_cgy_id" property="pdtCgyId"/>
@@ -322,6 +323,7 @@
                sfpp.flash_product_status,
                sfpp.flash_promotion_limit,
                sfpp.order_id,
+               sfpp.pdt_store_obj,
                pp.product_id,
                pp.brand_id,
                pp.pdt_cgy_id,
@@ -368,7 +370,8 @@
         SELECT
         sfpp.`flash_promotion_pdt_id`,
         SUM(sfpp.`flash_promotion_count`) AS flash_promotion_count,
-        sfpp.`flash_promotion_price`
+        sfpp.`flash_promotion_price`,
+        sfpp.user_id
         FROM `sms_flash_promotion_product` AS sfpp
         LEFT JOIN `sms_flash_promotion` AS sfp  ON sfp.`flash_promotion_id` = sfpp.`flash_promotion_id`
         WHERE sfpp.`product_id` = #{productId}

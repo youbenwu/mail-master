@@ -83,7 +83,6 @@ public class OmsOrderController {
         return CommonResult.success(result);
     }
 
-    // @RequestParam(name = "cpyType") @NotBlank @Pattern(regexp = "^[01]$") String cpyType
     @ApiOperation("生成高级会员支付订单(礼品订单)")
     @PostMapping(value = "/generateGiftOrder")
     @ApiImplicitParams({

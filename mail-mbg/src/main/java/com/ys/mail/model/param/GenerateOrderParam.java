@@ -26,7 +26,7 @@ public class GenerateOrderParam implements Serializable {
 
     @ApiModelProperty(value = "收货人电话",required = true)
     @NotBlank
-    @Pattern(regexp = "^[1][3456789][0-9]{9}$")
+    @Pattern(regexp = "^1[3-9]\\d{9}$")
     private String receiverPhone;
 
     @ApiModelProperty(value = "省份/直辖市",required = true)

@@ -51,18 +51,19 @@ public class FileController {
 
     @ApiOperation(value = "图片上传-COS", notes = "上传到腾讯云COS，图片大小不能超过500kb")
     @PostMapping(value = "/cos/upload")
-    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌", required = true, dataType = "int")
+    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码," +
+            "4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌,10->创客商品图片案例", required = true, dataType = "int")
     public CommonResult<String> cosUpload(@RequestParam(name = "file") MultipartFile file,
-                                          @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class) Integer imgType,
+                                          @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class, exclude = {"9"}) Integer imgType,
                                           HttpServletRequest req) {
         return fileService.imageUpload(file, EnumTool.getEnum(ImgPathEnum.class, imgType));
     }
 
     @ApiOperation(value = "图片批量上传-COS", notes = "批量上传图片到腾讯云COS")
     @PostMapping(value = "/cos/uploadBatch")
-    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌", required = true, dataType = "int")
+    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌,10->创客商品图片案例", required = true, dataType = "int")
     public CommonResult<String> cosUploadBatch(@RequestParam(value = "file", required = false) MultipartFile[] multipartFile,
-                                               @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class) Integer imgType,
+                                               @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class, exclude = {"9"}) Integer imgType,
                                                HttpServletRequest req) {
         if (BlankUtil.isEmpty(multipartFile)) {
             return CommonResult.failed("请选择要上传的图片");

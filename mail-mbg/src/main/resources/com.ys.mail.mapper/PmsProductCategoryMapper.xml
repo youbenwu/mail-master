@@ -172,38 +172,39 @@
     <!-- 根据分类ID查询商品列表信息 -->
     <select id="getProductById" resultType="com.ys.mail.model.dto.CgyProductDTO">
         SELECT
-                t1.product_id,
-                t1.pdt_cgy_id,
-                t1.pic,
-                t1.product_name,
-                t1.price,
-                <if test="query.member">
-                    t1.meb_price,
-                </if>
-                t1.sale,
-                <include refid="com.ys.mail.mapper.UmsAddressMapper.Map_Distance_SQL"/>
+            t1.product_id,
+            t1.pdt_cgy_id,
+            t1.pic,
+            t1.product_name,
+            t1.price,
+            <if test="query.member">
+                t1.meb_price,
+            </if>
+            t1.sale
         FROM
-                pms_product t1 LEFT JOIN ums_partner t2 ON t1.partner_id = t2.partner_id
+            pms_product t1
         WHERE
-                t1.deleted = 0
-                AND t1.is_publish_status = 1
-                <if test="query.member">
-                    AND t1.meb_price > 0
+            t1.deleted = 0
+            AND t1.is_publish_status = 1
+            <if test="query.member">
+                AND t1.meb_price > 0
+            </if>
+            <if test="query.productId!=0 and query.productId!=null">
+                AND t1.product_id <![CDATA[ < ]]> #{query.productId}
+            </if>
+            AND ( t1.pdt_cgy_id IN (
+                <if test="query.pdtCgyId == 0 or query.pdtCgyId ==null">
+                    SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND parent_id = (
+                        SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND is_default_status = 1 LIMIT 1
+                    )
                 </if>
-                AND t1.pdt_cgy_id IN (
-                    <if test="query.parentId != 0 and query.parentId !=null">
-                        SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND parent_id = #{query.parentId}
-                    </if>
-                    <if test="query.parentId == 0 or query.parentId ==null">
-                        SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND parent_id = (
-                            SELECT pdt_cgy_id FROM pms_product_category WHERE deleted = 0 AND is_default_status = 1 LIMIT 1
-                        )
-                    </if>
-                    <if test="query.pdtCgyId != 0 and query.pdtCgyId !=null">
-                        AND pdt_cgy_id = #{query.pdtCgyId}
-                    </if>
+                <if test="query.pdtCgyId != 0 and query.pdtCgyId !=null">
+                    SELECT pdt_cgy_id FROM pms_product_category WHERE parent_id = #{query.pdtCgyId} OR t1.pdt_cgy_id = #{query.pdtCgyId}
+                </if>
                 )
-        ORDER BY distance
+            )
+        ORDER BY t1.product_id DESC
+        LIMIT 20
     </select>
 
 </mapper>

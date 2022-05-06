@@ -12,6 +12,12 @@ import com.ys.mail.model.vo.UmsUserOrderCollectStaticsVO;
  */
 public interface UmsUserOrderCollectStaticsService {
 
-    UmsUserOrderCollectStaticsVO getOrderCollectStaticsInfo(Long userId, String cpyType);
+    /**
+     * 获取用户订单统计数据
+     *
+     * @param cpyType 客户端类型
+     * @return 结果
+     */
+    UmsUserOrderCollectStaticsVO getOrderCollectStaticsInfo(String cpyType);
 
 }

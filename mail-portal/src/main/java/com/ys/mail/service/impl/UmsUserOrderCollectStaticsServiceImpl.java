@@ -21,8 +21,8 @@ public class UmsUserOrderCollectStaticsServiceImpl implements UmsUserOrderCollec
     private UmsUserOrderCollectStaticsMapper mapper;
 
     @Override
-    public UmsUserOrderCollectStaticsVO getOrderCollectStaticsInfo(Long userId, String cpyType) {
-        if (BeanUtil.isEmpty(userId)) userId = UserUtil.getCurrentUser().getUserId();
+    public UmsUserOrderCollectStaticsVO getOrderCollectStaticsInfo(String cpyType) {
+        Long userId = UserUtil.getCurrentUser().getUserId();
         // 先查询收藏，足迹，和悦券的总数
         UmsUserOrderCollectStaticsVO staticsVO = mapper.getProductCollectStaticsInfo(userId);
         // 再查询订单状态信息

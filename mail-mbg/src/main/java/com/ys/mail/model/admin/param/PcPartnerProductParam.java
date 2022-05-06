@@ -63,6 +63,9 @@ public class PcPartnerProductParam implements Serializable {
     @TableField("is_publish_status")
     private Boolean publishStatus;
 
+    @ApiModelProperty(value = "案例图片,最多5张")
+    private String casePics;
+
     /**
      * 新增和修改构造函数
      *

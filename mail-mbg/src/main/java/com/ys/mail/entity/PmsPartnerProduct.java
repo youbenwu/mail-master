@@ -70,6 +70,9 @@ public class PmsPartnerProduct implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    @ApiModelProperty(value = "案例图片,最多5张")
+    private String casePics;
+
     public PmsPartnerProduct() {
     }
 

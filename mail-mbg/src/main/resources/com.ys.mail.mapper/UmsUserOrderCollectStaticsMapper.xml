@@ -39,6 +39,7 @@
               oo.user_id = #{userId}
             <if test="cpyType!=null">
                 AND oo.cpy_type = #{cpyType}
+                AND oo.order_type = 1
             </if>
     </select>
 </mapper>
