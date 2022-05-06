@@ -47,6 +47,7 @@ public enum BusinessErrorCode implements IErrorCode {
     PRODUCT_CONFIRMRECEIPT_FAILED(400140, "确认收货失败"),
     PRODUCT_CONFIRMRECEIPT_FAILED_ORDER_ERROR(400141, "确认收货失败-订单状态异常"),
     FLASH_PRODUCT_NO_EXIST(400142, "秒杀商品不存在"),
+    FLASH_PRODUCT_NO_BUY(400143, "不能购买自己上架的商品"),
 
     ERR_DEPOSIT_MONEY_EX_COUNT(400150, "当天提现次数已达上限(由于风控：暂时每天限提%d次)"),
     REVIEW_DEPOSIT_MONEY_EXCEED(400151, "该笔提现已申请后台审核，请稍后查看结果"),

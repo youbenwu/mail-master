@@ -1,16 +1,13 @@
 package com.ys.mail.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.model.CommonResult;
-import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.dto.CgyProductDTO;
 import com.ys.mail.model.dto.NavCategoryDTO;
 import com.ys.mail.model.dto.SearchProductDTO;
 import com.ys.mail.model.query.CategorySearchQuery;
 import com.ys.mail.model.query.CgyProductQuery;
-import com.ys.mail.model.query.PageQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
 import com.ys.mail.service.PmsProductCategoryService;
 import com.ys.mail.util.BlankUtil;
@@ -60,8 +57,8 @@ public class PmsProductCategoryController {
 
     @ApiOperation("根据分类ID查询商品列表")
     @GetMapping(value = "/getProductById")
-    public CommonResult<IPage<CgyProductDTO>> getProductById(CgyProductQuery query, MapQuery mapQuery, PageQuery pageQuery) {
-        IPage<CgyProductDTO> list = productCategoryService.getProductById(query, mapQuery, pageQuery);
+    public CommonResult<List<CgyProductDTO>> getProductById(CgyProductQuery query) {
+        List<CgyProductDTO> list = productCategoryService.getProductById(query);
         return CommonResult.success(list);
     }
 }

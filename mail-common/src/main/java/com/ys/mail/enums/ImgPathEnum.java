@@ -52,7 +52,12 @@ public enum ImgPathEnum implements IPairs<Integer, String, ImgPathEnum> {
     /**
      * 用户店铺头像
      */
-    STORE_PATH(9, "/store/");
+    STORE_PATH(9, "/store/"),
+    /**
+     * 创客商品图片案例
+     */
+    CASE_PICS_PATH(10, "/casePics/");
+    ;
 
     final Integer type;
     final String path;

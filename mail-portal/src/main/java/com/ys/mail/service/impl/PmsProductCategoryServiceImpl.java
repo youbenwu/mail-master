@@ -76,9 +76,8 @@ public class PmsProductCategoryServiceImpl extends ServiceImpl<PmsProductCategor
     }
 
     @Override
-    public IPage<CgyProductDTO> getProductById(CgyProductQuery query, MapQuery mapQuery, PageQuery pageQuery) {
-        IPage<CgyProductDTO> page = new Page<>(pageQuery.getPageNum(), pageQuery.getPageSize());
-        return productCategoryMapper.getProductById(page, query, mapQuery);
+    public List<CgyProductDTO> getProductById(CgyProductQuery query) {
+        return productCategoryMapper.getProductById(query);
     }
 
 }

@@ -24,7 +24,7 @@ public class SmsClient {
     /**
      * 短信内容
      */
-    private static final String CONTENT = "您的短信验证码为:";
+    private static final String CONTENT = "您的短信验证码为：";
 
     /**
      * 轻创营登录账号

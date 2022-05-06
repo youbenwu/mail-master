@@ -23,10 +23,10 @@ public class CgyProductDTO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long productId;
 
-    @ApiModelProperty(value = "商品价格")
+    @ApiModelProperty(value = "商品价格，100等于1元")
     private Double price;
 
-    @ApiModelProperty(value = "商品会员价格")
+    @ApiModelProperty(value = "商品会员价格，100等于1元")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double mebPrice;
 
@@ -38,8 +38,5 @@ public class CgyProductDTO implements Serializable {
 
     @ApiModelProperty(value = "商品名称")
     private String productName;
-
-    @ApiModelProperty(value = "距离，单位m")
-    private Double distance;
 
 }

@@ -33,13 +33,11 @@ public class UmsUserStatisticsController {
     @ApiOperation("获取用户订单收藏的相关数量")
     @GetMapping(value = "/getCount")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户ID，为空时默认当前用户"),
             @ApiImplicitParam(name = "cpyType", value = "公司类型订单:0->大尾狐,1->呼啦兔允许为空")
     })
-    public CommonResult<UmsUserOrderCollectStaticsVO> getOrderCollectCount(@RequestParam(value = "userId", required = false) Long userId,
-                                                                           @RequestParam(value = "cpyType", required = false)
+    public CommonResult<UmsUserOrderCollectStaticsVO> getOrderCollectCount(@RequestParam(value = "cpyType", required = false)
                                                                            @BlankOrPattern(regexp = "^[01]$", message = "公司类型订单:0->大尾狐,1->呼啦兔") String cpyType) {
-        UmsUserOrderCollectStaticsVO orderCollectStaticsInfo = staticsService.getOrderCollectStaticsInfo(userId, cpyType);
+        UmsUserOrderCollectStaticsVO orderCollectStaticsInfo = staticsService.getOrderCollectStaticsInfo(cpyType);
         return CommonResult.success(orderCollectStaticsInfo);
     }
 }

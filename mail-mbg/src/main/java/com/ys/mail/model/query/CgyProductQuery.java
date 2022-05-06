@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
@@ -22,16 +21,15 @@ public class CgyProductQuery implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotBlank
-    @ApiModelProperty(value = "父级导航分类ID")
-    @BlankOrPattern(regEnum = RegularEnum.KEY)
-    private String parentId;
-
-    @ApiModelProperty(value = "下级分类ID，可选")
+    @ApiModelProperty(value = "分类ID，可选")
     @BlankOrPattern(regEnum = RegularEnum.KEY)
     private String pdtCgyId;
 
     @ApiModelProperty(value = "会员标记,默认是首页数据,true->表示会员专享数据")
     private Boolean member;
+
+    @ApiModelProperty(value = "产品ID，用于分页，可选")
+    @BlankOrPattern(regEnum = RegularEnum.KEY)
+    private String productId;
 
 }
