@@ -1,15 +1,16 @@
 package com.ys.mail.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.entity.PmsProductCategory;
 import com.ys.mail.model.admin.tree.PcProductCategoryTree;
 import com.ys.mail.model.dto.CgyProductDTO;
 import com.ys.mail.model.dto.NavCategoryDTO;
 import com.ys.mail.model.dto.SearchProductDTO;
+import com.ys.mail.model.dto.TwoNavCategoryDTO;
 import com.ys.mail.model.query.CategorySearchQuery;
 import com.ys.mail.model.query.CgyProductQuery;
+import com.ys.mail.model.query.CgyTagProductQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -58,10 +59,26 @@ public interface PmsProductCategoryMapper extends BaseMapper<PmsProductCategory>
     List<NavCategoryDTO> getNavCategory();
 
     /**
+     * 获取二级分类列表
+     *
+     * @return 结果
+     */
+    List<TwoNavCategoryDTO> getTwoNavCategory();
+
+    /**
      * 根据分类ID获取商品列表
      *
      * @param query 查询条件
      * @return 结果
      */
     List<CgyProductDTO> getProductById(@Param("query") CgyProductQuery query);
+
+    /**
+     * 根据分类、标签获取商品列表
+     *
+     * @param query 业务查询对象
+     * @return 结果
+     */
+    List<CgyProductDTO> getProductByTag(@Param("query") CgyTagProductQuery query);
+
 }
