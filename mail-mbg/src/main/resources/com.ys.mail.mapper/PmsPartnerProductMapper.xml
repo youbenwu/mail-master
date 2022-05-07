@@ -15,6 +15,7 @@
         <result column="is_publish_status" property="publishStatus" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
+        <result column="case_pics" property="casePics"/>
     </resultMap>
 
     <resultMap id="DtoResultMap" type="com.ys.mail.model.dto.PartnerProductDTO">
@@ -41,11 +42,13 @@
         <result column="detail_title" property="detailTitle"/>
         <result column="partner_name" property="partnerName"/>
         <result column="serve_desc" property="serveDesc"/>
+        <result column="case_pics" property="casePics"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        partner_pdt_id, product_id, partner_name, partner_price, earnest_money, total_price, serve_desc, re_periods, is_publish_status, create_time, update_time
+        partner_pdt_id, product_id, partner_name, partner_price, earnest_money,
+        total_price, serve_desc, re_periods, is_publish_status, create_time, update_time,case_pics
     </sql>
 
     <select id="selectList" resultMap="DtoResultMap">
@@ -75,7 +78,7 @@
     <select id="selectByPrPdtId" resultMap="PoResultMap">
         select pp.detail_desc,pp.sale,ppp.total_price,ppp.partner_pdt_id,
                pp.album_pics,pp.sub_title,pp.description,pp.detail_title,ppp.partner_name,
-               ppp.serve_desc
+               ppp.serve_desc,ppp.case_pics
         from pms_product pp left join pms_partner_product ppp  on pp.product_id = ppp.product_id
         where ppp.partner_pdt_id = #{partnerPdtId}  and pp.deleted = 0;
     </select>

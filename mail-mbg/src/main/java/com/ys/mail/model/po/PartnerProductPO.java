@@ -42,4 +42,7 @@ public class PartnerProductPO implements Serializable {
 
     @ApiModelProperty(value = "服务描述")
     private String serveDesc;
+
+    @ApiModelProperty(value = "案例图片")
+    private String casePics;
 }

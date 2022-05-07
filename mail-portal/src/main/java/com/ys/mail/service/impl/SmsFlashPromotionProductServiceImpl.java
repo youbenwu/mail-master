@@ -246,10 +246,12 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     public synchronized CommonResult<GenerateOrderBO> quickGenerateOrder(GenerateOrderParam param) {
         LOGGER.info("---秒杀抢购开始---");
         LOGGER.info("请求参数为:{}", JSON.toJSONString(param));
-        LOGGER.info("秒杀抢购下单用户id:{}", UserUtil.getCurrentUser().getUserId());
-        //
+        Long userId = UserUtil.getCurrentUser().getUserId();
+
+        LOGGER.info("秒杀抢购下单用户id:{}", userId);
         Long flashPromotionId = param.getFlashPromotionId();
-        final String key = "BUY_LIMIT:" + flashPromotionId + ":" + UserUtil.getCurrentUser().getUserId();
+
+        final String key = "BUY_LIMIT:" + flashPromotionId + ":" + userId;
         // 查询场次表结束时间
         SmsFlashPromotion smsFlashPromotion = flashPromotionMapper.selectById(flashPromotionId);
         if (BlankUtil.isEmpty(smsFlashPromotion)) {
@@ -261,7 +263,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         long nowTimeL = nowDate.getTime();
         long overdueL = endTimeL - nowTimeL;
         // 查询手底下人有多少交了99元数量  payment_type
-        Integer auserNumber = umsUserMapper.findAdvancedUsersNumber(UserUtil.getCurrentUser().getUserId());
+        Integer auserNumber = umsUserMapper.findAdvancedUsersNumber(userId);
         Integer purchasesNumber = 5 + (auserNumber / 2);
         // 获取 已下单次数
         Integer countRedis = (Integer) redisTemplate.opsForValue().get(key);
@@ -269,13 +271,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         if (overdueL <= 0L) {
             return CommonResult.failed("秒杀场次已经结束");
         }
-        if (countRedis == null) {
-            redisTemplate.opsForValue().set(key, 0, overdueL, TimeUnit.MILLISECONDS);
-            countRedis = 0;
-        }
-        if (purchasesNumber - countRedis <= 0) {
-            return CommonResult.failed("当前场次购买次数达到上限");
-        }
+
         // 暂时先实现功能,再用锁,暂时先这样后面再优化
         // todo: 查询产品下 类随机 取一个flash_promotion_pdt_id
         if (BlankUtil.isEmpty(param.getFlashPromotionId())) {
@@ -286,6 +282,22 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         LOGGER.info("单个产品价格:{}", divisionPrice);
         // 需在传递的 flashPromotionId 活动时间内
         SmsFlashPromotionProduct promotionProduct = flashPromotionProductMapper.selectGroupFlashPromotionCount(param.getProductId(), divisionPrice, param.getFlashPromotionId(), cpyType);
+
+        // 用户不能购买自己上架的产品(当随机到的产品为自己上传的，则不能进行秒杀)
+        Long productUserId = promotionProduct.getUserId();
+        if (BlankUtil.isNotEmpty(productUserId)) {
+            ApiAssert.isTrue(productUserId.equals(userId), BusinessErrorCode.FLASH_PRODUCT_NO_BUY);
+        }
+
+        // 扣减缓存中的库存
+        if (countRedis == null) {
+            redisTemplate.opsForValue().set(key, 0, overdueL, TimeUnit.MILLISECONDS);
+            countRedis = 0;
+        }
+        if (purchasesNumber - countRedis <= 0) {
+            return CommonResult.failed("当前场次购买次数达到上限");
+        }
+
         Long price = param.getPrice();
         Integer quantity = param.getQuantity();
         if (BlankUtil.isEmpty(promotionProduct)) {
@@ -335,7 +347,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         String orderSn = IdGenerator.INSTANCE.generateId();
         order.setOrderId(orderId);
         order.setOrderSn(orderSn);
-        order.setUserId(UserUtil.getCurrentUser().getUserId());
+        order.setUserId(userId);
         order.setTotalAmount(price);
         order.setPartnerPrice(flashPromotionProduct.getPartnerPrice());
         order.setPayAmount(price);

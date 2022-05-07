@@ -1,17 +1,16 @@
 package com.ys.mail.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.PmsProductCategory;
 import com.ys.mail.mapper.PmsProductCategoryMapper;
-import com.ys.mail.model.admin.query.MapQuery;
 import com.ys.mail.model.dto.CgyProductDTO;
 import com.ys.mail.model.dto.NavCategoryDTO;
 import com.ys.mail.model.dto.SearchProductDTO;
+import com.ys.mail.model.dto.TwoNavCategoryDTO;
 import com.ys.mail.model.query.CategorySearchQuery;
 import com.ys.mail.model.query.CgyProductQuery;
-import com.ys.mail.model.query.PageQuery;
+import com.ys.mail.model.query.CgyTagProductQuery;
 import com.ys.mail.model.tree.ProductCategoryTree;
 import com.ys.mail.service.PmsProductCategoryService;
 import com.ys.mail.util.BlankUtil;
@@ -76,9 +75,18 @@ public class PmsProductCategoryServiceImpl extends ServiceImpl<PmsProductCategor
     }
 
     @Override
-    public IPage<CgyProductDTO> getProductById(CgyProductQuery query, MapQuery mapQuery, PageQuery pageQuery) {
-        IPage<CgyProductDTO> page = new Page<>(pageQuery.getPageNum(), pageQuery.getPageSize());
-        return productCategoryMapper.getProductById(page, query, mapQuery);
+    public List<TwoNavCategoryDTO> getTwoNavCategory() {
+        return productCategoryMapper.getTwoNavCategory();
+    }
+
+    @Override
+    public List<CgyProductDTO> getProductById(CgyProductQuery query) {
+        return productCategoryMapper.getProductById(query);
+    }
+
+    @Override
+    public List<CgyProductDTO> getProductByTag(CgyTagProductQuery query) {
+        return productCategoryMapper.getProductByTag(query);
     }
 
 }
