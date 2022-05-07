@@ -45,7 +45,6 @@ public class ProductCategoryParam implements Serializable {
     private Boolean showStatus;
 
     @ApiModelProperty(value = "是否默认显示首页，只有一个生效：0->不显示；1->显示")
-    @NotNull
     @TableField("is_default_status")
     private Boolean defaultStatus;
 
