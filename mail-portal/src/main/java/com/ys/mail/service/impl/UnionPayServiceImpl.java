@@ -20,6 +20,7 @@ import com.ys.mail.constant.UnionPayConstant;
 import com.ys.mail.entity.OmsOrder;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.entity.UmsUser;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.CommonResultCode;
@@ -35,6 +36,7 @@ import com.ys.mail.model.unionPay.WebPay;
 import com.ys.mail.model.vo.OrderItemSkuVO;
 import com.ys.mail.service.*;
 import com.ys.mail.util.*;
+import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -341,24 +343,35 @@ public class UnionPayServiceImpl implements UnionPayService {
 
     @Override
     public synchronized CommonResult<String> aliPayBuyProduct(AliBuyProductParam param) throws AlipayApiException {
-//        BusinessErrorCode repBuyProduct = repBuyProduct(param.getOrderSn(), param.getAmount());
-//        if (repBuyProduct.getCode() != BusinessErrorCode.RESPONSE_SUCCESS.getCode()) {
-//            return CommonResult.failed(repBuyProduct);
-//        }
+        // 校验订单
+        this.validOrderPay(param);
+        // 发起调用
         AlipayTradeAppPayResponse response = repAlipay(param);
+        // 响应结果
         String body = response.getBody();
         return response.isSuccess() ? CommonResult.success(body) : CommonResult.failed(body);
     }
 
-    @Override
-    public CommonResult<String> aliPayBuyUpgrade(AliBuyProductParam param) throws AlipayApiException {
-//        BussinessErrorCode repBuyProduct = repBuyProduct(param.getOrderSn(), param.getAmount());
-//        if(repBuyProduct.getCode() != BussinessErrorCode.RESPONSE_SUCCESS.getCode()){
-//            return CommonResult.failed(repBuyProduct);
-//        }
-        AlipayTradeAppPayResponse response = repAlipay(param);
-        String body = response.getBody();
-        return response.isSuccess() ? CommonResult.success(body) : CommonResult.failed(body);
+    /**
+     * 统一校验订单参数的合法性
+     * 如：orderSn、userId、amount、orderStatus
+     *
+     * @param param 参数
+     */
+    private void validOrderPay(AliBuyProductParam param) {
+        Long userId = UserUtil.getCurrentUser().getUserId();
+        SqlLambdaQueryWrapper<OmsOrder> wrapper = new SqlLambdaQueryWrapper<>();
+        wrapper.eq(OmsOrder::getUserId, userId)
+               .eq(OmsOrder::getDeleteStatus, NumberUtils.INTEGER_ZERO)
+               .eq(OmsOrder::getOrderSn, param.getOrderSn())
+               .eq(OmsOrder::getPayAmount, param.getAmount())
+               .eq(OmsOrder::getOrderStatus, NumberUtils.INTEGER_ZERO)
+               .eq(OmsOrder::getTransId, NumberUtils.INTEGER_ZERO)
+               .or()
+               .isNull(OmsOrder::getTransId)
+               .last("LIMIT 1");
+        OmsOrder order = orderService.getOne(wrapper);
+        ApiAssert.noValue(order, CommonResultCode.ILLEGAL_REQUEST);
     }
 
     private BusinessErrorCode repBuyProduct(String orderSn, String amount) {

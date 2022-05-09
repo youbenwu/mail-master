@@ -2,7 +2,6 @@ package com.ys.mail.model.query;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.elasticsearch.common.recycler.Recycler;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -29,7 +28,7 @@ public class QuickBuyProductQuery implements Serializable {
     @Pattern(regexp = "^\\d{19}$")
     private String flashPromotionId;
 
-    @ApiModelProperty(value = "商品秒杀价格")
+    @ApiModelProperty(value = "商品秒杀价格", required = true)
     @NotNull
     private Long flashPromotionPrice;
 }

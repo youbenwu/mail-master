@@ -54,15 +54,6 @@ public interface UnionPayService {
     String aliPayNotify(HttpServletRequest request, HttpServletResponse response);
 
     /**
-     * 支付宝单笔支付接口
-     *
-     * @param param 实体参数
-     * @return 返回值
-     * @throws AlipayApiException 阿里支付异常向外抛出
-     */
-    CommonResult<String> aliPayBuyUpgrade(AliBuyProductParam param) throws AlipayApiException;
-
-    /**
      * 余额支付购买接口
      *
      * @param param 实体对象
