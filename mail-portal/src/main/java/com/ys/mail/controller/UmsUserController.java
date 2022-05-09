@@ -11,6 +11,7 @@ import com.ys.mail.entity.UmsUser;
 import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.param.*;
+import com.ys.mail.model.vo.UmsUserVo;
 import com.ys.mail.model.vo.UserInviteDataVO;
 import com.ys.mail.service.SysSettingService;
 import com.ys.mail.service.UmsUserService;
@@ -86,8 +87,8 @@ public class UmsUserController {
 
     @ApiOperation("个人资料-DT")
     @GetMapping(value = "/info")
-    public CommonResult<UmsUser> info() {
-        UmsUser user = userService.info();
+    public CommonResult<UmsUserVo> info() {
+        UmsUserVo user = userService.info();
         return CommonResult.success(user);
     }
 
@@ -174,7 +175,7 @@ public class UmsUserController {
         qw.eq("role_id", NumberUtils.INTEGER_ONE).eq("deleted", NumberUtils.INTEGER_ZERO);
         int count = userService.count(qw);
         QueryWrapper<UmsUser> qwp = new QueryWrapper<>();
-        // 获取最新支付会员
+        // 获取最近支付过的一位会员
         qwp.eq("role_id", NumberUtils.INTEGER_ONE).eq("deleted", NumberUtils.INTEGER_ZERO)
                 .orderByDesc("create_time,update_time").last("limit 1");
         UmsUser user = userService.getOne(qwp);

@@ -20,6 +20,7 @@ import com.ys.mail.model.admin.query.Query;
 public interface SmsFlashPromotionProductService extends IService<SmsFlashPromotionProduct> {
     /**
      * 新增或修改限时购商品
+     *
      * @param param
      * @return
      */
@@ -27,6 +28,7 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
 
     /**
      * 限时购商品详情
+     *
      * @param flashPromotionPdtId 主键
      * @return 返回对象
      */
@@ -34,6 +36,7 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
 
     /**
      * 查询翻页列表
+     *
      * @param query 查询条件
      * @return 返回值
      */
@@ -41,6 +44,7 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
 
     /**
      * 限时购商品删除
+     *
      * @param flashPromotionPdtId id
      * @return 返回值
      */
@@ -48,14 +52,23 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
 
     /**
      * 置换场次id
-     * @param flashPromotionId        新id
+     *
+     * @param flashPromotionId         新id
      * @param replacedFlashPromotionId 被更换的id
      */
     void replaceFlashPromotionId(Long flashPromotionId, Long replacedFlashPromotionId);
 
     /**
      * 最新场次和商品
+     *
      * @return 返回值
      */
     SessionOrPdtDTO getSessionOrPdt();
+
+    /**
+     * 清除首页秒杀缓存
+     *
+     * @param b 是否清除
+     */
+    void delHomeSecondProduct(boolean b);
 }

@@ -60,6 +60,8 @@
 
         <result column="sub_title" property="subTitle" />
         <result column="price" property="price" />
+        <result column="purchase_note" property="purchaseNote" />
+
         <result column="sp_data" property="spData" />
         <result column="pic" property="pic" />
         <result column="flash_promotion_round" property="flashPromotionRound" />
@@ -73,7 +75,10 @@
         <result column="publisher_pic" property="publisherPic"/>
         <result column="nick_pic" property="nickPic"/>
         <result column="is_status" property="isStatus"/>
+
         <result column="partner_id" property="partnerId"/>
+        <result column="phone" property="partnerPhone"/>
+        <result column="fullAddress" property="partnerAddress"/>
 
         <association property="product" javaType="com.ys.mail.entity.PmsProduct" columnPrefix="pp_">
             <id column="product_id" property="productId"/>
@@ -111,6 +116,7 @@
         <result column="sub_title" property="subTitle"/>
         <result column="album_pics" property="albumPics"/>
         <result column="detail_desc" property="detailDesc"/>
+        <result column="purchase_note" property="purchaseNote" />
         <result column="partner_id" property="partnerId"/>
 
         <association property="flashPromotion" javaType="com.ys.mail.entity.SmsFlashPromotion" columnPrefix="sfp_">
@@ -288,7 +294,11 @@
     <select id="getFlashProductMesg" resultMap="AppDtoBaseResultMap">
         select a.*,
         d.sub_title,
+        d.purchase_note,
         d.pic ,
+        up.partner_id,
+        up.phone,
+        CONCAT(up.province,up.region,up.address) AS fullAddress,
         (SELECT sfp.`start_time` FROM `sms_flash_promotion` AS sfp
         WHERE sfp.`cpy_type` = a.`cpy_type`
         AND NOW() &lt; sfp.`start_time`
@@ -298,9 +308,10 @@
         a.flash_promotion_price as `price`
         FROM sms_flash_promotion_product a
         INNER JOIN pms_product d ON d.product_id=a.product_id
+        INNER JOIN ums_partner up ON d.partner_id = up.partner_id
         <where>
-        and flash_promotion_pdt_id =  #{integralId}
-        and user_id=#{userId}
+        and a.flash_promotion_pdt_id =  #{integralId}
+        and a.user_id=#{userId}
         </where>
         order by a.create_time desc
     </select>
@@ -337,6 +348,7 @@
                sfp.start_time sfp_start_time,
                sfp.end_time sfp_end_time,
                pp.detail_desc,
+               pp.purchase_note,
                pp.partner_id
         from pms_product pp left join sms_flash_promotion_product sfpp
         on pp.product_id = sfpp.product_id

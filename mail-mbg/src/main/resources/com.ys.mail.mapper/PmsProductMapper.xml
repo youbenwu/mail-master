@@ -43,14 +43,15 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="deleted" property="deleted" />
-        <result column="is_handpick_status" property="handpickStatus"/>
-        <result column="is_delicacy_status" property="delicacyStatus"/>
-        <result column="is_style_status" property="styleStatus"/>
-        <result column="is_live_status" property="liveStatus"/>
         <result column="comment_sum" property="commentSum"/>
         <result column="partner_id" property="partnerId"/>
         <result column="meb_price" property="mebPrice"/>
         <result column="dis_count" property="disCount"/>
+        <result column="is_live_status" property="liveStatus"/>
+        <result column="is_handpick_status" property="handpickStatus"/>
+        <result column="is_delicacy_status" property="delicacyStatus"/>
+        <result column="is_style_status" property="styleStatus"/>
+        <result column="is_home_status" property="homeStatus"/>
     </resultMap>
 
     <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.PmsProductVO">
@@ -93,16 +94,17 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="deleted" property="deleted" />
-        <result column="is_handpick_status" property="handpickStatus"/>
-        <result column="is_delicacy_status" property="delicacyStatus"/>
-        <result column="is_style_status" property="styleStatus"/>
-        <result column="is_live_status" property="liveStatus"/>
         <result column="comment_sum" property="commentSum"/>
         <result column="brand_name" property="brandName"/>
         <result column="pdt_cgy_name" property="pdtCgyName"/>
         <result column="pdt_attribute_name" property="pdtAttributeName"/>
         <result column="meb_price" property="mebPrice"/>
         <result column="dis_count" property="disCount"/>
+        <result column="is_live_status" property="liveStatus"/>
+        <result column="is_handpick_status" property="handpickStatus"/>
+        <result column="is_delicacy_status" property="delicacyStatus"/>
+        <result column="is_style_status" property="styleStatus"/>
+        <result column="is_home_status" property="homeStatus"/>
     </resultMap>
 
     <resultMap id="DtoResultMap" type="com.ys.mail.model.dto.ProductInfoDTO">
@@ -145,13 +147,14 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="deleted" property="deleted" />
-        <result column="is_handpick_status" property="handpickStatus"/>
-        <result column="is_delicacy_status" property="delicacyStatus"/>
-        <result column="is_style_status" property="styleStatus"/>
-        <result column="is_live_status" property="liveStatus"/>
         <result column="comment_sum" property="commentSum"/>
         <result column="meb_price" property="mebPrice"/>
         <result column="dis_count" property="disCount"/>
+        <result column="is_live_status" property="liveStatus"/>
+        <result column="is_handpick_status" property="handpickStatus"/>
+        <result column="is_delicacy_status" property="delicacyStatus"/>
+        <result column="is_style_status" property="styleStatus"/>
+        <result column="is_home_status" property="homeStatus"/>
 
         <collection property="pmsProductAttributes" ofType="com.ys.mail.model.dto.ProductInfoDTO" column="pdt_attribute_cgy_id"
             select="com.ys.mail.mapper.PmsProductAttributeMapper.selectByPdtAttributeCgyId"
@@ -269,7 +272,7 @@
                description, original_price, stock, low_stock, unit, weight, preview_status, service_ids,
                album_pics, detail_title, detail_desc, promotion_start_time, promotion_end_time, promotion_per_limit,
                promotion_type, create_time, update_time, deleted,is_handpick_status,is_delicacy_status,
-               is_style_status,is_live_status,comment_sum,meb_price,
+               is_style_status,is_live_status,is_home_status,comment_sum,meb_price,
                dis_count,partner_id
         from pms_product where product_id = #{productId} AND deleted = 0 and is_publish_status = 1
     </select>
@@ -352,6 +355,16 @@
             </if>
             <if test="query.promotionType != null">
                 AND a.promotion_type = #{query.promotionType}
+            </if>
+            <if test="query.isPartner != null">
+                <choose>
+                    <when test="query.isPartner">
+                        AND a.partner_id IS NOT NULL
+                    </when>
+                    <otherwise>
+                        AND a.partner_id IS NULL
+                    </otherwise>
+                </choose>
             </if>
         </where>
         order by a.create_time desc

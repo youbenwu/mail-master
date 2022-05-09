@@ -86,6 +86,9 @@ public class QuickBuyProductInfoDTO {
     @ApiModelProperty(value = "详情页,富文本")
     private String detailDesc;
 
+    @ApiModelProperty(value = "用户购买须知")
+    private String purchaseNote;
+
     @ApiModelProperty(value = "限时购价格,1分等于1,100等于1元,限时购展示价格")
     private Long flashPromotionPrice;
 

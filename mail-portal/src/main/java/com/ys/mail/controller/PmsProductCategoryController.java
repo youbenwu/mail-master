@@ -74,11 +74,6 @@ public class PmsProductCategoryController {
     @ApiOperation(value = "根据分类、标签查询商品列表", notes = "会员专享，按分类、便签查询")
     @GetMapping(value = "/getProductByTag")
     public CommonResult<List<CgyProductDTO>> getProductByTag(CgyTagProductQuery query) {
-        // 设置默认标签
-        boolean flag = BlankUtil.isEmpty(query.getIsLiveStatus()) && BlankUtil.isEmpty(query.getIsHandpickStatus()) && BlankUtil.isEmpty(query.getIsDelicacyStatus()) && BlankUtil.isEmpty(query.getIsStyleStatus());
-        if (flag) {
-            query.setIsStyleStatus(true);
-        }
         List<CgyProductDTO> list = productCategoryService.getProductByTag(query);
         return CommonResult.success(list);
     }
