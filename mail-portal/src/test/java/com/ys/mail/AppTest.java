@@ -1,8 +1,10 @@
 package com.ys.mail;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ys.mail.config.CfrConfig;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.AlipayConstant;
+import com.ys.mail.domain.TencentFaceIdInfo;
 import com.ys.mail.entity.PmsProduct;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.entity.UmsUserInvite;
@@ -11,11 +13,9 @@ import com.ys.mail.mapper.UmsUserInviteMapper;
 import com.ys.mail.model.map.RedisGeoDTO;
 import com.ys.mail.model.po.UmsUserInviteNumberPO;
 import com.ys.mail.model.po.UmsUserInviterPO;
+import com.ys.mail.model.tencent.TencentFaceIdClient;
 import com.ys.mail.service.*;
-import com.ys.mail.util.BlankUtil;
-import com.ys.mail.util.GeoUtil;
-import com.ys.mail.util.HttpUtil;
-import com.ys.mail.util.IdWorker;
+import com.ys.mail.util.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author 070
@@ -43,7 +40,7 @@ import java.util.Set;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {MailPortalApplication.class})
-public class test {
+public class AppTest {
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -67,8 +64,8 @@ public class test {
     private String accessPath;
     @Value("${redis.database}")
     private String redisDatabase;
-    @Value("${cfr.daWeiHu.appId}")
-    private String daWeiHuAppId;
+//    @Value("${cfr.daWeiHu.appId}")
+//    private String daWeiHuAppId;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -82,6 +79,12 @@ public class test {
 
     @Autowired
     private PmsSkuStockService skuStockService;
+
+    @Autowired
+    private TencentFaceIdClient faceIdClient;
+
+    @Autowired
+    private TencentFaceIdInfo faceIdInfo;
 
 
     @Test
@@ -160,15 +163,15 @@ public class test {
         redisTemplate.delete(keys);
     }
 
-    @Test
-    public void test9() {
-        CfrConfig cfrConfig = new CfrConfig();
-        String url = "https://miniprogram-kyc.tencentcloudapi.com/api/oauth2/access_token?" +
-                "app_id=" + cfrConfig.getDaWeiHuAppId() +
-                "&secret=" + cfrConfig.getDaWeiHuAppSecret() +
-                "&grant_type=client_credential&version=1.00";
-        HttpUtil.get(url);
-    }
+//    @Test
+//    public void test9() {
+//        CfrConfig cfrConfig = new CfrConfig();
+//        String url = "https://miniprogram-kyc.tencentcloudapi.com/api/oauth2/access_token?" +
+//                "app_id=" + cfrConfig.getDaWeiHuAppId() +
+//                "&secret=" + cfrConfig.getDaWeiHuAppSecret() +
+//                "&grant_type=client_credential&version=1.00";
+//        HttpUtil.get(url);
+//    }
 
     @Test
     public void test10() {
@@ -276,6 +279,39 @@ public class test {
         List<RedisGeoDTO> list = redisService.gRadius(fullKey, 116.328103, 39.900835, 5000);
         System.out.println(list);
 
+    }
+
+    @Test
+    public void test16(){
+        Map<String, Object> map = new HashMap<>();
+        CfrConfig cfrConfig = new CfrConfig();
+        map.put("wbappId", "2fzRslIeFRZKGlouLnqaPf5c1E7nzlYToyj9FMroCLEmbCXwO0VDxBDFIm90lGem");
+        map.put("userId", "6458605727202545664");
+        map.put("version", "1.00");
+        String url = "https://miniprogram-kyc.tencentcloudapi.com/api/oauth2/access_token?" + "app_id=" + "IDA8JT8c" + "&secret=" + "ftTzy9d3WykmUxZbFyfgBHT8P0YvhM9RXRDpGQXXpJQpnqpke0X2lde8728jsaV4" + "&grant_type=client_credential&version=1.0.0";
+        String s = HttpUtil.get(url);
+        System.out.println(s);
+    }
+
+    @Test
+    public void test17() throws Exception {
+
+        // 第一步获取acc_token
+//        String accessToken = faceIdClient.getAccessToken();
+//
+//        //JSONObject jsonObject = JSONObject.parseObject(accessToken);
+//        System.out.println(accessToken);
+//        // 第二步获取 sign_ticket
+//        String apiTicket = faceIdClient.getApiTicket(accessToken, "6458605727202545664");
+//        //JSONObject apiTicketResult = JSONObject.parseObject(apiTicket);
+//        System.out.println(apiTicket);
+//
+//        //第三步生成签名
+//        faceIdClient.getSign(faceIdInfo.getWBappid(),
+//                "6458605727202545664",
+//                "1.0.0",
+//                "apiTicket",
+//                TencentFaceIdClient.getRandomNumByLength(32));
     }
 
 }

@@ -1,12 +1,11 @@
 package com.ys.mail.controller;
 
 
+import afu.org.checkerframework.checker.oigj.qual.O;
+import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.ys.mail.annotation.ApiBlock;
-import com.ys.mail.annotation.BlackListPhone;
-import com.ys.mail.annotation.BlankOrPattern;
-import com.ys.mail.annotation.LocalLockAnn;
+import com.ys.mail.annotation.*;
 import com.ys.mail.entity.UmsUser;
 import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.model.CommonResult;
@@ -197,15 +196,11 @@ public class UmsUserController {
         return userService.verifyFace(userImageString);
     }
 
-    @ApiOperation("人脸识别安卓调用sdk")
+    @ApiOperation("人脸识别调用sdk")
     @PostMapping(value = "/callVerifyFace")
-    public CommonResult<Object> callVerifyFace(@Validated @RequestBody VerifyFaceParam param) {
-        // TODO 用户进行人脸识别,发送一个faceId给前端做唯一,使用aop做缓存设计,存入redis中存入一个用户id,存入三次,并且一天,第二天可以重新开始
-        // TODO 存入凌晨0:00过期,安卓发起调用,我这边返回faceId给安卓,使用注解aop,
-        // TODO 安卓调用sdk,先从服务器端拿到faceId,服务器做三层拦截,第一,验证三次被拦截,第二,已经人脸识别无需再人脸识别
-        // TODO 大尾狐和呼啦兔的验证都是要经过这个接口,接口不需要判断是大尾狐还是呼啦兔,只需要判断用户id,用户id是唯一的且要被记录
-        // TODO 比如在大尾狐验证一次,呼啦兔也验证一次,这个是会被记录的,接口始终只会返回一个结果给前端,那么需要前端调用的时候让后端调用的是哪个sdk
-        // TODO 区分开是哪个sdk就ok了
+    @OftenReqAnn(key="userCallVerifyFace:arg[0]")
+    public CommonResult<JSONObject> callVerifyFace(@Validated @RequestBody VerifyFaceParam param){
+        // 用注解判断,一天只能5次,不能一直刷,
         return userService.callVerifyFace(param);
     }
 

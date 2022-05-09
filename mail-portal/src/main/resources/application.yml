@@ -61,13 +61,13 @@ secure:
 
 #自定义一键登录参数
 oauth:
-  app_key: m5e254702a22b7                  #5dd23f6d7c895 旧版
-  app_secret: 700e41efdf22a9d334aa223faf2c9346          #a931990ca352f2cd2d7265a36711bc52   旧版
+  app_key: m5ea3812a73669
+  app_secret: 8ab1aff2f329ade887d80ded108aecee
   app_store: 7e3aee69764965616dd45df12af00498
   url: http://identify.accuratead.cn/auth/auth/sdkClientFreeLogin
   hulatu: #呼啦兔的一键登录参数
-    app_key: m5e254dd47c59c                #5de56e3dd9346 旧版
-    app_secret: 7539d592fc6f9838ad13db572db06452        #7ebbc12b806cf68b1be5c5d31c274322旧版
+    app_key: m5ea388a6ed3c0
+    app_secret: 9d94ca6ae6e4cd5f1f7f0e19f0065776
 
 #线程池配置参数
 task:

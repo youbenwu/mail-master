@@ -1,5 +1,6 @@
 package com.ys.mail.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.UmsUser;
@@ -165,7 +166,7 @@ public interface UmsUserService extends IService<UmsUser> {
      * @param param 参数实体
      * @return 返回值
      */
-    CommonResult<Object> callVerifyFace(VerifyFaceParam param);
+    CommonResult<JSONObject> callVerifyFace(VerifyFaceParam param);
 
     /**
      * 查询用户的邀请数据明细
