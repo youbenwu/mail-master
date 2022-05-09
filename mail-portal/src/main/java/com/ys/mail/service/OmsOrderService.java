@@ -33,7 +33,7 @@ public interface OmsOrderService extends IService<OmsOrder> {
     /**
      * 根据目标用户id查询相关的订单记录
      *
-     * @param targetUserId 目标用户id
+     * @param userId 目标用户id
      * @param orderId      翻页的订单id
      * @param pageSize     查询条数
      * @return 返回值
@@ -90,11 +90,12 @@ public interface OmsOrderService extends IService<OmsOrder> {
     /**
      * 高级会员支付回调更新使用
      *
-     * @param userId 用户ID
-     * @param order  回调订单
+     * @param userId      用户ID
+     * @param order       回调订单
+     * @param totalAmount 交易金额
      * @return 是否成功
      */
-    boolean updateUserForSeniorPay(Long userId, OmsOrder order);
+    boolean updateUserForSeniorPay(Long userId, OmsOrder order, Long totalAmount);
 
     /**
      * 是待发货

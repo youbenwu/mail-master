@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.UmsUser;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.param.*;
+import com.ys.mail.model.vo.UmsUserVo;
 import com.ys.mail.model.vo.UserInviteDataVO;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -148,7 +149,7 @@ public interface UmsUserService extends IService<UmsUser> {
      *
      * @return 返回值
      */
-    UmsUser info();
+    UmsUserVo info();
 
     /**
      * 验证人脸数据是否有效

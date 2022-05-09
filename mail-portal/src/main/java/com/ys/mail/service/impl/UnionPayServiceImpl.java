@@ -486,7 +486,7 @@ public class UnionPayServiceImpl implements UnionPayService {
             if (!BlankUtil.isEmpty(order) && !BlankUtil.isEmpty(multiply)
                     && multiply.compareTo(DecimalUtil.toBigDecimal(order.getPayAmount())) == NumberUtils.INTEGER_ZERO) {
                 try {
-                    response = this.handleCallback(order, tradeStatus, outTradeNo, tradeNo, gmtPayment);
+                    response = this.handleCallback(order, totalAmount, tradeStatus, outTradeNo, tradeNo, gmtPayment);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -515,7 +515,7 @@ public class UnionPayServiceImpl implements UnionPayService {
      * @return 是否执行成功
      * @throws ParseException e
      */
-    private boolean handleCallback(OmsOrder order, String tradeStatus, String outTradeNo, String tradeNo, String gmtPayment) throws ParseException {
+    private boolean handleCallback(OmsOrder order, String totalAmount, String tradeStatus, String outTradeNo, String tradeNo, String gmtPayment) throws ParseException {
         boolean response = true;
         switch (tradeStatus) {
             default:
@@ -534,7 +534,7 @@ public class UnionPayServiceImpl implements UnionPayService {
                     case THREE:
                         LOGGER.info("【升级高级会员付款回调】,流水号：{}", tradeNo);
                         order.setOrderStatus(OmsOrder.OrderStatus.SIX.key());
-                        response = orderService.updateUserForSeniorPay(order.getUserId(), order);
+                        response = orderService.updateUserForSeniorPay(order.getUserId(), order, DecimalUtil.strToLongForMultiply(totalAmount));
                         break;
                     case FOUR:
                         order.setOrderStatus(OmsOrder.OrderStatus.SIX.key());
@@ -613,7 +613,7 @@ public class UnionPayServiceImpl implements UnionPayService {
 
             // 此处验签成功,判断支付密码,取值,订单号
             String orderSn = result.getString("sn");
-            // 金额
+            // 金额，这里的金额是乘以100的
             Long amount = result.getLong("a");
             // 用户id
             Long userId = result.getLong("id");
@@ -676,7 +676,7 @@ public class UnionPayServiceImpl implements UnionPayService {
                                 break;
                             case THREE:
                                 order.setOrderStatus(OmsOrder.OrderStatus.SIX.key());
-                                response = orderService.updateUserForSeniorPay(order.getUserId(), order);
+                                response = orderService.updateUserForSeniorPay(order.getUserId(), order, amount);
                                 sb.append("购买会员价格:").append(dAmount);
                                 break;
                             case FOUR:

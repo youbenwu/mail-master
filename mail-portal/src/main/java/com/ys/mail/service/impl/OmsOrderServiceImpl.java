@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.*;
+import com.ys.mail.enums.SettingTypeEnum;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.CommonResultCode;
@@ -78,6 +80,8 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     @Autowired
     private RedisConfig redisConfig;
     @Autowired
+    private SysSettingService sysSettingService;
+    @Autowired
     private UmsUserInviteService umsUserInviteService;
 
     @Override
@@ -129,28 +133,23 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     public CommonResult<GenerateOrderBO> generateGiftOrder(String userImageString, String cpyType) {
         // 判断该人脸数据是否已被有效注册，如果有则不能再次生成订单
         CommonResult<Boolean> commonResult = umsUserService.verifyFace(userImageString);
-        if (BlankUtil.isEmpty(commonResult.getData()))
-            return CommonResult.failed(BusinessErrorCode.USER_IMAGE_STRING_EXIST);
+        ApiAssert.noValue(commonResult.getData(), BusinessErrorCode.USER_IMAGE_STRING_EXIST);
 
         // 验证当前用户是否支付99元，如果是则无需再支付，否则进入下一步
         UmsUser currentUser = UserUtil.getCurrentUser();
-        if (Objects.equals(NumberUtils.INTEGER_ONE, currentUser.getPaymentType()))
-            return CommonResult.failed(CommonResultCode.ERR_REPAYMENT_CODE);
+        ApiAssert.isTrue(Objects.equals(NumberUtils.INTEGER_ONE, currentUser.getPaymentType()), CommonResultCode.ERR_REPAYMENT_CODE);
 
-        // 验证该用户是否已经存在礼品订单，如果有则返回该订单，否则进入下一步
-        long amount = 99L; // 1 测试时将值修改为1表示0.01，默认改为99
+        // 读取设置中的付费会员价格，需要除以100
+        Integer price = sysSettingService.getSettingValue(SettingTypeEnum.fourteen);
+        Long amount = Long.valueOf(price);
         OmsOrder giftOrder = this.getGiftOrder(currentUser.getUserId());
+        // 验证该用户是否已经存在礼品订单，如果有则返回该订单，否则进入下一步
         if (BeanUtil.isNotEmpty(giftOrder)) {
-            amount = giftOrder.getPayAmount(); // 2 测试时注释
-            return CommonResult.success(new GenerateOrderBO(giftOrder.getOrderSn(), Long.toString(amount))); //99
+            amount = giftOrder.getPayAmount();
+            return CommonResult.success(new GenerateOrderBO(giftOrder.getOrderSn(), Long.toString(amount)));
         }
 
-        // 3、生成礼品订单（部分数据暂时为空），需要查询出最新的高级会员价格，并一起返回（该订单状态为待付款、假设实付金额为99、订单类型为3等）
-        UmsUserInviteRule umsUserInviteRule = umsUserInviteRuleService.selectRuleByAgentLevelType(NumberUtils.INTEGER_TWO, null);
-
-        if (BeanUtil.isNotEmpty(umsUserInviteRule)) {
-            amount = umsUserInviteRule.getMaxTotalAmount().longValue(); // 测试时注释 9900
-        }
+        // 3、生成礼品订单（部分数据暂时为空，该订单状态为待付款、假设实付金额为99、订单类型为3等）
         OmsOrder omsOrder = OmsOrder.builder().orderId(IdWorker.generateId()).userId(currentUser.getUserId())
                                     .orderSn(IdGenerator.INSTANCE.generateId()).totalAmount(NumberUtils.LONG_ZERO)
                                     .payAmount(amount).payType(NumberUtils.INTEGER_ZERO)
@@ -159,12 +158,13 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
                                     .receiverCity("").receiverRegion("").receiverAddress("")
                                     .cpyType(BlankUtil.isNotEmpty(cpyType) ? Byte.valueOf(cpyType) : NumberUtils.BYTE_ZERO)
                                     .build();
+        // 更新订单
         boolean flag = this.saveOrUpdate(omsOrder);
 
         // TODO 更新用户人脸信息到用户表中的userImageString字段（如果有定时关闭订单操作，应该在那里清空，暂时在此处清空）
         if (flag) {
-            // 清空其他无效人脸数据
-            userImageString = DigestUtils.sha512Hex(userImageString); // 压缩数据
+            // 清空其他无效人脸数据，压缩数据
+            userImageString = DigestUtils.sha512Hex(userImageString);
             LambdaUpdateWrapper<UmsUser> wrapper = new LambdaUpdateWrapper<>();
             wrapper.set(UmsUser::getUserImageString, StringUtils.EMPTY)
                    .eq(UmsUser::getUserImageString, userImageString);
@@ -266,19 +266,22 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     /**
      * 回调使用：高级会员支付成功后更新用户、订单等信息
      *
-     * @param userId 操作的用户ID
+     * @param userId      操作的用户ID
+     * @param order       系统订单对象
+     * @param totalAmount 支付金额，需要乘以100后调用
      * @return bool
      */
     @Override
-    public boolean updateUserForSeniorPay(Long userId, OmsOrder order) {
+    public boolean updateUserForSeniorPay(Long userId, OmsOrder order, Long totalAmount) {
         UmsUser user = umsUserService.getById(userId);
         if (BeanUtil.isNotEmpty(user)) {
+            // 校验价格，需要与订单中的金额保持一致，否则为非法操作
+            ApiAssert.isFalse(order.getPayAmount().equals(totalAmount), CommonResultCode.ILLEGAL_REQUEST);
             // 更新用户付款字段  0 1 0
             user.setPaymentType(NumberUtils.INTEGER_ONE);
             boolean flag = umsUserService.updateById(user);
             LOGGER.info("【升级高级会员付款回调】,更新用户：{}", flag);
             if (!flag) throw new ApiException("更新失败");
-            // TODO:添加付款流水
             // 删除该用户的缓存
             userCacheService.delUser(user.getPhone());
             return true;

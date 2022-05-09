@@ -53,12 +53,12 @@ public class FlashPromotionProductDTO implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
     @TableField(fill = FieldFill.UPDATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     @ApiModelProperty(value = "商品标题")
@@ -112,6 +112,16 @@ public class FlashPromotionProductDTO implements Serializable {
     private Integer isStatus;
 
     @ApiModelProperty(value = "合伙人id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long partnerId;
+
+    @ApiModelProperty(value = "合伙人手机号")
+    private String partnerPhone;
+
+    @ApiModelProperty(value = "合伙人地址")
+    private String partnerAddress;
+
+    @ApiModelProperty(value = "用户购买须知")
+    private String purchaseNote;
 
 }

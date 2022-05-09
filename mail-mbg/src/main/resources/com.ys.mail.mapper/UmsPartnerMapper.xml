@@ -29,8 +29,8 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="PartnerAddressMap" type="com.ys.mail.model.dto.PartnerAddressDTO">
         <result column="partner_id" property="partnerId"/>
-        <result column="phone" property="phone"/>
-        <result column="fullAddress" property="fullAddress"/>
+        <result column="phone" property="partnerPhone"/>
+        <result column="fullAddress" property="partnerAddress"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -40,8 +40,8 @@
 
     <select id="getAddressByProductId" resultMap="PartnerAddressMap">
         SELECT
-                up.partner_id,up.phone,
-                CONCAT(up.province,up.region,up.address) AS fullAddress
+                up.partner_id,up.phone partnerPhone,
+                CONCAT(up.province,up.region,up.address) AS partnerAddress
         FROM
                 pms_product pp INNER JOIN ums_partner up ON pp.partner_id = up.partner_id
         WHERE pp.product_id = #{productId}

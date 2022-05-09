@@ -38,6 +38,9 @@ public class PmsProductQuery extends Query {
     @ApiModelProperty(value = "促销类型：0->没有促销使用原价;1->使用促销价；2->使用会员价；3->使用阶梯价格；4->使用满减价格；5->限时购;6->拼团购;7->礼品;8->合伙人商品")
     private Integer promotionType;
 
+    @ApiModelProperty(value = "是否合伙人产品：0->false，1->true，默认所有")
+    private Boolean isPartner;
+
 }
 
 

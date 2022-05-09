@@ -3,6 +3,7 @@ package com.ys.mail.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.PmsProduct;
 import com.ys.mail.entity.SmsFlashPromotionProduct;
 import com.ys.mail.entity.UmsPartner;
@@ -42,14 +43,14 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Autowired
     private RedisService redisService;
     @Autowired
+    private RedisConfig redisConfig;
+
+    @Autowired
     private UmsPartnerService umsPartnerService;
     @Autowired
     private UserManageService userManageService;
     @Autowired
     private PmsProductService pmsProductService;
-
-    @Value("${redis.database}")
-    private String redisDatabase;
     @Value("${redis.key.homeSecondProduct}")
     private String redisKeyHomeSecondProduct;
 
@@ -106,9 +107,10 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         return flashPromotionProductMapper.selectSessionOrPdt();
     }
 
-    private void delHomeSecondProduct(boolean b) {
+    @Override
+    public void delHomeSecondProduct(boolean b) {
         if (b) {
-            LOGGER.info("清除缓存成功:count{}", redisService.keys(":home:*"));
+            LOGGER.info("清除缓存成功:count{}", redisService.keys(redisConfig.fullKey("home:*")));
         }
     }
 }
