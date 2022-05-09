@@ -33,6 +33,8 @@ import com.ys.mail.model.oauth.Base64Utils;
 import com.ys.mail.model.oauth.DES;
 import com.ys.mail.model.oauth.SignUtil;
 import com.ys.mail.model.param.*;
+import com.ys.mail.model.vo.ProductStoreVO;
+import com.ys.mail.model.vo.UmsUserVo;
 import com.ys.mail.model.vo.UserInviteDataVO;
 import com.ys.mail.model.vo.UserInviteItemDataVO;
 import com.ys.mail.security.util.JwtTokenUtil;
@@ -44,6 +46,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -103,6 +106,8 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
     private UmsUserMapper umsUserMapper;
     @Autowired
     private IncomeService incomeService;
+    @Autowired
+    private SmsProductStoreService smsProductStoreService;
 
     @Value("${jwt.tokenHead}")
     private String tokenHead;
@@ -359,7 +364,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         redisService.set(key, alipayName + alipayAccount, expireCommon);
 
         UmsUser build = UmsUser.builder().alipayAccount(alipayAccount).alipayName(alipayName)
-                .userId(currentUser.getUserId()).build();
+                               .userId(currentUser.getUserId()).build();
         boolean b = updateById(build);
         if (b) {
             userCacheService.delUser(currentUser.getPhone());
@@ -475,17 +480,17 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         // 构建支付对象
         String orderSn = IdGenerator.INSTANCE.generateId();
         AlipayPaidOutParam build = AlipayPaidOutParam.builder().outBizNo(orderSn).transAmount(transAmount)
-                .productCode(AlipayConstant.PRODUCT_CODE)
-                .bizScene(AlipayConstant.BIZ_SCENE)
-                .orderTitle(AlipayConstant.USER_DEPOSIT)
-                .payeeInfo(PayeeInfo.builder()
-                        .identityType(AlipayConstant.IDENTITY_TYPE_LOGON)
-                        .identity(currentUser.getAlipayAccount())
-                        .name(alipayName).build())
-                .remark(orderSn + alipayName + AlipayConstant.USER_DEPOSIT)
-                .businessParams(BusinessParams.builder()
-                        .payerShowName(AlipayConstant.JH_KJ + AlipayConstant.USER_DEPOSIT)
-                        .build()).build();
+                                                     .productCode(AlipayConstant.PRODUCT_CODE)
+                                                     .bizScene(AlipayConstant.BIZ_SCENE)
+                                                     .orderTitle(AlipayConstant.USER_DEPOSIT)
+                                                     .payeeInfo(PayeeInfo.builder()
+                                                                         .identityType(AlipayConstant.IDENTITY_TYPE_LOGON)
+                                                                         .identity(currentUser.getAlipayAccount())
+                                                                         .name(alipayName).build())
+                                                     .remark(orderSn + alipayName + AlipayConstant.USER_DEPOSIT)
+                                                     .businessParams(BusinessParams.builder()
+                                                                                   .payerShowName(AlipayConstant.JH_KJ + AlipayConstant.USER_DEPOSIT)
+                                                                                   .build()).build();
 
         // 返回响应
         AlipayFundTransUniTransferResponse response = commonPayService.paidOut(build);
@@ -494,16 +499,16 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
             // 添加提现流水：微服务架构这里可以直接返回给前端,异步操作这段插入
             LOGGER.info("提现{}", result);
             UmsIncome umsIncome = UmsIncome.builder().incomeId(IdWorker.generateId()).userId(userId)
-                    .income(NumberUtils.LONG_ZERO)
-                    .expenditure(money).balance(finalBalance)
-                    .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
-                    .incomeType(UmsIncome.IncomeType.TWO.key()) // 2->余额提现
-                    .incomeNo(response.getOrderId())
-                    // .incomeNo("")
-                    .orderTradeNo(orderSn)
-                    .detailSource("提现到账成功:" + transAmount + "元")
-                    .payType(UmsIncome.PayType.TWO.key()) // 提现到支付宝
-                    .build();
+                                           .income(NumberUtils.LONG_ZERO)
+                                           .expenditure(money).balance(finalBalance)
+                                           .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
+                                           .incomeType(UmsIncome.IncomeType.TWO.key()) // 2->余额提现
+                                           .incomeNo(response.getOrderId())
+                                           // .incomeNo("")
+                                           .orderTradeNo(orderSn)
+                                           .detailSource("提现到账成功:" + transAmount + "元")
+                                           .payType(UmsIncome.PayType.TWO.key()) // 提现到支付宝
+                                           .build();
             updateResult = umsIncomeService.save(umsIncome);
             if (!updateResult) throw new ApiException("添加流水记录失败");
         } else {
@@ -571,18 +576,18 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         String transAmount = DecimalUtil.longToStrForDivider(money);
         // 从余额中冻结该笔提现金额，插入一条冻结流水记录
         UmsIncome umsIncome = UmsIncome.builder().incomeId(IdWorker.generateId()).userId(userId)
-                .income(NumberUtils.LONG_ZERO).expenditure(money).balance(finalBalance)
-                .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
-                .incomeType(UmsIncome.IncomeType.FOUR.key()) // 4->审核资金
-                .incomeNo("").orderTradeNo("").detailSource("系统审核中:" + transAmount + "元")
-                .payType(UmsIncome.PayType.THREE.key()).build();
+                                       .income(NumberUtils.LONG_ZERO).expenditure(money).balance(finalBalance)
+                                       .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
+                                       .incomeType(UmsIncome.IncomeType.FOUR.key()) // 4->审核资金
+                                       .incomeNo("").orderTradeNo("").detailSource("系统审核中:" + transAmount + "元")
+                                       .payType(UmsIncome.PayType.THREE.key()).build();
         updateResult = umsIncomeService.save(umsIncome);
         if (!updateResult) throw new ApiException("审核扣除资金失败");
 
         // 添加审核
         PcReview pcReview = PcReview.builder().reviewId(IdWorker.generateId()).userId(userId).reviewMoney(money)
-                .rateIncomeId(rateIncomeId).alipayAccount(currentUser.getAlipayAccount())
-                .alipayName(currentUser.getAlipayName()).build();
+                                    .rateIncomeId(rateIncomeId).alipayAccount(currentUser.getAlipayAccount())
+                                    .alipayName(currentUser.getAlipayName()).build();
         updateResult = reviewService.save(pcReview);
         if (!updateResult) throw new ApiException("添加审核记录失败");
         return CommonResult.success(BusinessErrorCode.REVIEW_DEPOSIT_MONEY_EXCEED.getMessage(), String.valueOf(finalBalance));
@@ -615,10 +620,14 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
     }
 
     @Override
-    public UmsUser info() {
+    public UmsUserVo info() {
+        UmsUserVo vo = new UmsUserVo();
         UmsUser currentUser = UserUtil.getCurrentUser();
         currentUser.setPayPassword(BlankUtil.isEmpty(currentUser.getPayPassword()) ? FigureConstant.NOT_PAY_PASSWORD : FigureConstant.IS_PAY_PASSWORD);
-        return currentUser;
+        BeanUtils.copyProperties(currentUser, vo);
+        ProductStoreVO productStoreVO = smsProductStoreService.getInfo();
+        vo.setStoreInfo(productStoreVO);
+        return vo;
     }
 
     @Override
@@ -690,15 +699,15 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
             if (inviteTotal > NumberUtils.INTEGER_ZERO) {
                 // 统计团长分佣，当月
                 teamSumMap = umsIncomeService.getMap(new SqlQueryWrapper<UmsIncome>().eq("user_id", parentId)
-                        .eq("income_type", UmsIncome.IncomeType.SIX.key())
-                        .compareDate(SqlFormatEnum.STRING_DATE_FORMAT_YM_EQ, "create_time", DateTool.getYearMonth())
-                        .sum("income", "teamSum"));
+                                                                                     .eq("income_type", UmsIncome.IncomeType.SIX.key())
+                                                                                     .compareDate(SqlFormatEnum.STRING_DATE_FORMAT_YM_EQ, "create_time", DateTool.getYearMonth())
+                                                                                     .sum("income", "teamSum"));
 
                 // 查询团长的所有下级信息(下级用户ID、被邀请人电话、被邀请人头像、被邀请时间) TODO：当迁移parentId到用户表后需要修改这里
                 List<UserInviteItemDataVO> inviteInfoList = umsUserMapper.getUserInviteInfo(parentId);
                 // 遍历出所有下级ID
                 List<Long> inviteIds = inviteInfoList.stream().map(UserInviteItemDataVO::getUserId)
-                        .collect(Collectors.toList());
+                                                     .collect(Collectors.toList());
 
                 // 查询所有下级成员的有效消费记录（下级用户ID、有效消费金额、有效消费笔数），可以仅查询当月
                 List<Map<String, Object>> inviteOrderList = umsUserMapper.getInviteOrderCollectByParent(parentId, inviteIds, true);
@@ -706,10 +715,10 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
                 // 统计：团长的所有下级有效订单总笔数、总金额
                 if (BlankUtil.isNotEmpty(inviteOrderList)) {
                     memberOrderNum = inviteOrderList.stream().map(m -> Integer.valueOf(m.get("count").toString()))
-                            .reduce(0, Integer::sum);
+                                                    .reduce(0, Integer::sum);
                     memberOrderSum = Long.valueOf(inviteOrderList.stream()
-                            .map(m -> Integer.valueOf(m.get("money").toString()))
-                            .reduce(0, Integer::sum));
+                                                                 .map(m -> Integer.valueOf(m.get("money").toString()))
+                                                                 .reduce(0, Integer::sum));
                 }
 
                 // 合并下级数据
@@ -720,7 +729,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         // 计算分页
         if (BlankUtil.isNotEmpty(userId)) {
             pageInviteList = totalData.stream().filter(vo -> vo.getUserId() < Long.parseLong(userId)).limit(pageSize)
-                    .collect(Collectors.toList());
+                                      .collect(Collectors.toList());
         } else {
             if (BlankUtil.isEmpty(totalData)) totalData = new ArrayList<>();
             pageInviteList = totalData.stream().limit(pageSize).collect(Collectors.toList());
@@ -730,8 +739,8 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         if (BlankUtil.isEmpty(inviteData)) {
             Object teamSum = teamSumMap.get("teamSum");
             inviteData = UserInviteDataVO.builder().teamNum(inviteTotal)
-                    .teamSum(BlankUtil.isNotEmpty(teamSum) ? DecimalUtil.objToLong(teamSum) : NumberUtils.LONG_ZERO)
-                    .consumeNum(memberOrderNum).consumeTotal(memberOrderSum).build();
+                                         .teamSum(BlankUtil.isNotEmpty(teamSum) ? DecimalUtil.objToLong(teamSum) : NumberUtils.LONG_ZERO)
+                                         .consumeNum(memberOrderNum).consumeTotal(memberOrderSum).build();
             // 计算缓存过期时间，隔天刷新
             Long expire = DateTool.getNowToNextDaySeconds();
             // 存入缓存

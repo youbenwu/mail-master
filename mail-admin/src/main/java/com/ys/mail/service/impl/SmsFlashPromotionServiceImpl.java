@@ -47,10 +47,10 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     @Transactional(rollbackFor = Exception.class)
     public boolean delFlashPromotion(Long flashPromotionId) throws ParseException {
         QueryWrapper<SmsFlashPromotionProduct> wrapper = new QueryWrapper<>();
-        wrapper.eq("flash_promotion_id",flashPromotionId);
+        wrapper.eq("flash_promotion_id", flashPromotionId);
         flashPromotionProductService.remove(wrapper);
         boolean b = removeById(flashPromotionId);
-        if(b){
+        if (b) {
             customTrigger.resetJob();
         }
         return b;
@@ -60,16 +60,17 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     @Transactional(rollbackFor = Exception.class)
     public boolean createFlashPromotion(PcFlashPromotionParam param) throws ParseException {
         SmsFlashPromotion flashPromotion = new SmsFlashPromotion();
-        BeanUtils.copyProperties(param,flashPromotion);
+        BeanUtils.copyProperties(param, flashPromotion);
         Long flashPromotionId = flashPromotion.getFlashPromotionId();
         flashPromotion.setFlashPromotionId(flashPromotionId.equals(NumberUtils.LONG_ZERO) ? IdWorker.generateId() : flashPromotionId);
         boolean b = saveOrUpdate(flashPromotion);
-        if(b){
+        if (b) {
             customTrigger.resetJob();
+            // 清除首页缓存
+            flashPromotionProductService.delHomeSecondProduct(true);
         }
         return b;
     }
-
 
 
     @Override
@@ -86,7 +87,7 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
             return CommonResult.failed(BusinessErrorCode.NOT_PROMOTION_HOME);
         }*/
         boolean b = flashPromotionMapper.updateHome();
-        if(b){
+        if (b) {
             SmsFlashPromotion flashPromotion = new SmsFlashPromotion(flashPromotionId, homeStatus);
             b = updateById(flashPromotion);
         }
@@ -99,7 +100,7 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
         SmsFlashPromotion flashPromotion = new SmsFlashPromotion(publishStatus, flashPromotionId);
 
         boolean b = updateById(flashPromotion);
-        if(b){
+        if (b) {
             customTrigger.resetJob();
         }
         return b;

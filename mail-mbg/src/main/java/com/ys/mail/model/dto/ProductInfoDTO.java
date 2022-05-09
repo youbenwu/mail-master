@@ -161,22 +161,6 @@ public class ProductInfoDTO implements Serializable {
     @TableLogic
     private Integer deleted;
 
-    @ApiModelProperty(value = "是否精选,0->不精选,1->精选")
-    @TableField("is_handpick_status")
-    private Boolean handpickStatus;
-
-    @ApiModelProperty(value = "精致:0->false,1->true")
-    @TableField("is_delicacy_status")
-    private Boolean delicacyStatus;
-
-    @ApiModelProperty(value = "穿搭:0->false,1->true")
-    @TableField("is_style_status")
-    private Boolean styleStatus;
-
-    @ApiModelProperty(value = "是否生活：0->false,1->true")
-    @TableField("is_live_status")
-    private Boolean liveStatus;
-
     @ApiModelProperty(value = "评论数,默认为0")
     private Integer commentSum;
 
@@ -195,4 +179,26 @@ public class ProductInfoDTO implements Serializable {
 
     @ApiModelProperty(value = "折扣比例")
     private BigDecimal disCount;
+
+    @ApiModelProperty(value = "会员特惠：0->false,1->true")
+    @TableField("is_live_status")
+    private Boolean liveStatus;
+
+    @ApiModelProperty(value = "会员尾品：0->false,1->true")
+    @TableField("is_handpick_status")
+    private Boolean handpickStatus;
+
+    @ApiModelProperty(value = "潮品专区：0->false,1->true")
+    @TableField("is_delicacy_status")
+    private Boolean delicacyStatus;
+
+    @ApiModelProperty(value = "甄选好物：0->false,1->true")
+    @TableField("is_style_status")
+    private Boolean styleStatus;
+
+    @ApiModelProperty(value = "首页推荐：0->false,1->true")
+    @TableField("is_home_status")
+    private Boolean homeStatus;
+
+
 }

@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import com.ys.mail.enums.SettingValueTypeEnum;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static com.ys.mail.enums.SettingValueTypeEnum.valueOf;
 
@@ -34,11 +35,15 @@ public class ConvertTypeUtil {
             case DOUBLE:
                 return (V) Convert.convert(Double.class, value);
             case BOOLEAN:
-                if (BlankUtil.isEmpty(value)) return null;
+                if (BlankUtil.isEmpty(value)) {
+                    return null;
+                }
                 value = value.toUpperCase();
-                if ("TRUE".equals(value) || "FALSE".equals(value))
+                if ("TRUE".equals(value) || "FALSE".equals(value)) {
                     return (V) Convert.convert(Boolean.class, value);
-                else throw new ConvertException("类型转换异常");
+                } else {
+                    throw new ConvertException("类型转换异常");
+                }
             case JSON:
                 return (V) JSONUtil.parse(value);
             case LIST:
@@ -57,8 +62,8 @@ public class ConvertTypeUtil {
      */
     public static Boolean checkType(String value, String type) {
         try {
-            convert(value, type);
-            return true;
+            Object convert = convert(value, type);
+            return convert != null && Objects.equals(value, Objects.toString(convert));
         } catch (Exception e) {
             return false;
         }

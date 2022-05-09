@@ -25,23 +25,23 @@ public class CgyTagProductQuery implements Serializable {
     @BlankOrPattern(regEnum = RegularEnum.KEY)
     private String pdtCgyId;
 
-    @ApiModelProperty(value = "会员标记，默认是首页数据，true->会员专享，可选")
+    @ApiModelProperty(value = "会员标记，默认是首页数据，且其它标签无效；true->会员专享，可选")
     private Boolean member;
 
     @ApiModelProperty(value = "产品ID，用于分页，可选")
     @BlankOrPattern(regEnum = RegularEnum.KEY)
     private String productId;
 
-    @ApiModelProperty(value = "会员特惠：0->false,1->true，可选")
+    @ApiModelProperty(value = "标签1：会员特惠：0->false,1->true，可选")
     private Boolean isLiveStatus;
 
-    @ApiModelProperty(value = "会员尾品：0->false,1->true，可选")
+    @ApiModelProperty(value = "标签2：会员尾品：0->false,1->true，可选")
     private Boolean isHandpickStatus;
 
-    @ApiModelProperty(value = "潮品专区：0->false,1->true，可选")
+    @ApiModelProperty(value = "标签3：潮品专区：0->false,1->true，可选")
     private Boolean isDelicacyStatus;
 
-    @ApiModelProperty(value = "甄选好物：0->false,1->true，可选")
+    @ApiModelProperty(value = "标签4：甄选好物：0->false,1->true，可选")
     private Boolean isStyleStatus;
 
 }

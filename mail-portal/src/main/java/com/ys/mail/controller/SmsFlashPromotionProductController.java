@@ -162,7 +162,7 @@ public class SmsFlashPromotionProductController {
     //@ApiBlock
     @ApiOperation("秒杀生成订单-DT")
     @PostMapping(value = "/quickGenerateOrder")
-    // @LocalLockAnn(key = "quickGenerateOrder:arg[0]")
+    @LocalLockAnn(key = "quickGenerateOrder:arg[0]")
     public CommonResult<GenerateOrderBO> quickGenerateOrder(@Validated @RequestBody GenerateOrderParam param) {
         // 秒杀生成订单
         return flashPromotionProductService.quickGenerateOrder(param);

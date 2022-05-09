@@ -1,5 +1,6 @@
 package com.ys.mail.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,12 +23,13 @@ public class PartnerAddressDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "合伙人ID，用于校验地址")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long partnerId;
 
     @ApiModelProperty(value = "合伙人手机号")
-    private String phone;
+    private String partnerPhone;
 
     @ApiModelProperty(value = "完整的合伙人地址")
-    private String fullAddress;
+    private String partnerAddress;
 
 }
