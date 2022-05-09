@@ -12,10 +12,7 @@ import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.PageCommonResult;
 import com.ys.mail.model.admin.query.DetailQuery;
 import com.ys.mail.model.admin.query.Query;
-import com.ys.mail.model.dto.OrderDetailDto;
-import com.ys.mail.model.dto.OrderInfoDTO;
-import com.ys.mail.model.dto.PartnerAddressDTO;
-import com.ys.mail.model.dto.VerifyDto;
+import com.ys.mail.model.dto.*;
 import com.ys.mail.model.vo.ElectronicVo;
 import com.ys.mail.model.vo.MerchandiseVo;
 import com.ys.mail.model.vo.OrderItemDetailsVO;
@@ -363,9 +360,9 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
         }
 
         // 商品合伙人信息
-        UmsPartner umsPartner = umsPartnerMapper.selectById(order.getPartnerId());
-        if (ObjectUtils.isNotEmpty(umsPartner)) {
-            BeanUtils.copyProperties(umsPartner, dto);
+        PartnerUserDTO partnerUserDTO = partnerMapper.getPartnerInfoById(order.getPartnerId());
+        if (ObjectUtils.isNotEmpty(partnerUserDTO)) {
+            BeanUtils.copyProperties(partnerUserDTO, dto);
         }
 
         BeanUtils.copyProperties(order, dto);

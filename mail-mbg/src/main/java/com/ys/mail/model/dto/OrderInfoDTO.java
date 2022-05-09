@@ -94,8 +94,6 @@ public class OrderInfoDTO implements Serializable {
     @ApiModelProperty(value = "合伙人价格")
     private Long partnerPrice;
 
-
-
     @ApiModelProperty(value = "省")
     private String province;
     @ApiModelProperty(value = "市")
@@ -108,5 +106,14 @@ public class OrderInfoDTO implements Serializable {
     private Double latitude;
     @ApiModelProperty(value = "经度")
     private Double longitude;
+
+    @ApiModelProperty(value = "合伙人店铺名称")
+    private String corporateName;
+
+    @ApiModelProperty(value = "合伙人手机号")
+    private String phone;
+
+    @ApiModelProperty(value = "合伙人头像")
+    private String headPortrait;
 
 }

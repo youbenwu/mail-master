@@ -56,7 +56,9 @@
                 t1.city,
                 t1.region,
                 t1.address,
-                t2.head_portrait
+                t2.head_portrait,
+                t1.latitude,
+                t1.longitude
         FROM ums_partner t1,ums_user t2
         WHERE t1.user_id = t2.user_id AND t1.partner_id = #{partnerId}
     </select>

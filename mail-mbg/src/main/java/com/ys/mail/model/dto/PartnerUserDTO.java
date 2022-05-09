@@ -43,6 +43,12 @@ public class PartnerUserDTO implements Serializable {
     @ApiModelProperty(value = "头像")
     private String headPortrait;
 
+    @ApiModelProperty(value = "纬度")
+    private Double latitude;
+
+    @ApiModelProperty(value = "经度")
+    private Double longitude;
+
     @ApiModelProperty(value = "距离，单位m")
     private Double distance;
 }
