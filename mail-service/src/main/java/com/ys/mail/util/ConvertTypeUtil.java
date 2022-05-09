@@ -63,7 +63,11 @@ public class ConvertTypeUtil {
     public static Boolean checkType(String value, String type) {
         try {
             Object convert = convert(value, type);
-            return convert != null && Objects.equals(value, Objects.toString(convert));
+            // 特殊处理
+            if (SettingValueTypeEnum.INTEGER.name().equals(type)) {
+                return convert != null && Objects.equals(value, Objects.toString(convert));
+            }
+            return true;
         } catch (Exception e) {
             return false;
         }
