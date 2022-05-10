@@ -36,6 +36,7 @@ public class PmsPartnerProduct implements Serializable {
     private Long partnerPdtId;
 
     @ApiModelProperty(value = "商品id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long productId;
 
     @ApiModelProperty(value = "合伙人商品名称")
