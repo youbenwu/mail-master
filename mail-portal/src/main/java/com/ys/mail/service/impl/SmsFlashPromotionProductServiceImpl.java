@@ -818,7 +818,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.eq(SmsFlashPromotionProduct::getOrderId, orderId);
         SmsFlashPromotionProduct flashPromotionProduct = this.getOne(wrapper);
-        return flashPromotionProduct.getExpireTime();
+        return Optional.ofNullable(flashPromotionProduct).map(SmsFlashPromotionProduct::getExpireTime).orElse(null);
     }
 
     private RedisGeoDTO getGeoById(List<RedisGeoDTO> list, Long id) {
