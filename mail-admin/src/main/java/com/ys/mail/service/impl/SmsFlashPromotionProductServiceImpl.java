@@ -69,7 +69,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         PmsProduct pmsProduct = pmsProductService.getById(productId);
 
         // 获取设置中定义的秒杀上架截止时间的最低天数，如：7天
-        Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_two);
+        Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_four);
         Optional.ofNullable(days).map(map -> {
             boolean checkExpireTime = DateTool.checkExpireTime(param.getExpireTime(), days);
             String message = BusinessErrorCode.ERR_DATE_ILLEGAL.getMessage(days);
