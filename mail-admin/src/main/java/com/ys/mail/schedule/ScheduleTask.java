@@ -369,7 +369,7 @@ public class ScheduleTask {
     public void scheduledTask6() {
 
         LOGGER.info("异步执行普通订单的邀请人返佣开始---任务执行时间:{},线程名称:{}", LocalDateTime.now(), Thread.currentThread().getName());
-        Double ratio = settingService.getSettingValue(SettingTypeEnum.twenty_four);
+        Double ratio = settingService.getSettingValue(SettingTypeEnum.twenty_two);
         if (BlankUtil.isEmpty(ratio)) {
             LOGGER.info("scheduledTask6管理员设置未开启邀请普通订单返佣");
             return;
