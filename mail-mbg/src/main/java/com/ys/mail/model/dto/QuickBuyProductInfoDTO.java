@@ -120,7 +120,7 @@ public class QuickBuyProductInfoDTO {
     @TableField("is_publish_status")
     private Boolean publishStatus;
 
-    @ApiModelProperty(value = "秒杀商品状态：1->已卖出；2->秒杀中；3->上架")
+    @ApiModelProperty(value = "秒杀商品状态：-1->已过期；1->已卖出；2->秒杀中；3->上架")
     private Integer flashProductStatus;
 
     @ApiModelProperty(value = "创建时间")
@@ -139,6 +139,10 @@ public class QuickBuyProductInfoDTO {
 
     @ApiModelProperty(value = "用户商品店铺对象，记录当时最新的数据")
     private String pdtStoreObj;
+
+    @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date expireTime;
 
     @ApiModelProperty(value = "秒杀场次对象")
     private SmsFlashPromotion flashPromotion;

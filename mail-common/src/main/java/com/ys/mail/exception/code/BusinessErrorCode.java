@@ -86,6 +86,9 @@ public enum BusinessErrorCode implements IErrorCode {
 
     ERR_SMS_MISTAKE(400235, "发送短信失败"),
 
+    ERR_DATE_ILLEGAL(400300, "日期跨度不能小于%d天"),
+    ERR_DATE_EXPIRE(400301, "该商品已过期，不能上架"),
+
     ;
 
     private int code;

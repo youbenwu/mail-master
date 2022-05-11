@@ -388,6 +388,13 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
      */
     @Override
     public CommonResult<String> depositAlipay(DepositAlipayParam param) throws AlipayApiException {
+        UmsUser currentUser = UserUtil.getCurrentUser();
+        // 校验支付密码与支付名称
+        if (BlankUtil.isEmpty(currentUser.getPayPassword())) { // 校验是否设置密码
+            return CommonResult.failed(CommonResultCode.ERR_TEM_PAY_CODE);
+        } else if (!passwordEncoder.matches(param.getPayPassword(), currentUser.getPayPassword())) { // 校验输入密码
+            return CommonResult.failed(CommonResultCode.ERR_NOT_PAY_CODE);
+        }
         // 实时读取系统设置
         Double temp = sysSettingService.getSettingValue(SettingTypeEnum.eight);
         Long maxSingleLimit = DecimalUtil.strToLongForMultiply(temp);// 单笔最大限额，读取出来需要乘以100
@@ -406,17 +413,11 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         // 时间定义
         String today = DateTool.getTodayNow();
         // 提取公共变量
-        UmsUser currentUser = UserUtil.getCurrentUser();
         Long userId = currentUser.getUserId();
         String nickname = currentUser.getNickname();
         String transAmount = param.getTransAmount();
         LOGGER.info(template.get(0), userId, nickname, transAmount);
-        // 校验支付密码与支付名称
-        if (BlankUtil.isEmpty(currentUser.getPayPassword())) { // 校验是否设置密码
-            return CommonResult.failed(CommonResultCode.ERR_TEM_PAY_CODE);
-        } else if (!passwordEncoder.matches(param.getPayPassword(), currentUser.getPayPassword())) { // 校验输入密码
-            return CommonResult.failed(CommonResultCode.ERR_NOT_PAY_CODE);
-        }
+
         // 检查个人当天的审核次数
         PcReview review = reviewService.getNewestRecord(userId, today);
         if (BlankUtil.isNotEmpty(review) && Objects.equals(review.getReviewState(), PcReview.ReviewState.ZERO.key())) {

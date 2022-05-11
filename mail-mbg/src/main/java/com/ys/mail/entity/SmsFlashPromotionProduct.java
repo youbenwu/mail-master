@@ -108,8 +108,12 @@ public class SmsFlashPromotionProduct implements Serializable {
     @ApiModelProperty(value = "商品店铺对象")
     private String pdtStoreObj;
 
+    @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
+    private Date expireTime;
+
     @AllArgsConstructor
     public enum FlashProductStatus implements IPairs<Integer, String, FlashProductStatus> {
+        MINUS_ONE(-1, "已过期"),
         ONE(1, "已卖出"),
         TWO(2, "秒杀中"),
         THREE(3, "上架"),

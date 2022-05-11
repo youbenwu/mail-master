@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RabbitMqSmsConfig;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.FigureConstant;
-import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.*;
 import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
@@ -148,16 +147,22 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
     @Override
     public CommonResult<Boolean> addUserFlashProduct(Long flashPromotionPdtId) {
+        Long userId = UserUtil.getCurrentUser().getUserId();
         // 所属用户和id校验
         SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.eq(SmsFlashPromotionProduct::getFlashPromotionPdtId, flashPromotionPdtId)
-               .eq(SmsFlashPromotionProduct::getUserId, UserUtil.getCurrentUser().getUserId());
+               .eq(SmsFlashPromotionProduct::getUserId, userId);
         SmsFlashPromotionProduct smsFlashPromotionProduct = flashPromotionProductMapper.selectOne(wrapper);
         ApiAssert.noValue(smsFlashPromotionProduct, BusinessErrorCode.FLASH_PRODUCT_NO_EXIST);
 
-        // 状态校验：秒杀状态为Null 或者 状态 为  1:已卖出 则不能上架
+        // 状态校验：只有当秒杀状态为3才能上架
         Integer flashProductStatus = smsFlashPromotionProduct.getFlashProductStatus();
-        ApiAssert.isTrue(flashProductStatus == null || !flashProductStatus.equals(NumberConstant.THREE), CommonResultCode.ILLEGAL_REQUEST);
+        boolean condition = SmsFlashPromotionProduct.FlashProductStatus.THREE.key().equals(flashProductStatus);
+        ApiAssert.isFalse(condition, CommonResultCode.ILLEGAL_REQUEST);
+
+        // 过期时间校验
+        boolean expireTime = DateTool.isExpireTime(smsFlashPromotionProduct.getExpireTime());
+        ApiAssert.isTrue(expireTime, BusinessErrorCode.ERR_DATE_EXPIRE);
 
         // 填充信息
         smsFlashPromotionProduct.setIsPublishStatus(true);

@@ -219,7 +219,7 @@ public class SmsFlashPromotionProductController {
     @ApiOperation("我的店铺-DT")
     @GetMapping(value = "/getMyStore")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageSize", value = "翻页长度,默认为null就翻页20条", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageSize", value = "翻页长度,默认20条", dataType = "Integer"),
             @ApiImplicitParam(name = "cpyType", value = "公司类型:0->大尾狐,1->呼啦兔", dataType = "Byte", required = true)
     })
     public CommonResult<MyStorePO> getMyStore(@RequestParam(value = "pageSize", defaultValue = "20") @Range(min = 1, max = 30, message = "翻页长度取值{1-30}") Integer pageSize,
@@ -232,10 +232,10 @@ public class SmsFlashPromotionProductController {
     @GetMapping(value = "/getAllProduct/{cpyType:^0|^1}")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cpyType", value = "公司类型:0->大尾狐,1->呼啦兔", dataType = "Byte", required = true),
-            @ApiImplicitParam(name = "flashPromotionPdtId", value = "翻页id,每次传最后一个id,首次传null可查最新20条", dataType = "String")
+            @ApiImplicitParam(name = "flashPromotionPdtId", value = "翻页id，分页条数为20条，可选", dataType = "String")
     })
     public CommonResult<List<MyStoreDTO>> getAllProduct(@PathVariable Byte cpyType,
-                                                        @RequestParam(value = "flashPromotionPdtId", required = false) @Pattern(regexp = "\\d{19}$") String flashPromotionPdtId) {
+                                                        @RequestParam(value = "flashPromotionPdtId", required = false) @BlankOrPattern(regexp = "\\d{19}$") String flashPromotionPdtId) {
         // 翻页id传空,第二次,公司类型,最后一个id
         List<MyStoreDTO> result = flashPromotionProductService.getAllProduct(cpyType, flashPromotionPdtId);
         return CommonResult.success(result);

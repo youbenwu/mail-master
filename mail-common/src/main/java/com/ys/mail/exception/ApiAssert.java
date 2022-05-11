@@ -98,7 +98,7 @@ public class ApiAssert {
      * @param condition 条件，如 3 > 2 等表达式
      * @param errorCode 异常码
      */
-    public static <T> void isTrue(boolean condition, IErrorCode errorCode) {
+    public static void isTrue(boolean condition, IErrorCode errorCode) {
         if (condition) {
             throw new BusinessException(errorCode);
         }
@@ -110,9 +110,15 @@ public class ApiAssert {
      * @param condition 条件，如 3 > 5 等表达式
      * @param errorCode 异常码
      */
-    public static <T> void isFalse(boolean condition, IErrorCode errorCode) {
+    public static void isFalse(boolean condition, IErrorCode errorCode) {
         if (!condition) {
             throw new BusinessException(errorCode);
+        }
+    }
+
+    public static void isFalse(boolean condition, String message) {
+        if (!condition) {
+            throw new BusinessException(message);
         }
     }
 

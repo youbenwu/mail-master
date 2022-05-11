@@ -57,7 +57,7 @@
         <result column="flash_promotion_id" property="flashPromotionId"/>
         <result column="order_id" property="orderId"/>
 
-
+        <result column="product_name" property="productName" />
         <result column="sub_title" property="subTitle" />
         <result column="price" property="price" />
         <result column="purchase_note" property="purchaseNote" />
@@ -106,6 +106,7 @@
         <result column="flash_product_status" property="flashProductStatus"/>
         <result column="order_id" property="orderId"/>
         <result column="pdt_store_obj" property="pdtStoreObj"/>
+        <result column="expire_time" property="expireTime"/>
         <result column="product_id" property="productId"/>
         <result column="brand_id" property="brandId"/>
         <result column="pdt_cgy_id" property="pdtCgyId"/>
@@ -186,7 +187,8 @@
                sfpp.flash_promotion_origin_price,
                sfpp.create_time,
                sfpp.flash_promotion_limit,
-               sfpp.partner_price
+               sfpp.partner_price,
+               sfpp.expire_time
         FROM sms_flash_promotion_product sfpp
             LEFT JOIN pms_product pp on pp.product_id = sfpp.product_id
             LEFT JOIN sms_flash_promotion sfp on sfp.flash_promotion_id = sfpp.flash_promotion_id
@@ -293,6 +295,7 @@
 
     <select id="getFlashProductMesg" resultMap="AppDtoBaseResultMap">
         select a.*,
+        d.product_name,
         d.sub_title,
         d.purchase_note,
         d.pic ,
@@ -331,10 +334,13 @@
                sfpp.publisher_id,
                sfpp.sku_stock_id,
                sfpp.is_publish_status,
-               sfpp.flash_product_status,
+                CASE WHEN
+                    DATE( sfpp.expire_time ) <![CDATA[ < ]]> DATE( CURRENT_DATE ()) THEN '-1' ELSE sfpp.flash_product_status
+                END AS flash_product_status,
                sfpp.flash_promotion_limit,
                sfpp.order_id,
                sfpp.pdt_store_obj,
+               sfpp.expire_time,
                pp.product_id,
                pp.brand_id,
                pp.pdt_cgy_id,
@@ -588,6 +594,7 @@
             <result column="product_id" property="productId"/>
             <result column="user_id" property="userId"/>
             <result column="order_id" property="orderId"/>
+            <result column="expire_time" property="expireTime"/>
 
             <association property="storeProduct" javaType="com.ys.mail.model.dto.MyStoreDTO$StoreProduct"
             column="product_id" select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.selectStorePdt"
@@ -599,11 +606,13 @@
                 flash_promotion_pdt_id,
                 flash_promotion_price,
                 cpy_type,
-                is_publish_status,
-                flash_product_status,
+                CASE WHEN
+                    DATE( expire_time ) <![CDATA[ < ]]> DATE( CURRENT_DATE ()) THEN '-1' ELSE flash_product_status
+                END AS flash_product_status,
                 product_id,
                 user_id,
-                order_id
+                order_id,
+                expire_time
         FROM
                 sms_flash_promotion_product
         WHERE
@@ -631,11 +640,13 @@
                 flash_promotion_pdt_id,
                 flash_promotion_price,
                 cpy_type,
-                is_publish_status,
-                flash_product_status,
+                CASE WHEN
+                    DATE( expire_time ) <![CDATA[ < ]]> DATE( CURRENT_DATE ()) THEN '-1' ELSE flash_product_status
+                END AS flash_product_status,
                 product_id,
                 user_id,
-                order_id
+                order_id,
+                expire_time
         FROM
                 sms_flash_promotion_product
             <where>

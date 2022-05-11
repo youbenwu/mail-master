@@ -61,6 +61,9 @@ public class FlashPromotionProductDTO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    @ApiModelProperty(value = "商品名称")
+    private String productName;
+
     @ApiModelProperty(value = "商品标题")
     private String subTitle;
 

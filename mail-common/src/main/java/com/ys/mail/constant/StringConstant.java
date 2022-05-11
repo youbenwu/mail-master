@@ -19,6 +19,8 @@ public class StringConstant {
     public static final String ENV_PROD = "prod";
     public static final String ENV_DEV = "dev";
     public static final String ENV_TEST = "test";
+
+    public static final String PAY_PASSWORD = "123456";
     public static final String RESULT_STATUS = "status";
 
     /**

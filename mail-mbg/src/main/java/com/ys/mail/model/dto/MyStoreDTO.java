@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 我的店铺信息
@@ -27,7 +28,7 @@ public class MyStoreDTO implements Serializable {
     @TableField("is_publish_status")
     private Boolean publishStatus;
 
-    @ApiModelProperty(value = "秒杀商品状态：1->已卖出；2->秒杀中；3->上架; 4->待卖出")
+    @ApiModelProperty(value = "秒杀商品状态：-1->已过期；1->已卖出；2->秒杀中；3->上架; 4->待卖出")
     private Integer flashProductStatus;
 
     @ApiModelProperty(value = "翻页id")
@@ -48,6 +49,9 @@ public class MyStoreDTO implements Serializable {
 
     @ApiModelProperty(value = "商品对象")
     private StoreProduct storeProduct;
+
+    @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
+    private Date expireTime;
 
     @Data
     static class StoreProduct {
