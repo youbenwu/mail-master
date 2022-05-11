@@ -188,8 +188,14 @@ public class OmsOrder implements Serializable {
     @ApiModelProperty(value = "合伙人价格")
     private Long partnerPrice;
 
+    @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
+    private Date expireTime;
+
     @AllArgsConstructor
     public enum PayType implements IPairs<Integer, String, PayType> {
+        /**
+         * 支付类型
+         */
         ZERO(0, "未支付"),
         ONE(1, "云闪付"),
         TWO(2, "支付宝"),
@@ -211,6 +217,9 @@ public class OmsOrder implements Serializable {
 
     @AllArgsConstructor
     public enum OrderStatus implements IPairs<Integer, String, OrderStatus> {
+        /**
+         * 订单状态
+         */
         ZERO(0, "待付款"),
         ONE(1, "待发货"),
         TWO(2, "已发货"),
@@ -237,6 +246,9 @@ public class OmsOrder implements Serializable {
 
     @AllArgsConstructor
     public enum OrderType implements IPairs<Integer, String, OrderType> {
+        /**
+         * 订单类型
+         */
         ZERO(0, "正常订单"),
         ONE(1, "秒杀订单"),
         TWO(2, "拼团订单"),

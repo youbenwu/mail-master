@@ -363,6 +363,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
                                      .equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
         order.setCpyType(param.getCpyType());
         order.setPartnerId(pmsProduct.getPartnerId());
+        order.setExpireTime(flashPromotionProduct.getExpireTime());
         try {
             // 为true生成item的子订单
             if (!orderService.save(order)) {
@@ -524,6 +525,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             sfpp.setOrderId(orderInfo.getOrderId());
             // 合伙人原价格      如果置换-则拿  置换后产品价格  否则 拿订单的合伙人原价格
             sfpp.setPartnerPrice(br ? skuStock.getPrice() : orderInfo.getPartnerPrice());
+            // 加入截止日期
+            sfpp.setExpireTime(orderInfo.getExpireTime());
             // true 置换成功
             boolean b = saveOrUpdate(sfpp);
 
