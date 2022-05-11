@@ -9,14 +9,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @Desc 设置表中的类型，每新增一个类型都记录到该枚举上，方便维护
+ * 设置表中的类型，每新增一个类型都记录到该枚举上，方便维护
  * - 使用设置计算时，统一引用该枚举，尽量别直接使用数字
- * @Author CRH
- * @Create 2022-02-14 19:19
+ *
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 @Getter
 @AllArgsConstructor
 public enum SettingTypeEnum implements IPairs<Integer, String, SettingTypeEnum> {
+    /**
+     * 类型
+     */
     zero(0),
     one(1),
     two(2),

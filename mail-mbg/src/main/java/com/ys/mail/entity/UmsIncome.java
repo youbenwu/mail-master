@@ -104,6 +104,9 @@ public class UmsIncome implements Serializable {
 
     @AllArgsConstructor
     public enum IncomeType implements IPairs<Integer, String, IncomeType> {
+        /**
+         * 状态
+         */
         MINUS_TWO(-2, "系统补还"),
         MINUS_ONE(-1, "系统扣除"),
         ZERO(0, "邀请收益"),
@@ -114,13 +117,13 @@ public class UmsIncome implements Serializable {
         FIVE(5, "审核退还"),
         SIX(6, "团长分佣"),
         SEVEN(7, "商家收益"),
-        EIGHT(8, "创客收益"),// 合伙人商品每月返还收益
+        EIGHT(8, "创客收益"),
         NINE(9, "余额支付"),
         TEN(10, "扣除服务费"),
         ELEVEN(11, "退还服务费"),
-        TWELVE(12,"邀请创客冻结收益"),
-        THIRTEEN(13,"解冻邀请创客冻结收益"),
-        FOURTEEN(14,"会员订单收益"),
+        TWELVE(12, "邀请创客冻结收益"),
+        THIRTEEN(13, "解冻邀请创客冻结收益"),
+        FOURTEEN(14, "会员订单收益"),
         ;
         final Integer type;
         final String name;
@@ -138,6 +141,9 @@ public class UmsIncome implements Serializable {
 
     @AllArgsConstructor
     public enum PayType implements IPairs<Integer, String, PayType> {
+        /**
+         * 状态
+         */
         ZERO(0, "未支付"),
         ONE(1, "云闪付"),
         TWO(2, "支付宝"),

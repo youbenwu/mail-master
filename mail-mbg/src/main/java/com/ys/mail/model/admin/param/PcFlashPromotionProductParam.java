@@ -77,7 +77,6 @@ public class PcFlashPromotionProductParam implements Serializable {
     private Long partnerPrice;
 
     @ApiModelProperty(value = "截止时间，格式：yyyy-MM-dd，作用于合伙人商品，过期则不能上架、核销等")
-    @Future
     private Date expireTime;
 
 

@@ -2,8 +2,10 @@ package com.ys.mail.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ys.mail.enums.IPairs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,7 +14,7 @@ import java.util.Date;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author 070
@@ -20,17 +22,10 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="PmsVerificationCode对象", description="")
+@ApiModel(value = "PmsVerificationCode对象", description = "")
 public class PmsVerificationCode implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /* 待使用  */
-    public static final Integer CODE_STATUS_ZERO = 0;
-    /* 已使用 */
-    public static final Integer CODE_STATUS_ONE = 1;
-    /*  失效-----确认交付不可使用 */
-    public static final Integer CODE_STATUS_TWO = 2;
 
     @ApiModelProperty(value = "核销码id")
     @TableId(value = "verification_id", type = IdType.INPUT)
@@ -50,7 +45,7 @@ public class PmsVerificationCode implements Serializable {
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
-    @ApiModelProperty(value = "状态 0待使用 1已使用 2已失效")
+    @ApiModelProperty(value = "状态：0待使用 1已使用 2已失效")
     private Integer isStatus;
 
     @ApiModelProperty(value = "创建时间")
@@ -65,6 +60,32 @@ public class PmsVerificationCode implements Serializable {
     @TableField(fill = FieldFill.INSERT)
     @TableLogic
     private Integer deleted;
+
+    @ApiModelProperty(value = "截止时间")
+    private Date expireTime;
+
+    @AllArgsConstructor
+    public enum IsStatus implements IPairs<Integer, String, IsStatus> {
+        /**
+         * 状态
+         */
+        ZERO(0, "待使用"),
+        ONE(1, "已使用"),
+        TWO(2, "已失效"),
+        ;
+        final Integer type;
+        final String name;
+
+        @Override
+        public Integer key() {
+            return this.type;
+        }
+
+        @Override
+        public String value() {
+            return this.name;
+        }
+    }
 
 
 }

@@ -13,6 +13,7 @@ import com.ys.mail.model.query.QuickBuyProductQuery;
 import com.ys.mail.model.vo.NearbyStoreProductVO;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -144,4 +145,12 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
      * @return 结果
      */
     NearbyStoreProductVO getNearbyStore(Long flashPromotionId, Integer productType, Double radius, MapQuery mapQuery, Long partnerId);
+
+    /**
+     * 获取指定订单中的截止/过期时间
+     *
+     * @param orderId 订单ID
+     * @return 日期
+     */
+    Date getExpireTime(Long orderId);
 }

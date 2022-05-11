@@ -97,6 +97,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Autowired
     private SmsFlashPromotionHistoryMapper flashPromotionHistoryMapper;
     @Autowired
+    private SmsFlashPromotionProductService smsFlashPromotionProductService;
+    @Autowired
     private OmsVerificationOrderMapper verificationOrderMapper;
     @Autowired
     private PmsVerificationCodeMapper verificationCodeMapper;
@@ -700,38 +702,48 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         return CommonResult.success("退回成功");
     }
 
-    // 合伙人二维码 确认收货逻辑
     public void confirmReceiptVerification(String orderSn, int symNum, boolean br) {
+        // 合伙人二维码 确认收货逻辑
         OmsVerificationOrder verificationOrder = verificationOrderMapper.selectOne(Wrappers
                 .<OmsVerificationOrder>lambdaQuery().eq(OmsVerificationOrder::getOrderId, orderSn));
         if (ObjectUtils.isNotEmpty(verificationOrder)) {
             Long verificationId = verificationOrder.getVerificationId();
             PmsVerificationCode verificationCode = verificationCodeMapper.selectById(verificationId);
-            verificationCode.setIsStatus(PmsVerificationCode.CODE_STATUS_TWO);
+            verificationCode.setIsStatus(PmsVerificationCode.IsStatus.TWO.key());
             verificationCodeMapper.updateById(verificationCode);
         }
-        if (br) {// br = true 新生成  置为失效
+        // br = true 新生成  置为失效
+        if (br) {
             OmsOrder order = orderService.getOne(new QueryWrapper<OmsOrder>().eq("order_sn", orderSn));
-            for (int i = 0; i < symNum; ++i) {
-                if (BlankUtil.isNotEmpty(order.getPartnerId())) {
-                    // 商品数量
-                    Integer count = 1;
-                    Long verificationId = IdWorker.generateId();
-                    // 插入订单核销表
-                    OmsVerificationOrder verificationOrder1 = new OmsVerificationOrder();
-                    verificationOrder1.setVerificationOrderId(IdWorker.generateId());
-                    verificationOrder1.setVerificationId(verificationId);
-                    verificationOrder1.setOrderId(order.getOrderSn());
-                    verificationOrder1.setQuantity(count);
-                    verificationOrderMapper.insert(verificationOrder1);
-                    // 插入核销表
-                    PmsVerificationCode verificationCode = new PmsVerificationCode();
-                    verificationCode.setVerificationId(verificationId);
-                    verificationCode.setPartnerId(order.getPartnerId());
-                    verificationCode.setCode(IdGenerator.INSTANCE.cancelId());
-                    verificationCode.setIsStatus(PmsVerificationCode.CODE_STATUS_TWO);
-                    /* 请修改!!! */
-                    verificationCodeMapper.insert(verificationCode);
+            if (BlankUtil.isNotEmpty(order)) {
+                Long orderId = order.getOrderId();
+
+                // 加入截止时间
+                Date expireTime = this.getExpireTime(orderId);
+
+                // 打散核销码
+                for (int i = 0; i < symNum; ++i) {
+                    if (BlankUtil.isNotEmpty(order.getPartnerId())) {
+                        // 商品数量
+                        Integer count = 1;
+                        Long verificationId = IdWorker.generateId();
+                        // 插入订单核销表
+                        OmsVerificationOrder verificationOrder1 = new OmsVerificationOrder();
+                        verificationOrder1.setVerificationOrderId(IdWorker.generateId());
+                        verificationOrder1.setVerificationId(verificationId);
+                        verificationOrder1.setOrderId(order.getOrderSn());
+                        verificationOrder1.setQuantity(count);
+                        verificationOrderMapper.insert(verificationOrder1);
+                        // 插入核销表
+                        PmsVerificationCode verificationCode = new PmsVerificationCode();
+                        verificationCode.setVerificationId(verificationId);
+                        verificationCode.setPartnerId(order.getPartnerId());
+                        verificationCode.setCode(IdGenerator.INSTANCE.cancelId());
+                        verificationCode.setExpireTime(expireTime);
+                        verificationCode.setIsStatus(PmsVerificationCode.IsStatus.TWO.key());
+                        /* 请修改!!! */
+                        verificationCodeMapper.insert(verificationCode);
+                    }
                 }
             }
         }
@@ -799,6 +811,14 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             vo.setGeoList(list);
         }
         return vo;
+    }
+
+    @Override
+    public Date getExpireTime(Long orderId) {
+        SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
+        wrapper.eq(SmsFlashPromotionProduct::getOrderId, orderId);
+        SmsFlashPromotionProduct flashPromotionProduct = this.getOne(wrapper);
+        return flashPromotionProduct.getExpireTime();
     }
 
     private RedisGeoDTO getGeoById(List<RedisGeoDTO> list, Long id) {

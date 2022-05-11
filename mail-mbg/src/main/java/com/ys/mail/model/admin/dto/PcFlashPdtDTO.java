@@ -86,5 +86,6 @@ public class PcFlashPdtDTO implements Serializable {
     private Long partnerPrice;
 
     @ApiModelProperty(value = "截止时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date expireTime;
 }

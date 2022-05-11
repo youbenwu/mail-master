@@ -116,4 +116,7 @@ public class OrderInfoDTO implements Serializable {
     @ApiModelProperty(value = "合伙人头像")
     private String headPortrait;
 
+    @ApiModelProperty(value = "截止时间")
+    private Date expireTime;
+
 }

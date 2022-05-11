@@ -113,6 +113,9 @@ public class SmsFlashPromotionProduct implements Serializable {
 
     @AllArgsConstructor
     public enum FlashProductStatus implements IPairs<Integer, String, FlashProductStatus> {
+        /**
+         * 状态
+         */
         MINUS_ONE(-1, "已过期"),
         ONE(1, "已卖出"),
         TWO(2, "秒杀中"),

@@ -30,7 +30,7 @@ public class DateTool {
         DateTime currentDay = getNow();
         DateTime offsetDay = DateUtil.offsetDay(currentDay, offset);
         DateTime parseTime = DateUtil.parse(DateUtil.format(time, "yyyy-MM-dd"));
-        return parseTime.after(offsetDay);
+        return parseTime.compareTo(offsetDay) >= 0;
     }
 
     /**
@@ -40,6 +40,9 @@ public class DateTool {
      * @return 是否已过期，true->已过期，false->没过期
      */
     public static boolean isExpireTime(Date expireTime) {
+        if (BlankUtil.isEmpty(expireTime)) {
+            return false;
+        }
         DateTime currentDay = getNow();
         return currentDay.after(expireTime);
     }
