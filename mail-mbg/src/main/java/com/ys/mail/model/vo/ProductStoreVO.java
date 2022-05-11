@@ -61,6 +61,7 @@ public class ProductStoreVO implements Serializable {
     private Integer reviewState;
 
     @ApiModelProperty(value = "审核描述")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String reviewDesc;
 
 }
