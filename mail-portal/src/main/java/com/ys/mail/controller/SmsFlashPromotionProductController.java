@@ -161,12 +161,13 @@ public class SmsFlashPromotionProductController {
         return BlankUtil.isEmpty(result) ? CommonResult.failed(BusinessErrorCode.NOT_ORDER_LIST) : CommonResult.success(result);
     }
 
-    @ApiOperation("手动触发退款")
-    @PostMapping(value = "/userIncome/{flashPromotionPdtId}")
-    @LocalLockAnn(key = "userIncome:arg[0]")
-    public CommonResult<Object> userIncome(@PathVariable Long flashPromotionPdtId) {
-        return flashPromotionProductService.userIncome(flashPromotionPdtId);
-    }
+
+//    @ApiOperation("手动触发退款")
+//    @PostMapping(value = "/userIncome/{flashPromotionPdtId}")
+//    @LocalLockAnn(key = "userIncome:arg[0]")
+//    public CommonResult<Object> userIncome(@PathVariable Long flashPromotionPdtId) {
+//        return flashPromotionProductService.userIncome(flashPromotionPdtId);
+//    }
 
     /**
      * 我的店铺中快购信息通知,我的产品出现慢查询,极度影响性能,建议join不能超过2层,如果出现超过2层,那就是建表的问题
@@ -225,6 +226,17 @@ public class SmsFlashPromotionProductController {
                                                              MapQuery mapQuery) {
         NearbyStoreProductVO vo = flashPromotionProductService.getNearbyStore(flashPromotionId, productType, radius, mapQuery, partnerId);
         return CommonResult.success(vo);
+    }
+
+    /**
+     * 手动触发退款
+     */
+    @ApiOperation("我的店铺退款")
+    @PostMapping(value = "/userIncome/{id:^\\d{19}$}")
+    @LocalLockAnn(key = "userIncome:arg[0]")
+    public CommonResult<Boolean> userIncome(@PathVariable("id") Long flashPromotionPdtId){
+
+        return flashPromotionProductService.refund(flashPromotionPdtId);
     }
 
 }

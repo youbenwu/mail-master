@@ -153,4 +153,11 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
      * @return 日期
      */
     Date getExpireTime(Long orderId);
+
+    /**
+     * 退款方法
+     * @param flashPromotionPdtId id
+     * @return 返回值
+     */
+    CommonResult<Boolean> refund(Long flashPromotionPdtId);
 }

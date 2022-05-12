@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RabbitMqSmsConfig;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.FigureConstant;
+import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.*;
 import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiAssert;
@@ -860,6 +861,66 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         // 将经纬度数据加载到Redis中，并设置过期时间
         redisService.gAdd(fullKey, geoMap);
         redisService.expire(fullKey, redisConfig.getExpire().getMinute());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public synchronized CommonResult<Boolean> refund(Long flashPromotionPdtId) {
+
+        SmsFlashPromotionProduct promotionProduct = this.getById(flashPromotionPdtId);
+        ApiAssert.noValue(promotionProduct,BusinessErrorCode.GOODS_NOT_EXIST);
+        ApiAssert.noValue(promotionProduct.getFlashProductStatus(),BusinessErrorCode.NPE_PARAM);
+        Long partnerPrice = promotionProduct.getPartnerPrice();
+        Long flashPromotionPrice = promotionProduct.getFlashPromotionPrice();
+        Long publisherId = promotionProduct.getPublisherId();
+        Long productId = promotionProduct.getProductId();
+        Integer flashPromotionCount = promotionProduct.getFlashPromotionCount();
+        Date expireTime = promotionProduct.getExpireTime();
+        ApiAssert.noEq(UserUtil.getCurrentUser().getUserId(),publisherId,BusinessErrorCode.GOODS_NOT_EXIST);
+        if(BlankUtil.isNotEmpty(expireTime) && DateTool.isExpireTime(expireTime)){
+            promotionProduct.setFlashProductStatus(NumberConstant.MINUS_ONE);
+        }
+        Integer status = promotionProduct.getFlashProductStatus();
+        if(!ObjectUtil.equal(status,NumberUtils.INTEGER_MINUS_ONE)){
+            return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_PDT_SALE);
+        }
+        ApiAssert.noValue(partnerPrice,BusinessErrorCode.PDT_SUPPLY_NOT);
+        if(BlankUtil.isNotEmpty(flashPromotionPrice) && flashPromotionPrice.compareTo(partnerPrice) < NumberUtils.INTEGER_ZERO){
+            return CommonResult.failed(BusinessErrorCode.PDT_UNDER_SUPPLY_PRICE);
+        }
+        if(BlankUtil.isEmpty(publisherId) || BlankUtil.isEmpty(productId) || BlankUtil.isEmpty(flashPromotionCount) ||
+                ObjectUtil.equal(flashPromotionCount,NumberUtils.INTEGER_ZERO)){
+            return CommonResult.failed(BusinessErrorCode.NPE_PARAM);
+        }
+
+        UmsIncome umsIncome = umsIncomeMapper.selectNewestByUserId(publisherId);
+        boolean empty = BlankUtil.isEmpty(umsIncome);
+        long income = empty ? NumberUtils.LONG_ZERO : umsIncome.getIncome();
+        long balance = empty ? NumberUtils.LONG_ZERO : umsIncome.getBalance();
+        long allIncome = empty ? NumberUtils.LONG_ZERO : umsIncome.getAllIncome();
+        UmsIncome build = UmsIncome.builder()
+                .incomeId(IdWorker.generateId())
+                .userId(publisherId)
+                .income(income + partnerPrice)
+                .expenditure(NumberUtils.LONG_ZERO)
+                .balance(balance + partnerPrice)
+                .allIncome(allIncome + partnerPrice)
+                .incomeType(UmsIncome.IncomeType.FIFTEEN.key())
+                .detailSource("用户退款-秒杀产品")
+                .remark("平台回购-秒杀产品id:{" + flashPromotionPdtId + "},价格:{" + partnerPrice + "},持有人id:{" + publisherId + "},数量:{" + flashPromotionCount + "}")
+                .payType(UmsIncome.PayType.THREE.key())
+                .flashPromotionPdtId(flashPromotionPdtId)
+                .incomeNo(FigureConstant.STRING_EMPTY)
+                .orderTradeNo(FigureConstant.STRING_EMPTY)
+                .build();
+        SmsFlashPromotionProduct build1 = SmsFlashPromotionProduct.builder()
+                .flashPromotionPdtId(flashPromotionPdtId)
+                .flashProductStatus(SmsFlashPromotionProduct.FlashProductStatus.FIVE.key())
+                .flashPromotionCount(NumberUtils.INTEGER_ZERO)
+                .build();
+        umsIncomeMapper.insert(build);
+        this.updateById(build1);
+        return CommonResult.success(Boolean.TRUE);
     }
 
 }

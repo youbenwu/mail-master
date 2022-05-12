@@ -83,8 +83,8 @@ public class AppTest {
     @Autowired
     private TencentFaceIdClient faceIdClient;
 
-    @Autowired
-    private TencentFaceIdInfo faceIdInfo;
+//    @Autowired
+//    private TencentFaceIdInfo faceIdInfo;
 
 
     @Test
@@ -213,7 +213,7 @@ public class AppTest {
     public void test14() {
         UmsIncome income = UmsIncome.builder()
                 .incomeId(IdWorker.generateId())
-                .userId(6458605727202545664L)
+                .userId(1458610631027593216L)
                 .income(100000000L)
                 .expenditure(0L)
                 .balance(100000000L)
