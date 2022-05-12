@@ -151,7 +151,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
     @Override
     public CommonResult<Boolean> addUserFlashProduct(Long flashPromotionPdtId) {
-        Long userId = UserUtil.getCurrentUser().getUserId();
+        UmsUser currentUser = UserUtil.getCurrentUser();
+        Long userId = currentUser.getUserId();
         // 所属用户和id校验
         SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.eq(SmsFlashPromotionProduct::getFlashPromotionPdtId, flashPromotionPdtId)
@@ -186,6 +187,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             SmsProductStore reviewed = smsProductStoreService.getReviewed();
             ProductStoreObjDTO storeObjDTO = new ProductStoreObjDTO();
             BeanUtils.copyProperties(reviewed, storeObjDTO);
+            storeObjDTO.setStoreLogo(currentUser.getHeadPortrait());
             smsFlashPromotionProduct.setPdtStoreObj(JSON.toJSONString(storeObjDTO));
 
             // 关联场次ID
