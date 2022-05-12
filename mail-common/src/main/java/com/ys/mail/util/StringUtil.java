@@ -2,6 +2,7 @@ package com.ys.mail.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ys.mail.enums.AnsiColorEnum;
 
 import java.util.*;
 
@@ -208,5 +209,16 @@ public class StringUtil {
      */
     public static boolean compareKey(Object sourceKey, Object targetKey) {
         return Objects.toString(sourceKey).equals(Objects.toString(targetKey));
+    }
+
+    /**
+     * 获取带颜色编码的内容
+     *
+     * @param colorEnum 颜色枚举
+     * @param content   原始内容
+     * @return 带颜色编码的内容
+     */
+    public static String getColorContent(AnsiColorEnum colorEnum, String content) {
+        return String.format("%s%s%s", colorEnum.getCode(), content, AnsiColorEnum.RESET.getCode());
     }
 }

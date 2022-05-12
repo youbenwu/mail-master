@@ -1,8 +1,11 @@
 package com.ys.mail.exception;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.ys.mail.constant.StringConstant;
+import com.ys.mail.enums.AnsiColorEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.util.BlankUtil;
+import com.ys.mail.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
@@ -50,12 +53,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = BusinessException.class)
     public CommonResult<String> handler(BusinessException e) {
         String message = e.getMessage();
-        if (e.getErrorCode() != null) {
-            logger.warn("【业务异常】-[异常编码:{}]-[异常结果:{}]", e.getErrorCode().getCode(), message);
-            return CommonResult.failed(e.getErrorCode(), message);
-        }
-        logger.warn("【业务异常】-[异常结果:{}]", message);
-        return CommonResult.failed(message);
+        // 打印简洁的业务异常
+        String title = String.format("\n%s业务异常：%s", StringConstant.LEFT_ARROWS, message);
+        String link = String.format("\n%s异常位置：%s", StringConstant.LEFT_ARROWS, e.getStackTrace()[1]);
+        String content = StringUtil.getColorContent(AnsiColorEnum.RED_BOLD, title + link);
+        logger.warn(content);
+        // 返回结果
+        return CommonResult.failed(e.getErrorCode(), message);
     }
 
     @ResponseBody
@@ -199,7 +203,7 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(JsonMappingException.class)
-    public CommonResult<String> jsonMappingException(JsonMappingException e){
+    public CommonResult<String> jsonMappingException(JsonMappingException e) {
         return CommonResult.failed(BlankUtil.isEmpty(e) ? null : e.getMessage());
     }
 }
