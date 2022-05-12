@@ -160,9 +160,10 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         SmsFlashPromotionProduct smsFlashPromotionProduct = flashPromotionProductMapper.selectOne(wrapper);
         ApiAssert.noValue(smsFlashPromotionProduct, BusinessErrorCode.FLASH_PRODUCT_NO_EXIST);
 
-        // 状态校验：只有当秒杀状态为3才能上架
+        // 状态校验：只有当秒杀状态为3、4才能上架
         Integer flashProductStatus = smsFlashPromotionProduct.getFlashProductStatus();
-        boolean condition = SmsFlashPromotionProduct.FlashProductStatus.THREE.key().equals(flashProductStatus);
+        boolean condition = SmsFlashPromotionProduct.FlashProductStatus.THREE.key().equals(flashProductStatus) ||
+                SmsFlashPromotionProduct.FlashProductStatus.FOUR.key().equals(flashProductStatus);
         ApiAssert.isFalse(condition, CommonResultCode.ILLEGAL_REQUEST);
 
         // 过期时间校验
