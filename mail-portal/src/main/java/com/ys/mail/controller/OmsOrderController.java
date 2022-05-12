@@ -73,6 +73,9 @@ public class OmsOrderController {
     @GetMapping(value = "/get/{orderSn:^\\d+$}/info")
     public CommonResult<OrderInfoDTO> getOrderInfo(@PathVariable String orderSn) {
         OrderInfoDTO result = omsOrderService.getNewOrderInfo(orderSn);
+        if (BlankUtil.isNotEmpty(result) && BlankUtil.isEmpty(result.getKdName())) {
+            result.setKdName("");
+        }
         return BlankUtil.isEmpty(result) ? CommonResult.failed("没有此订单消息") : CommonResult.success(result);
     }
 

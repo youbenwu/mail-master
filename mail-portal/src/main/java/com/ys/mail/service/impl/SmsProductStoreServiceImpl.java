@@ -2,15 +2,20 @@ package com.ys.mail.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.SmsProductStore;
+import com.ys.mail.entity.UmsUser;
 import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.mapper.SmsProductStoreMapper;
 import com.ys.mail.model.param.insert.ProductStoreInsertParam;
 import com.ys.mail.model.vo.ProductStoreVO;
+import com.ys.mail.service.RedisService;
 import com.ys.mail.service.SmsProductStoreService;
+import com.ys.mail.service.UserCacheService;
 import com.ys.mail.util.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +55,7 @@ public class SmsProductStoreServiceImpl extends ServiceImpl<SmsProductStoreMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addStore(ProductStoreInsertParam param) {
+        UmsUser currentUser = UserUtil.getCurrentUser();
         // 个人店铺数量限制为1
         SmsProductStore info = this.get();
         ApiAssert.haveValue(info, BusinessErrorCode.USER_STORE_EXIST);
@@ -60,12 +66,13 @@ public class SmsProductStoreServiceImpl extends ServiceImpl<SmsProductStoreMappe
         // 填充字段
         Long storeId = IdWorker.generateId();
         productStore.setPdtStoreId(storeId);
-        productStore.setUserId(UserUtil.getCurrentUser().getUserId());
+        productStore.setUserId(currentUser.getUserId());
         return this.save(productStore);
     }
 
     @Override
     public boolean updateStore(ProductStoreInsertParam param) {
+        UmsUser currentUser = UserUtil.getCurrentUser();
         // 查询出个人的店铺信息
         SmsProductStore info = this.get();
         if (BlankUtil.isEmpty(info)) {

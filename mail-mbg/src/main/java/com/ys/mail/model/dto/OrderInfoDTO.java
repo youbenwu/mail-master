@@ -1,6 +1,7 @@
 package com.ys.mail.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ys.mail.model.vo.OrderItemDetailsVO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

@@ -10,6 +10,7 @@ import com.ys.mail.config.RabbitMqSmsConfig;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.FigureConstant;
 import com.ys.mail.entity.*;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
@@ -116,7 +117,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     private RedisService redisService;
     @Autowired
     private RedisConfig redisConfig;
-
+    @Autowired
+    private SysSettingService sysSettingService;
 
     @Value("${redis.database}")
     private String redisDatabase;
@@ -270,8 +272,11 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         long nowTimeL = nowDate.getTime();
         long overdueL = endTimeL - nowTimeL;
         // 查询手底下人有多少交了99元数量  payment_type
-        Integer auserNumber = umsUserMapper.findAdvancedUsersNumber(userId);
-        Integer purchasesNumber = 5 + (auserNumber / 2);
+        Integer anUserNumber = umsUserMapper.findAdvancedUsersNumber(userId);
+
+        // 读取设置中的【每场秒杀购买基础数次】值
+        Integer baseNumber = sysSettingService.getSettingValue(SettingTypeEnum.twenty_five);
+        Integer purchasesNumber = baseNumber + (anUserNumber / 2);
         // 获取 已下单次数
         Integer countRedis = (Integer) redisTemplate.opsForValue().get(key);
         // 获取场次下 该用户下单次数

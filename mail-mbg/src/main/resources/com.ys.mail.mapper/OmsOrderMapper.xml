@@ -100,6 +100,7 @@
         <result column="delivery_company" property="deliveryCompany"/>
         <result column="delivery_sn" property="deliverySn"/>
         <result column="cpy_type" property="cpyType"/>
+        <result column="expire_time" property="expireTime"/>
 
         <!--一对多，方式一-->
         <collection property="omsOrderItem" ofType="com.ys.mail.model.vo.OrderItemDetailsVO" column="order_item_id">
@@ -230,6 +231,7 @@
                oo.order_note,
                oo.payment_time,
                oo.partner_price,
+               oo.expire_time,
                ooi.product_pic,
                ooi.product_price,
                ooi.is_appraise,

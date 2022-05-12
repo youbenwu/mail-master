@@ -59,8 +59,9 @@
                 t2.head_portrait,
                 t1.latitude,
                 t1.longitude
-        FROM ums_partner t1,ums_user t2
-        WHERE t1.user_id = t2.user_id AND t1.partner_id = #{partnerId}
+        FROM
+                ums_partner t1 LEFT JOIN ums_user t2 ON t1.user_id = t2.user_id
+        WHERE t1.partner_id = #{partnerId}
     </select>
 
 </mapper>

@@ -21,6 +21,7 @@
         <result column="order_id" property="orderId"/>
         <result column="total_amount" property="totalAmount"/>
         <result column="pdt_store_obj" property="pdtStoreObj"/>
+        <result column="expire_time" property="expireTime"/>
     </resultMap>
 
     <resultMap id="DtoBaseResultMap" type="com.ys.mail.model.admin.dto.PcFlashPromotionProductDTO">
@@ -409,7 +410,8 @@
         sfpp.`flash_promotion_pdt_id`,
         sfpp.`flash_promotion_count`,
         sfpp.`partner_price`,
-        sfpp.`flash_promotion_price`
+        sfpp.`flash_promotion_price`,
+        sfpp.`expire_time`
         FROM `sms_flash_promotion_product` AS sfpp
         WHERE sfpp.`product_id` = #{productId}
         AND sfpp.`flash_promotion_count` > 0
