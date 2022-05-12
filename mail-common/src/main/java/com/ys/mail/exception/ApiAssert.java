@@ -60,6 +60,12 @@ public class ApiAssert {
         }
     }
 
+    public static <T> void noValue(T t, String message) {
+        if (BlankUtil.isEmpty(t)) {
+            throw new BusinessException(message);
+        }
+    }
+
     /**
      * {t1}与{t2}相等则抛出异常
      *

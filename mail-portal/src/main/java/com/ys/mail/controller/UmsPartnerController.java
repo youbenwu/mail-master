@@ -58,7 +58,11 @@ public class UmsPartnerController {
     }
 
     @PostMapping("/verification")
-    @ApiOperation("核销接口")
+    @ApiOperation(value = "核销接口",notes = "参数为JSON结构，格式如下：\n" +
+            "{\n" +
+            "  \"code\": \"202205121605427778twzq27cig\"\n" +
+            "}")
+    @ApiImplicitParam(name = "params", value = "核销码参数，格式为JSON")
     public CommonResult<Boolean> verification(@RequestBody Map<String, String> params) {
         return partnerService.verification(params);
     }
