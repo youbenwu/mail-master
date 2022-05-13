@@ -764,16 +764,28 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Override
     public MyStorePO getMyStore(Integer pageSize, Byte cpyType) {
         return MyStorePO.builder()
-                        .storeDtoS(flashPromotionProductMapper.selectMyStore(pageSize, UserUtil.getCurrentUser()
-                                                                                               .getUserId(), cpyType))
+                        .storeDtoS(getMyStore(flashPromotionProductMapper.selectMyStore(pageSize, UserUtil.getCurrentUser()
+                                .getUserId(), cpyType)))
                         .msgVO(historyService.getShopMsg())
                         .build();
+    }
+
+    private List<MyStoreDTO> getMyStore(List<MyStoreDTO> dTos){
+        dTos.stream().filter(Objects::nonNull).forEach(
+                x->{
+                    long time = System.currentTimeMillis();
+                    if(BlankUtil.isNotEmpty(x) && BlankUtil.isNotEmpty(x.getExpireTime()) && time > x.getExpireTime().getTime() && !x.getFlashProductStatus().equals(SettingTypeEnum.five.key())){
+                        x.setFlashProductStatus(NumberUtils.INTEGER_MINUS_ONE);
+                    }
+                }
+        );
+        return dTos;
     }
 
     @Override
     public List<MyStoreDTO> getAllProduct(Byte cpyType, String flashPromotionPdtId) {
         Long id = BlankUtil.isEmpty(flashPromotionPdtId) ? null : Long.valueOf(flashPromotionPdtId);
-        return flashPromotionProductMapper.selectAllProduct(cpyType, id, UserUtil.getCurrentUser().getUserId());
+        return getMyStore(flashPromotionProductMapper.selectAllProduct(cpyType, id, UserUtil.getCurrentUser().getUserId()));
     }
 
     @Override

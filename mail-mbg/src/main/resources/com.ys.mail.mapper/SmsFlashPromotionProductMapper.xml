@@ -608,9 +608,7 @@
                 flash_promotion_pdt_id,
                 flash_promotion_price,
                 cpy_type,
-                CASE WHEN
-                    DATE( expire_time ) <![CDATA[ < ]]> DATE( CURRENT_DATE ()) THEN '-1' ELSE flash_product_status
-                END AS flash_product_status,
+                flash_product_status,
                 product_id,
                 user_id,
                 order_id,
@@ -642,9 +640,7 @@
                 flash_promotion_pdt_id,
                 flash_promotion_price,
                 cpy_type,
-                CASE WHEN
-                    DATE( expire_time ) <![CDATA[ < ]]> DATE( CURRENT_DATE ()) THEN '-1' ELSE flash_product_status
-                END AS flash_product_status,
+                flash_product_status,
                 product_id,
                 user_id,
                 order_id,
