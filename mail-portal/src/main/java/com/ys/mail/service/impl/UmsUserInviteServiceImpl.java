@@ -118,7 +118,7 @@ public class UmsUserInviteServiceImpl extends ServiceImpl<UmsUserInviteMapper, U
         // 构建二维码填充内容：邀请链接（当更换路径时需要清空cos/qrcode中的历史二维码图片）
         // -- 测试环境:http://reg.huwing.cn
         // -- 生成环境:http://regproduct.huwing.cn
-        String content = String.format(propInviteUrl + "?uid=%d&type=%s", userId, type);
+        String content = String.format(propInviteUrl + "/register?uid=%d&type=%s", userId, type);
         // 开始生成
         Boolean encode = QRCodeUtil.encode(content, tempFile);
         if (encode) {
