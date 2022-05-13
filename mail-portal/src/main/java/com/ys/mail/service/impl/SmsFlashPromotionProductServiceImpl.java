@@ -888,7 +888,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         if(BlankUtil.isNotEmpty(flashPromotionPrice) && flashPromotionPrice.compareTo(partnerPrice) < NumberUtils.INTEGER_ZERO){
             return CommonResult.failed(BusinessErrorCode.PDT_UNDER_SUPPLY_PRICE);
         }
-        if(BlankUtil.isEmpty(publisherId) || BlankUtil.isEmpty(productId) || BlankUtil.isEmpty(flashPromotionCount) ||
+        if(BlankUtil.isEmpty(promotionProduct.getUserId()) || BlankUtil.isEmpty(productId) || BlankUtil.isEmpty(flashPromotionCount) ||
                 ObjectUtil.equal(flashPromotionCount,NumberUtils.INTEGER_ZERO)){
             return CommonResult.failed(BusinessErrorCode.NPE_PARAM);
         }
