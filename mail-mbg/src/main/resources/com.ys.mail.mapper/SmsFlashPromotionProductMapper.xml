@@ -399,9 +399,9 @@
         AND sfpp.`flash_product_status` = 2
         AND sfpp.`flash_promotion_price` = #{price}
         AND sfpp.`flash_promotion_id` = #{flashPromotionId}
-        AND sfp.`flash_promotion_id` = #{flashPromotionId}
+        <!--AND sfp.`flash_promotion_id` = #{flashPromotionId}-->
         AND NOW() BETWEEN sfp.`start_time` and sfp.`end_time`
-        AND sfpp.`cpy_type`  = #{cpyType}
+       <!-- AND sfpp.`cpy_type`  = #{cpyType}-->
         GROUP BY sfpp.`product_id` , sfpp.`flash_promotion_price`
         ORDER BY sfpp.`flash_promotion_pdt_id` ASC
     </select>

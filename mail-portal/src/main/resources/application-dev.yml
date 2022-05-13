@@ -2,7 +2,7 @@ server:
   port: 8019
 
 spring:
-  datasource: #101.35.185.82  localhost
+  datasource: #159.75.212.173  localhost
     url: jdbc:mysql://localhost:3306/qcy_mail?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456

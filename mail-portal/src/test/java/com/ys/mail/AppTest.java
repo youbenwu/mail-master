@@ -213,7 +213,7 @@ public class AppTest {
     public void test14() {
         UmsIncome income = UmsIncome.builder()
                 .incomeId(IdWorker.generateId())
-                .userId(1458610631027593216L)
+                .userId(6524986054195679232L)
                 .income(100000000L)
                 .expenditure(0L)
                 .balance(100000000L)
