@@ -59,7 +59,10 @@ public class GlobalExceptionHandler {
         String content = StringUtil.getColorContent(AnsiColorEnum.RED_BOLD, title + link);
         logger.warn(content);
         // 返回结果
-        return CommonResult.failed(e.getErrorCode(), message);
+        if (e.getErrorCode() != null) {
+            return CommonResult.failed(e.getErrorCode(), message);
+        }
+        return CommonResult.failed(e.getMessage());
     }
 
     @ResponseBody
