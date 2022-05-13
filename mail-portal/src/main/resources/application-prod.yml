@@ -65,7 +65,7 @@ mybatis-plus:
 
 prop:
   staticAccessPath: /www/wwwroot/mail.huwing.cn/upload/
-  inviteUrl: http://regproduct.jitiger.cn
+  inviteUrl: http://wvpagesqcy.jitiger.cn
 
 # 融云IM相关配置（生产环境）
 rongcloud:
