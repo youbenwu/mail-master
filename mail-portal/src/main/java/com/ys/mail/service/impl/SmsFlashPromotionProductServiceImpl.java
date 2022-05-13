@@ -11,6 +11,7 @@ import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.FigureConstant;
 import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.*;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
@@ -98,6 +99,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Autowired
     private SmsFlashPromotionHistoryMapper flashPromotionHistoryMapper;
     @Autowired
+    private SmsFlashPromotionProductService smsFlashPromotionProductService;
+    @Autowired
     private OmsVerificationOrderMapper verificationOrderMapper;
     @Autowired
     private PmsVerificationCodeMapper verificationCodeMapper;
@@ -115,7 +118,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     private RedisService redisService;
     @Autowired
     private RedisConfig redisConfig;
-
+    @Autowired
+    private SysSettingService sysSettingService;
 
     @Value("${redis.database}")
     private String redisDatabase;
@@ -148,16 +152,24 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
     @Override
     public CommonResult<Boolean> addUserFlashProduct(Long flashPromotionPdtId) {
+        UmsUser currentUser = UserUtil.getCurrentUser();
+        Long userId = currentUser.getUserId();
         // 所属用户和id校验
         SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.eq(SmsFlashPromotionProduct::getFlashPromotionPdtId, flashPromotionPdtId)
-               .eq(SmsFlashPromotionProduct::getUserId, UserUtil.getCurrentUser().getUserId());
+               .eq(SmsFlashPromotionProduct::getUserId, userId);
         SmsFlashPromotionProduct smsFlashPromotionProduct = flashPromotionProductMapper.selectOne(wrapper);
         ApiAssert.noValue(smsFlashPromotionProduct, BusinessErrorCode.FLASH_PRODUCT_NO_EXIST);
 
-        // 状态校验：秒杀状态为Null 或者 状态 为  1:已卖出 则不能上架
+        // 状态校验：只有当秒杀状态为3、4才能上架
         Integer flashProductStatus = smsFlashPromotionProduct.getFlashProductStatus();
-        ApiAssert.isTrue(flashProductStatus == null || !flashProductStatus.equals(NumberConstant.THREE), CommonResultCode.ILLEGAL_REQUEST);
+        boolean condition = SmsFlashPromotionProduct.FlashProductStatus.THREE.key().equals(flashProductStatus) ||
+                SmsFlashPromotionProduct.FlashProductStatus.FOUR.key().equals(flashProductStatus);
+        ApiAssert.isFalse(condition, CommonResultCode.ILLEGAL_REQUEST);
+
+        // 过期时间校验
+        boolean expireTime = DateTool.isExpireTime(smsFlashPromotionProduct.getExpireTime());
+        ApiAssert.isTrue(expireTime, BusinessErrorCode.ERR_DATE_EXPIRE);
 
         // 填充信息
         smsFlashPromotionProduct.setIsPublishStatus(true);
@@ -177,6 +189,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             SmsProductStore reviewed = smsProductStoreService.getReviewed();
             ProductStoreObjDTO storeObjDTO = new ProductStoreObjDTO();
             BeanUtils.copyProperties(reviewed, storeObjDTO);
+            storeObjDTO.setStoreLogo(currentUser.getHeadPortrait());
             smsFlashPromotionProduct.setPdtStoreObj(JSON.toJSONString(storeObjDTO));
 
             // 关联场次ID
@@ -263,8 +276,11 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         long nowTimeL = nowDate.getTime();
         long overdueL = endTimeL - nowTimeL;
         // 查询手底下人有多少交了99元数量  payment_type
-        Integer auserNumber = umsUserMapper.findAdvancedUsersNumber(userId);
-        Integer purchasesNumber = 5 + (auserNumber / 2);
+        Integer anUserNumber = umsUserMapper.findAdvancedUsersNumber(userId);
+
+        // 读取设置中的【每场秒杀购买基础数次】值
+        Integer baseNumber = sysSettingService.getSettingValue(SettingTypeEnum.twenty_five);
+        Integer purchasesNumber = baseNumber + (anUserNumber / 2);
         // 获取 已下单次数
         Integer countRedis = (Integer) redisTemplate.opsForValue().get(key);
         // 获取场次下 该用户下单次数
@@ -356,6 +372,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
                                      .equals(NumberUtils.INTEGER_ONE) ? FigureConstant.CONFIRM_DELIVERY_DAY : null);
         order.setCpyType(param.getCpyType());
         order.setPartnerId(pmsProduct.getPartnerId());
+        order.setExpireTime(flashPromotionProduct.getExpireTime());
         try {
             // 为true生成item的子订单
             if (!orderService.save(order)) {
@@ -517,6 +534,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             sfpp.setOrderId(orderInfo.getOrderId());
             // 合伙人原价格      如果置换-则拿  置换后产品价格  否则 拿订单的合伙人原价格
             sfpp.setPartnerPrice(br ? skuStock.getPrice() : orderInfo.getPartnerPrice());
+            // 加入截止日期
+            sfpp.setExpireTime(orderInfo.getExpireTime());
             // true 置换成功
             boolean b = saveOrUpdate(sfpp);
 
@@ -695,38 +714,48 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         return CommonResult.success("退回成功");
     }
 
-    // 合伙人二维码 确认收货逻辑
     public void confirmReceiptVerification(String orderSn, int symNum, boolean br) {
+        // 合伙人二维码 确认收货逻辑
         OmsVerificationOrder verificationOrder = verificationOrderMapper.selectOne(Wrappers
                 .<OmsVerificationOrder>lambdaQuery().eq(OmsVerificationOrder::getOrderId, orderSn));
         if (ObjectUtils.isNotEmpty(verificationOrder)) {
             Long verificationId = verificationOrder.getVerificationId();
             PmsVerificationCode verificationCode = verificationCodeMapper.selectById(verificationId);
-            verificationCode.setIsStatus(PmsVerificationCode.CODE_STATUS_TWO);
+            verificationCode.setIsStatus(PmsVerificationCode.IsStatus.TWO.key());
             verificationCodeMapper.updateById(verificationCode);
         }
-        if (br) {// br = true 新生成  置为失效
+        // br = true 新生成  置为失效
+        if (br) {
             OmsOrder order = orderService.getOne(new QueryWrapper<OmsOrder>().eq("order_sn", orderSn));
-            for (int i = 0; i < symNum; ++i) {
-                if (BlankUtil.isNotEmpty(order.getPartnerId())) {
-                    // 商品数量
-                    Integer count = 1;
-                    Long verificationId = IdWorker.generateId();
-                    // 插入订单核销表
-                    OmsVerificationOrder verificationOrder1 = new OmsVerificationOrder();
-                    verificationOrder1.setVerificationOrderId(IdWorker.generateId());
-                    verificationOrder1.setVerificationId(verificationId);
-                    verificationOrder1.setOrderId(order.getOrderSn());
-                    verificationOrder1.setQuantity(count);
-                    verificationOrderMapper.insert(verificationOrder1);
-                    // 插入核销表
-                    PmsVerificationCode verificationCode = new PmsVerificationCode();
-                    verificationCode.setVerificationId(verificationId);
-                    verificationCode.setPartnerId(order.getPartnerId());
-                    verificationCode.setCode(IdGenerator.INSTANCE.cancelId());
-                    verificationCode.setIsStatus(PmsVerificationCode.CODE_STATUS_TWO);
-                    /* 请修改!!! */
-                    verificationCodeMapper.insert(verificationCode);
+            if (BlankUtil.isNotEmpty(order)) {
+                Long orderId = order.getOrderId();
+
+                // 加入截止时间
+                Date expireTime = this.getExpireTime(orderId);
+
+                // 打散核销码
+                for (int i = 0; i < symNum; ++i) {
+                    if (BlankUtil.isNotEmpty(order.getPartnerId())) {
+                        // 商品数量
+                        Integer count = 1;
+                        Long verificationId = IdWorker.generateId();
+                        // 插入订单核销表
+                        OmsVerificationOrder verificationOrder1 = new OmsVerificationOrder();
+                        verificationOrder1.setVerificationOrderId(IdWorker.generateId());
+                        verificationOrder1.setVerificationId(verificationId);
+                        verificationOrder1.setOrderId(order.getOrderSn());
+                        verificationOrder1.setQuantity(count);
+                        verificationOrderMapper.insert(verificationOrder1);
+                        // 插入核销表
+                        PmsVerificationCode verificationCode = new PmsVerificationCode();
+                        verificationCode.setVerificationId(verificationId);
+                        verificationCode.setPartnerId(order.getPartnerId());
+                        verificationCode.setCode(IdGenerator.INSTANCE.cancelId());
+                        verificationCode.setExpireTime(expireTime);
+                        verificationCode.setIsStatus(PmsVerificationCode.IsStatus.TWO.key());
+                        /* 请修改!!! */
+                        verificationCodeMapper.insert(verificationCode);
+                    }
                 }
             }
         }
@@ -796,6 +825,14 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         return vo;
     }
 
+    @Override
+    public Date getExpireTime(Long orderId) {
+        SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
+        wrapper.eq(SmsFlashPromotionProduct::getOrderId, orderId);
+        SmsFlashPromotionProduct flashPromotionProduct = this.getOne(wrapper);
+        return Optional.ofNullable(flashPromotionProduct).map(SmsFlashPromotionProduct::getExpireTime).orElse(null);
+    }
+
     private RedisGeoDTO getGeoById(List<RedisGeoDTO> list, Long id) {
         for (RedisGeoDTO redisGeoDTO : list) {
             if (redisGeoDTO.getId().equals(id)) {
@@ -824,6 +861,66 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         // 将经纬度数据加载到Redis中，并设置过期时间
         redisService.gAdd(fullKey, geoMap);
         redisService.expire(fullKey, redisConfig.getExpire().getMinute());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public synchronized CommonResult<Boolean> refund(Long flashPromotionPdtId) {
+
+        SmsFlashPromotionProduct promotionProduct = this.getById(flashPromotionPdtId);
+        ApiAssert.noValue(promotionProduct,BusinessErrorCode.GOODS_NOT_EXIST);
+        ApiAssert.noValue(promotionProduct.getFlashProductStatus(),BusinessErrorCode.NPE_PARAM);
+        Long partnerPrice = promotionProduct.getPartnerPrice();
+        Long flashPromotionPrice = promotionProduct.getFlashPromotionPrice();
+        Long publisherId = promotionProduct.getPublisherId();
+        Long productId = promotionProduct.getProductId();
+        Integer flashPromotionCount = promotionProduct.getFlashPromotionCount();
+        Date expireTime = promotionProduct.getExpireTime();
+        ApiAssert.noEq(UserUtil.getCurrentUser().getUserId(),publisherId,BusinessErrorCode.GOODS_NOT_EXIST);
+        if(BlankUtil.isNotEmpty(expireTime) && DateTool.isExpireTime(expireTime)){
+            promotionProduct.setFlashProductStatus(NumberConstant.MINUS_ONE);
+        }
+        Integer status = promotionProduct.getFlashProductStatus();
+        if(!ObjectUtil.equal(status,NumberUtils.INTEGER_MINUS_ONE)){
+            return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_PDT_SALE);
+        }
+        ApiAssert.noValue(partnerPrice,BusinessErrorCode.PDT_SUPPLY_NOT);
+        if(BlankUtil.isNotEmpty(flashPromotionPrice) && flashPromotionPrice.compareTo(partnerPrice) < NumberUtils.INTEGER_ZERO){
+            return CommonResult.failed(BusinessErrorCode.PDT_UNDER_SUPPLY_PRICE);
+        }
+        if(BlankUtil.isEmpty(publisherId) || BlankUtil.isEmpty(productId) || BlankUtil.isEmpty(flashPromotionCount) ||
+                ObjectUtil.equal(flashPromotionCount,NumberUtils.INTEGER_ZERO)){
+            return CommonResult.failed(BusinessErrorCode.NPE_PARAM);
+        }
+
+        UmsIncome umsIncome = umsIncomeMapper.selectNewestByUserId(publisherId);
+        boolean empty = BlankUtil.isEmpty(umsIncome);
+        long income = empty ? NumberUtils.LONG_ZERO : umsIncome.getIncome();
+        long balance = empty ? NumberUtils.LONG_ZERO : umsIncome.getBalance();
+        long allIncome = empty ? NumberUtils.LONG_ZERO : umsIncome.getAllIncome();
+        UmsIncome build = UmsIncome.builder()
+                .incomeId(IdWorker.generateId())
+                .userId(publisherId)
+                .income(income + partnerPrice)
+                .expenditure(NumberUtils.LONG_ZERO)
+                .balance(balance + partnerPrice)
+                .allIncome(allIncome + partnerPrice)
+                .incomeType(UmsIncome.IncomeType.FIFTEEN.key())
+                .detailSource("用户退款-秒杀产品")
+                .remark("平台回购-秒杀产品id:{" + flashPromotionPdtId + "},价格:{" + partnerPrice + "},持有人id:{" + publisherId + "},数量:{" + flashPromotionCount + "}")
+                .payType(UmsIncome.PayType.THREE.key())
+                .flashPromotionPdtId(flashPromotionPdtId)
+                .incomeNo(FigureConstant.STRING_EMPTY)
+                .orderTradeNo(FigureConstant.STRING_EMPTY)
+                .build();
+        SmsFlashPromotionProduct build1 = SmsFlashPromotionProduct.builder()
+                .flashPromotionPdtId(flashPromotionPdtId)
+                .flashProductStatus(SmsFlashPromotionProduct.FlashProductStatus.FIVE.key())
+                .flashPromotionCount(NumberUtils.INTEGER_ZERO)
+                .build();
+        umsIncomeMapper.insert(build);
+        this.updateById(build1);
+        return CommonResult.success(Boolean.TRUE);
     }
 
 }

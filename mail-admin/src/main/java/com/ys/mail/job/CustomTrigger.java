@@ -65,7 +65,7 @@ public class CustomTrigger {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            break;
+            //break;
         }
     }
 

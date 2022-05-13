@@ -8,11 +8,9 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.BeanUtils;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author DT
@@ -76,8 +74,10 @@ public class PcFlashPromotionProductParam implements Serializable {
     private Long flashPromotionOriginPrice;
 
     @ApiModelProperty(value = "合伙人价格")
-    /*@NotNull,添加合伙人商品时必须有值*/
     private Long partnerPrice;
+
+    @ApiModelProperty(value = "截止时间，格式：yyyy-MM-dd，作用于合伙人商品，过期则不能上架、核销等")
+    private Date expireTime;
 
 
     private PcFlashPromotionProductParam(){}

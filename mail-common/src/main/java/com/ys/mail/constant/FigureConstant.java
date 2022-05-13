@@ -79,4 +79,8 @@ public class FigureConstant {
     public static final int INT_FOUR = 4;
 
     public static final String SUCCESS = "200";
+
+    public static final int INT_ZERO = 0;
+
+    public static final int INT_ONE = 1;
 }

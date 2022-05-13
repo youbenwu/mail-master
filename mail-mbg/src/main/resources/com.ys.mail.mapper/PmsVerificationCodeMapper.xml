@@ -13,6 +13,7 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="deleted" property="deleted" />
+        <result column="expire_time" property="expireTime"/>
     </resultMap>
     <select id="queryDetail" resultType="com.ys.mail.model.dto.VerifyDto">
         SELECT

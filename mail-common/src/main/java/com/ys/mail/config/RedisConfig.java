@@ -68,6 +68,7 @@ public class RedisConfig {
         private String localLockAnn;
         private String inviteUser;
         private String geo;
+        private String faceTencent;
     }
 
     @Getter
@@ -82,6 +83,7 @@ public class RedisConfig {
         private Long sevenDay;
         private Long anHour;
         private Long minute;
+        private Long twenty;
     }
 
     /**

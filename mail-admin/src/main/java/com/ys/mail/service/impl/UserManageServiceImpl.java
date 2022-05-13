@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ys.mail.constant.StringConstant;
 import com.ys.mail.entity.*;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
+import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.*;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.dto.excel.*;
@@ -22,6 +25,7 @@ import com.ys.mail.util.*;
 import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +57,8 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
     private PcReviewMapper pcReviewMapper;
     @Autowired
     private SmsFlashPromotionProductMapper smsFlashPromotionProductMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public CommonResult<IPage<UmsUserBlackListVO>> getPage(UmsUserQuery query) {
@@ -172,6 +178,14 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
             // 导出Excel
             ExcelTool.writeExcel(workbookMap, fullName, response);
         }
+    }
+
+    @Override
+    public boolean resetPayPassword(Long userId) {
+        UmsUser umsUser = this.getById(userId);
+        ApiAssert.noValue(umsUser, CommonResultCode.ERROR_20001);
+        umsUser.setPayPassword(passwordEncoder.encode(StringConstant.PAY_PASSWORD));
+        return this.updateById(umsUser);
     }
 
     private void addUserSecKillData(Long userId, Map<String, List<Map<String, Object>>> workbookMap) {

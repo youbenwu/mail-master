@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Future;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -83,4 +84,8 @@ public class PcFlashPdtDTO implements Serializable {
 
     @ApiModelProperty(value = "合伙人价格")
     private Long partnerPrice;
+
+    @ApiModelProperty(value = "截止时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date expireTime;
 }

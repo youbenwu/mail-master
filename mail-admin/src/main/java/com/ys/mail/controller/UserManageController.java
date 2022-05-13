@@ -75,4 +75,11 @@ public class UserManageController {
         userManageService.exportUserDetailsExcel(userId, response);
     }
 
+    @PostMapping(value = "/resetPayPassword/{userId:^\\d{19}$}")
+    @ApiOperation(value = "重置用户的支付密码", notes = "默认密码为：123456")
+    public CommonResult<Boolean> resetPayPassword(@PathVariable("userId") Long userId) {
+        boolean result = userManageService.resetPayPassword(userId);
+        return result ? CommonResult.success(true) : CommonResult.failed(false);
+    }
+
 }

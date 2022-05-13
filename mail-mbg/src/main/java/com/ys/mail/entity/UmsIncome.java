@@ -59,7 +59,7 @@ public class UmsIncome implements Serializable {
      */
     @ApiModelProperty(value = "收益类型:-2->系统补还,-1->系统扣除,0->邀请收益,1->秒杀收益，2->余额提现，3->普通收益，" +
             "4->审核资金，5->审核退还，6->分佣收益，7->商家收益,8->创客收益,9->余额支付,10->扣除服务费,11->退还服务费," +
-            "12->邀请创客冻结收益,13->解冻邀请创客冻结收益,14->会员订单收益")
+            "12->邀请创客冻结收益,13->解冻邀请创客冻结收益,14->会员订单收益,15->用户退款秒杀产品")
     private Integer incomeType;
 
     /**
@@ -104,6 +104,9 @@ public class UmsIncome implements Serializable {
 
     @AllArgsConstructor
     public enum IncomeType implements IPairs<Integer, String, IncomeType> {
+        /**
+         * 状态
+         */
         MINUS_TWO(-2, "系统补还"),
         MINUS_ONE(-1, "系统扣除"),
         ZERO(0, "邀请收益"),
@@ -114,13 +117,14 @@ public class UmsIncome implements Serializable {
         FIVE(5, "审核退还"),
         SIX(6, "团长分佣"),
         SEVEN(7, "商家收益"),
-        EIGHT(8, "创客收益"),// 合伙人商品每月返还收益
+        EIGHT(8, "创客收益"),
         NINE(9, "余额支付"),
         TEN(10, "扣除服务费"),
         ELEVEN(11, "退还服务费"),
         TWELVE(12,"邀请创客冻结收益"),
         THIRTEEN(13,"解冻邀请创客冻结收益"),
         FOURTEEN(14,"会员订单收益"),
+        FIFTEEN(15,"用户退款秒杀产品")
         ;
         final Integer type;
         final String name;
@@ -138,6 +142,9 @@ public class UmsIncome implements Serializable {
 
     @AllArgsConstructor
     public enum PayType implements IPairs<Integer, String, PayType> {
+        /**
+         * 状态
+         */
         ZERO(0, "未支付"),
         ONE(1, "云闪付"),
         TWO(2, "支付宝"),

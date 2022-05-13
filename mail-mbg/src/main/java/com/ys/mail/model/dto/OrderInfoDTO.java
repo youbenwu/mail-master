@@ -1,6 +1,7 @@
 package com.ys.mail.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ys.mail.model.vo.OrderItemDetailsVO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -115,5 +116,8 @@ public class OrderInfoDTO implements Serializable {
 
     @ApiModelProperty(value = "合伙人头像")
     private String headPortrait;
+
+    @ApiModelProperty(value = "截止时间")
+    private Date expireTime;
 
 }

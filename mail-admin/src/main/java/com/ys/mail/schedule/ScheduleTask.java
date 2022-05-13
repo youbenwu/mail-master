@@ -74,7 +74,8 @@ public class ScheduleTask {
 
                 // 将冻结金额原路返回到余额中（插入）
                 List<UmsIncome> addIncomeList = new ArrayList<>();
-                List<Long> incomeIds = IdWorker.generateIds(todayReviewList.size()); // 生成一批流水ID
+                // 生成一批流水ID
+                List<Long> incomeIds = IdWorker.generateIds(todayReviewList.size());
                 // 从审核记录中获取待审核的用户ID集合
                 List<Long> userIds = new ArrayList<>();
                 todayReviewList.forEach(item -> userIds.add(item.getUserId()));

@@ -25,6 +25,7 @@ redis:
     rongCloudToken: 'global:rongCloud:token' # 融云用户token
     globalSysSetting: 'global:sysSetting:list' # 全局设置缓存
     userBlackList: 'ums:app:blacklist' # APP用户手机号黑名单
+    faceTencent: 'face:tencent'        # 腾讯云人脸识别缓存
   expire:
     district: 365     # 存入一年
     homePage: 604800  # 首页，7天
@@ -32,6 +33,7 @@ redis:
     anHour: 3600      # 1小时
     authCode: 90      # 90s,验证码超期时间
     minute: 60        # 60s
+    twenty: 1200        # 存入20分钟
 
 config:
   corePoolSize: 10
@@ -55,21 +57,29 @@ config:
 cos:
   secretId: AKIDJRJvGK8fv0sUosfCRP6XLs87pGQJvHMA # 永久身份
   secretKey: YppXzB6j5AyVljQqyqRlnY3HDtIPGqAH # 永久密钥
-  bucket: qcy-1257583875 # 默认桶名称
+  bucket: test-1257583875 # 默认桶名称
   region: ap-guangzhou # 桶区域
   durationSeconds: 1800 # 30分钟，临时密钥有效时长，单位是秒
   uploadFolder: images # 上传主目录
-  cdnDomain: qcy-1257583875.cos.ap-guangzhou.myqcloud.com # 默认域名或CDN加速域名
+  cdnDomain: test-1257583875.cos.ap-guangzhou.myqcloud.com # 默认域名或CDN加速域名
   threadPool: 32 # 线程数
   allowPrefixes: # 临时凭证的白名单
     - "*"
   allowActions: # 临时凭证的权限
     - "*:*"
 
-cfr:
-  daWeiHu:
-    appId: IDA2FSs0    #腾讯云人脸识别大尾狐appId
-    appSecret: DRK24ZMm9qS9QrSnZeTw4hwWLL45oUmjzQJz3cN7UO9wFSO0rwJFhkk2YhlSpP71   #腾讯云大尾狐人脸识别秘钥
-  huLaTu:
-    appId: IDASKxzd     #腾讯云人脸识别呼啦兔appId
-    appSecret: sObqiFiSu4cxwvXkETakEdh58MAqcU8UoZRmUKrlTkHnSGISwqWL02h0eGDDgWBZ   #腾讯云呼啦兔秘钥
+#cfr:
+#  daWeiHu:
+#    appId: IDA2FSs0    #腾讯云人脸识别大尾狐appId
+#    appSecret: DRK24ZMm9qS9QrSnZeTw4hwWLL45oUmjzQJz3cN7UO9wFSO0rwJFhkk2YhlSpP71   #腾讯云大尾狐人脸识别秘钥
+#  huLaTu:
+#    appId: IDASKxzd     #腾讯云人脸识别呼啦兔appId
+#    appSecret: sObqiFiSu4cxwvXkETakEdh58MAqcU8UoZRmUKrlTkHnSGISwqWL02h0eGDDgWBZ   #腾讯云呼啦兔秘钥
+
+#tencent:
+#  qcy:
+#    wbAppId: TIDAh0o1
+#    secret: 2fzRslIeFRZKGlouLnqaPf5c1E7nzlYToyj9FMroCLEmbCXwO0VDxBDFIm90lGem
+#  mlb:
+#    wbAppId: TIDAh0o1
+#    secret: 2fzRslIeFRZKGlouLnqaPf5c1E7nzlYToyj9FMroCLEmbCXwO0VDxBDFIm90lGem

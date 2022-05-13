@@ -53,4 +53,12 @@ public interface UserManageService extends IService<UmsUser> {
      * @param response 响应
      */
     void exportUserDetailsExcel(Long userId, HttpServletResponse response);
+
+    /**
+     * 重置用户的支付面
+     *
+     * @param userId 用户ID
+     * @return 结果
+     */
+    boolean resetPayPassword(Long userId);
 }

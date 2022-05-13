@@ -2,11 +2,11 @@ package com.ys.mail.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.*;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.mapper.*;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.PageCommonResult;
@@ -22,6 +22,7 @@ import com.ys.mail.service.UmsPartnerService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdWorker;
 import com.ys.mail.util.UserUtil;
+import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,30 +159,28 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<Boolean> verification(Map<String, String> params) {
         String code = params.get("code");
-        if (StringUtils.isBlank(code)) {
-            return CommonResult.failed("没有核销码信息");
-        }
+        ApiAssert.noValue(code, "核销码不能为空");
 
-        PmsVerificationCode verificationCode = verificationCodeMapper.selectOne(Wrappers
-                .<PmsVerificationCode>lambdaQuery()
-                .eq(PmsVerificationCode::getCode, code));
-        if (ObjectUtils.isEmpty(verificationCode)) {
-            return CommonResult.failed("没有核销码信息");
-        }
+        // 获取当前用户的合伙人ID
+        Long userId = UserUtil.getCurrentUser().getUserId();
+        UmsPartner umsPartner = this.getPartnerByUserId(userId);
+        ApiAssert.noValue(umsPartner, "没有合伙人信息");
+
+        // 获取核销码信息
+        SqlLambdaQueryWrapper<PmsVerificationCode> wrapper = new SqlLambdaQueryWrapper<>();
+        wrapper.eq(PmsVerificationCode::getCode, code)
+               .eq(PmsVerificationCode::getPartnerId, umsPartner.getPartnerId());
+        PmsVerificationCode verificationCode = verificationCodeMapper.selectOne(wrapper);
+        ApiAssert.noValue(verificationCode, "没有核销码信息");
 
         // 状态 0待使用 1已使用 2已过期',
         Integer isStatus = verificationCode.getIsStatus();
-        if (isStatus.equals(PmsVerificationCode.CODE_STATUS_TWO)) {
-            return CommonResult.failed("核销码已过期");
-        } else if (isStatus.equals(PmsVerificationCode.CODE_STATUS_ONE)) {
+        if (isStatus.equals(PmsVerificationCode.IsStatus.TWO.key())) {
+            return CommonResult.failed("核销码已失效");
+        } else if (isStatus.equals(PmsVerificationCode.IsStatus.ONE.key())) {
             return CommonResult.failed("核销码已使用");
-        } else if (isStatus.equals(PmsVerificationCode.CODE_STATUS_ZERO)) {
+        } else if (isStatus.equals(PmsVerificationCode.IsStatus.ZERO.key())) {
             PmsVerificationRecords records = new PmsVerificationRecords();
-            UmsPartner umsPartner = partnerMapper.selectById(verificationCode.getPartnerId());
-            if (ObjectUtils.isEmpty(umsPartner)) {
-                return CommonResult.failed("没有合伙人信息");
-            }
-            Long userId = umsPartner.getUserId();
             // 插入核销记录
             records.setRecordId(IdWorker.generateId());
             records.setCode(code);
@@ -200,7 +199,7 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
             verificationRecordsMapper.insert(records);
 
             // 更新码的状态
-            verificationCode.setIsStatus(PmsVerificationCode.CODE_STATUS_ONE);
+            verificationCode.setIsStatus(PmsVerificationCode.IsStatus.ONE.key());
             verificationCodeMapper.updateById(verificationCode);
 
             // 更新订单状态
@@ -343,10 +342,17 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
 
     @Override
     public CommonResult<OrderInfoDTO> orderDetail(Long orderId) {
-        OmsOrder order = orderService.getById(orderId);
+        // 加入用户ID，进行数据隔离
+        Long userId = UserUtil.getCurrentUser().getUserId();
+        SqlLambdaQueryWrapper<OmsOrder> wrapper = new SqlLambdaQueryWrapper<>();
+        wrapper.eq(OmsOrder::getUserId, userId)
+               .eq(OmsOrder::getOrderId, orderId);
+        OmsOrder order = orderService.getOne(wrapper);
         if (ObjectUtils.isEmpty(order)) {
             return CommonResult.failed("无此订单信息");
         }
+
+        // 构建对象
         OrderInfoDTO dto = new OrderInfoDTO();
 
         // 商品核销码信息
@@ -357,6 +363,7 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
             PmsVerificationCode verificationCode = verificationCodeMapper.selectById(verificationOrder.getVerificationId());
             dto.setCode(verificationCode.getCode());
             dto.setIsStatus(verificationCode.getIsStatus().toString());
+            dto.setExpireTime(verificationCode.getExpireTime());
         }
 
         // 商品合伙人信息
@@ -385,5 +392,10 @@ public class UmsPartnerServiceImpl extends ServiceImpl<UmsPartnerMapper, UmsPart
     @Override
     public PartnerAddressDTO getAddressByProductId(Long productId) {
         return umsPartnerMapper.getAddressByProductId(productId);
+    }
+
+    @Override
+    public UmsPartner getPartnerByUserId(Long userId) {
+        return umsPartnerMapper.getPartnerByUserId(userId);
     }
 }

@@ -85,6 +85,12 @@ public enum BusinessErrorCode implements IErrorCode {
     GOODS_NOT_NUM_EXIST(400234, "商品不存在或库存不足"),
 
     ERR_SMS_MISTAKE(400235, "发送短信失败"),
+    ERR_PROMOTION_PDT_SALE(400236, "未到过期时间不能退款"),
+    PDT_SUPPLY_NOT(400237,"该商品无供应商价格,无法退款!"),
+    PDT_UNDER_SUPPLY_PRICE(400238,"当前价低于供应商价格,无法退款!"),
+
+    ERR_DATE_ILLEGAL(400300, "日期跨度不能小于%d天"),
+    ERR_DATE_EXPIRE(400301, "该商品已过期，不能上架"),
 
     ;
 

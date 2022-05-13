@@ -13,21 +13,21 @@ import java.io.Serializable;
  * @version 1.0
  * @date 2022-01-12 13:17
  */
-@Data
-@Component
+//@Data
+//@Component
 public class CfrConfig implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-    @Value("${cfr.daWeiHu.appId}")
-    private String daWeiHuAppId;
-
-    @Value("${cfr.daWeiHu.appSecret}")
-    private String daWeiHuAppSecret;
-
-    @Value("${cfr.huLaTu.appId}")
-    private String huLaTuAppId;
-
-    @Value("${cfr.huLaTu.appSecret}")
-    private String huLaTuAppSecret;
+//    private static final long serialVersionUID = 1L;
+//
+//    @Value("${cfr.daWeiHu.appId}")
+//    private String daWeiHuAppId;
+//
+//    @Value("${cfr.daWeiHu.appSecret}")
+//    private String daWeiHuAppSecret;
+//
+//    @Value("${cfr.huLaTu.appId}")
+//    private String huLaTuAppId;
+//
+//    @Value("${cfr.huLaTu.appSecret}")
+//    private String huLaTuAppSecret;
 }

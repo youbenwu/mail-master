@@ -14,9 +14,11 @@ import com.ys.mail.model.mq.MSOrderCheckDTO;
 import com.ys.mail.service.OmsCartItemService;
 import com.ys.mail.service.OmsOrderItemService;
 import com.ys.mail.service.OmsOrderService;
+import com.ys.mail.service.SmsFlashPromotionProductService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdGenerator;
 import com.ys.mail.util.IdWorker;
+import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.get.GetRequest;
@@ -36,10 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,6 +59,8 @@ public class RabbitMqMSListener {
     private RestHighLevelClient client;
     @Autowired
     private PmsProductMapper productMapper;
+    @Autowired
+    private SmsFlashPromotionProductService smsFlashPromotionProductService;
     @Autowired
     private SmsFlashPromotionProductMapper flashPromotionProductMapper;
     @Autowired
@@ -220,9 +222,11 @@ public class RabbitMqMSListener {
             String outTradeNo = dto.getOutTradeNo();
             OmsOrder order = orderService.getOne(new QueryWrapper<OmsOrder>().eq("order_sn", outTradeNo));
             if (BlankUtil.isNotEmpty(order.getPartnerId())) {
+                Long orderId = order.getOrderId();
                 // 商品数量
-                Integer count = orderItemService.getQuantity(order.getOrderId());
+                Integer count = orderItemService.getQuantity(orderId);
                 Long verificationId = IdWorker.generateId();
+
                 // 插入订单核销表
                 OmsVerificationOrder verificationOrder = new OmsVerificationOrder();
                 verificationOrder.setVerificationOrderId(IdWorker.generateId());
@@ -230,11 +234,17 @@ public class RabbitMqMSListener {
                 verificationOrder.setOrderId(order.getOrderSn());
                 verificationOrder.setQuantity(count);
                 verificationOrderMapper.insert(verificationOrder);
+
                 // 插入核销表
                 PmsVerificationCode verificationCode = new PmsVerificationCode();
                 verificationCode.setVerificationId(verificationId);
                 verificationCode.setPartnerId(order.getPartnerId());
                 verificationCode.setCode(IdGenerator.INSTANCE.cancelId());
+
+                // 加入截止时间
+                Date expireTime = smsFlashPromotionProductService.getExpireTime(orderId);
+                verificationCode.setExpireTime(expireTime);
+
                 verificationCodeMapper.insert(verificationCode);
             }
             // es 添加活跃日期

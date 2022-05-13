@@ -33,4 +33,12 @@ public interface UmsPartnerMapper extends BaseMapper<UmsPartner> {
      * @return 结果
      */
     PartnerUserDTO getPartnerInfoById(@Param("partnerId") Long partnerId);
+
+    /**
+     * 根据合伙人用户ID获取合伙人信息
+     *
+     * @param userId 合伙人用户ID
+     * @return 合伙人信息
+     */
+    UmsPartner getPartnerByUserId(@Param("userId") Long userId);
 }

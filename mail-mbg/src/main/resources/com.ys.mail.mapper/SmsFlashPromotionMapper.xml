@@ -167,7 +167,7 @@
             </choose>
         </where>
         GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
-        ORDER BY fpp_distance,fpp.flash_promotion_pdt_id DESC
+        ORDER BY fpp.flash_promotion_pdt_id DESC
         limit 20;
     </select>
 
@@ -178,6 +178,7 @@
         and is_home_status = 1  and cpy_type = #{cpyType}
         limit 1;
     </select>
+
     <select id="selectAllNewestSecondPage" resultMap="BoResultMap">
         <!-- 实现思路,使用mybatis映射-->
         SELECT
@@ -215,7 +216,7 @@
             and fpp.flash_product_status = 2
         </where>
         GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
-        ORDER BY distance,fpp.flash_promotion_pdt_id DESC
+        ORDER BY fpp.flash_promotion_pdt_id DESC
         <if test="isOpenPage">
             limit 20;
         </if>

@@ -13,7 +13,6 @@ public class StringConstant {
     /**
      * 常量字符串
      */
-    public static final String SLASH = "/";
     public static final String LIMIT_ONE = "LIMIT 1";
     public static final String LIMIT_TEN = "LIMIT 10";
     public static final String ENV_PROD = "prod";
@@ -31,5 +30,13 @@ public class StringConstant {
     public static final String ONE = "1";
     public static final String TWO = "2";
     public static final String THREE = "3";
+    public static final String PAY_PASSWORD = "123456";
+
+    /**
+     * 符号
+     */
+    public static final String SLASH = "/";
+    public static final String LEFT_ARROWS = "========》";
+    public static final String RIGHT_ARROWS = "《========";
 
 }

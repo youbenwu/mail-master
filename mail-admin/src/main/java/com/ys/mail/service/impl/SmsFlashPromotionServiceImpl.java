@@ -81,16 +81,13 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult<Boolean> updateHome(Long flashPromotionId, Boolean homeStatus) {
-        // 所有删除只能存在于一个唯一,必须先全部清空,再复制,默认不能修改,其实可以用mysql索引
-       /* SmsFlashPromotion byId = getById(flashPromotionId);
-        if(!BlankUtil.isEmpty(byId) && byId.getHomeStatus() && !homeStatus){
-            return CommonResult.failed(BusinessErrorCode.NOT_PROMOTION_HOME);
-        }*/
         boolean b = flashPromotionMapper.updateHome();
         if (b) {
             SmsFlashPromotion flashPromotion = new SmsFlashPromotion(flashPromotionId, homeStatus);
             b = updateById(flashPromotion);
         }
+        // 清除首页缓存
+        flashPromotionProductService.delHomeSecondProduct(true);
         return b ? CommonResult.success(true) : CommonResult.failed(false);
     }
 

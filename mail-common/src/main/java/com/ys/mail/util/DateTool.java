@@ -17,6 +17,37 @@ import java.util.Date;
 public class DateTool {
 
     /**
+     * 检查时间是否符合要求
+     *
+     * @param time   目标时间
+     * @param offset 偏移天数
+     * @return 结果，true->符合要求，false->不符合
+     */
+    public static boolean checkExpireTime(Date time, Integer offset) {
+        if (BlankUtil.isEmpty(time)) {
+            return false;
+        }
+        DateTime currentDay = getNow();
+        DateTime offsetDay = DateUtil.offsetDay(currentDay, offset);
+        DateTime parseTime = DateUtil.parse(DateUtil.format(time, "yyyy-MM-dd"));
+        return parseTime.compareTo(offsetDay) >= 0;
+    }
+
+    /**
+     * 是否已经过期
+     *
+     * @param expireTime 过期、截止时间
+     * @return 是否已过期，true->已过期，false->没过期
+     */
+    public static boolean isExpireTime(Date expireTime) {
+        if (BlankUtil.isEmpty(expireTime)) {
+            return false;
+        }
+        DateTime currentDay = getNow();
+        return currentDay.after(expireTime);
+    }
+
+    /**
      * 计算第二天凌晨与当前时间的时间差秒数
      *
      * @return 时间戳
@@ -56,6 +87,16 @@ public class DateTool {
      */
     public static String getTodayNow() {
         return DateUtil.formatDate(new Date());
+    }
+
+    /**
+     * 获取当前日期，不带时间
+     *
+     * @return 结果
+     */
+    public static DateTime getNow() {
+        String todayNow = DateTool.getTodayNow();
+        return DateUtil.parseDate(todayNow);
     }
 
     /**

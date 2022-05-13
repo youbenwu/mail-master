@@ -49,6 +49,8 @@
         <result column="cpy_type" property="cpyType"/>
         <result column="partner_id" property="partnerId"/>
         <result column="buyer_logon_id" property="buyerLogonId"/>
+        <result column="expire_time" property="expireTime"/>
+
     </resultMap>
 
     <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.OmsOrderVO">
@@ -98,6 +100,7 @@
         <result column="delivery_company" property="deliveryCompany"/>
         <result column="delivery_sn" property="deliverySn"/>
         <result column="cpy_type" property="cpyType"/>
+        <result column="expire_time" property="expireTime"/>
 
         <!--一对多，方式一-->
         <collection property="omsOrderItem" ofType="com.ys.mail.model.vo.OrderItemDetailsVO" column="order_item_id">
@@ -122,7 +125,7 @@
         bill_phone, bill_email, receiver_name, receiver_phone, receiver_code, receiver_province, receiver_city,
         receiver_region, receiver_address, order_note, is_confirm_status, delete_status, is_appraise,payment_time,
         delivery_time,
-        receive_time, comment_time, create_time, update_time,order_select,trans_id,cpy_type,partner_price
+        receive_time, comment_time, create_time, update_time,order_select,trans_id,cpy_type,partner_price,expire_time
     </sql>
 
     <select id="selectOrderList" resultMap="BaseResultMapVO">
@@ -228,6 +231,7 @@
                oo.order_note,
                oo.payment_time,
                oo.partner_price,
+               oo.expire_time,
                ooi.product_pic,
                ooi.product_price,
                ooi.is_appraise,
