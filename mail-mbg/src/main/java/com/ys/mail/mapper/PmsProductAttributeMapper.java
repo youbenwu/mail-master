@@ -1,8 +1,9 @@
 package com.ys.mail.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ys.mail.entity.PmsProductAttribute;
+import com.ys.mail.model.vo.PmsProductAttributeVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,11 +21,21 @@ import java.util.List;
 public interface PmsProductAttributeMapper extends BaseMapper<PmsProductAttribute> {
     /**
      * 查询出商品关联的规格属性
+     *
      * @param pdtAttributeCgyId id
      * @return 返回值
      */
     List<PmsProductAttribute> selectByPdtAttributeCgyId(@Param("pdtAttributeCgyId") Long pdtAttributeCgyId);
 
 
-    Page<PmsProductAttribute> get(Page page,@Param("productAttributeName") String productAttributeName);
+    /**
+     * 分页查询
+     *
+     * @param page        分页
+     * @param pdtAttrName 属性名称
+     * @param pdtCgyName  属性分类名称
+     * @return 结果
+     */
+    IPage<PmsProductAttributeVO> get(IPage<PmsProductAttributeVO> page, @Param("pdtAttrName") String pdtAttrName,
+                                     @Param("pdtCgyName") String pdtCgyName);
 }

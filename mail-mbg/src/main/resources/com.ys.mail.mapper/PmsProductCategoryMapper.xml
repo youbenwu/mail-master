@@ -226,16 +226,20 @@
             t1.pdt_cgy_id,
             t1.pic,
             t1.product_name,
-            t1.price,
             <if test="query.member">
+                t1.price,
                 t1.meb_price,
+            </if>
+            <!-- 首页展示折扣价 -->
+            <if test="!query.member">
+                IF(t1.promotion_type = 2, t1.meb_price, t1.price) AS price,
             </if>
             t1.sale
         FROM pms_product t1
         WHERE
-                t1.deleted = 0
-            AND t1.is_publish_status = 1
-            <choose>
+        t1.deleted = 0
+        AND t1.is_publish_status = 1
+        <choose>
                 <when test="query.member">
                     AND t1.meb_price > 0
                     <if test="query.isLiveStatus">

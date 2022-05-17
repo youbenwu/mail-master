@@ -2,13 +2,17 @@ package com.ys.mail.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.entity.PmsProductAttribute;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.vo.PmsProductAttributeVO;
 import com.ys.mail.service.PmsProductAttributeService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdWorker;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +47,16 @@ public class PmsProductAttributeController {
 
     @ApiOperation("商品属性参数查询")
     @GetMapping(value = "get")
-    public CommonResult<Page<PmsProductAttribute>> get(@RequestParam(name = "productAttributeName", required = false) String productAttributeName, @RequestParam("pageNum") int pageNum, @RequestParam("pageSize") int pageSize) {
-//        QueryWrapper<PmsProductAttribute> queryWrapper = new QueryWrapper<>();
-//        if(!BlankUtil.isEmpty(productAttributeName)){
-//            queryWrapper.like("product_attribute_name",productAttributeName);
-//        }
-        Page<PmsProductAttribute> page = new Page<>(pageNum, pageSize);
-        Page<PmsProductAttribute> result = pmsProductAttributeService.get(page, productAttributeName);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "pdtAttrName", value = "商品属性名称"),
+            @ApiImplicitParam(name = "pdtCgyName", value = "商品属性分类名称")
+    })
+    public CommonResult<IPage<PmsProductAttributeVO>> get(@RequestParam(name = "pdtAttrName", required = false) String pdtAttrName,
+                                                          @RequestParam(name = "pdtCgyName", required = false) String pdtCgyName,
+                                                          @RequestParam("pageNum") int pageNum,
+                                                          @RequestParam("pageSize") int pageSize) {
+        IPage<PmsProductAttributeVO> page = new Page<>(pageNum, pageSize);
+        IPage<PmsProductAttributeVO> result = pmsProductAttributeService.get(page, pdtAttrName, pdtCgyName);
         return CommonResult.success(result);
     }
 
