@@ -26,7 +26,7 @@ public class CgyProductDTO implements Serializable {
     @ApiModelProperty(value = "商品价格，100等于1元")
     private Double price;
 
-    @ApiModelProperty(value = "商品会员价格，100等于1元")
+    @ApiModelProperty(value = "商品会员价格/折扣价，100等于1元")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double mebPrice;
 

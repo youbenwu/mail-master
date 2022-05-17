@@ -2,6 +2,7 @@ package com.ys.mail.model.dto;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ys.mail.entity.PmsProductAttribute;
 import com.ys.mail.entity.PmsProductCategory;
 import com.ys.mail.entity.PmsProductComment;
@@ -175,9 +176,11 @@ public class ProductInfoDTO implements Serializable {
     private Long pdtCollectId;
 
     @ApiModelProperty(value = "会员价")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Long mebPrice;
 
     @ApiModelProperty(value = "折扣比例")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private BigDecimal disCount;
 
     @ApiModelProperty(value = "会员特惠：0->false,1->true")

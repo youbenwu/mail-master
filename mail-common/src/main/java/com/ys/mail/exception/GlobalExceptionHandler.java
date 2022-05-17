@@ -54,8 +54,8 @@ public class GlobalExceptionHandler {
     public CommonResult<String> handler(BusinessException e) {
         String message = e.getMessage();
         // 打印简洁的业务异常
-        String title = String.format("\n%s业务异常：%s", StringConstant.LEFT_ARROWS, message);
-        String link = String.format("\n%s异常位置：%s", StringConstant.LEFT_ARROWS, e.getStackTrace()[1]);
+        String title = String.format("\n%s业务异常::%s", StringConstant.LEFT_ARROWS, message);
+        String link = String.format("\n%s异常位置::%s", StringConstant.LEFT_ARROWS, e.getStackTrace()[1]);
         String content = StringUtil.getColorContent(AnsiColorEnum.RED_BOLD, title + link);
         logger.warn(content);
         // 返回结果
