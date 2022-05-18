@@ -36,7 +36,7 @@
         <result column="type" property="type" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
-        <result column="pdt_attribute_name" property="pdtAttributeCgyName" />
+        <result column="name" property="pdtAttributeCgyName" />
     </resultMap>
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
@@ -49,11 +49,14 @@
     </select>
 
     <select id="get" resultMap="BaseResultMapVO">
-        select a.*,b.name pdt_attribute_name from pms_product_attribute a
+        select a.*,b.name from pms_product_attribute a
         inner join pms_product_attribute_category b on a.pdt_attribute_cgy_id =b.pdt_attribute_cgy_id
         <where>
-            <if test="productAttributeName!=''">
-                a.product_attribute_name = #{productAttributeName}
+            <if test="pdtAttrName!=null and pdtAttrName!=''">
+                a.product_attribute_name like concat('%',#{pdtAttrName},'%')
+            </if>
+            <if test="pdtCgyName!=null and pdtCgyName!=''">
+                and b.name like concat('%',#{pdtCgyName},'%')
             </if>
         </where>
         order by a.create_time desc

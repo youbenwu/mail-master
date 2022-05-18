@@ -1,9 +1,10 @@
 package com.ys.mail.service.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.PmsProductAttribute;
 import com.ys.mail.mapper.PmsProductAttributeMapper;
+import com.ys.mail.model.vo.PmsProductAttributeVO;
 import com.ys.mail.service.PmsProductAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,9 @@ public class PmsProductAttributeServiceImpl extends ServiceImpl<PmsProductAttrib
 
     @Autowired
     private PmsProductAttributeMapper pmsProductAttributeMapper;
+
     @Override
-    public Page<PmsProductAttribute> get(Page page, String productAttributeName) {
-        Page<PmsProductAttribute> result=pmsProductAttributeMapper.get(page,productAttributeName);
-        return result;
+    public IPage<PmsProductAttributeVO> get(IPage<PmsProductAttributeVO> page, String pdtAttrName, String pdtCgyName) {
+        return pmsProductAttributeMapper.get(page, pdtAttrName, pdtCgyName);
     }
 }

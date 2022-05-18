@@ -1,8 +1,9 @@
 package com.ys.mail.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.PmsProductAttribute;
+import com.ys.mail.model.vo.PmsProductAttributeVO;
 
 /**
  * <p>
@@ -15,6 +16,13 @@ import com.ys.mail.entity.PmsProductAttribute;
 
 public interface PmsProductAttributeService extends IService<PmsProductAttribute> {
 
-
-    Page<PmsProductAttribute> get(Page page,String productAttributeName);
+    /**
+     * 分页查询
+     *
+     * @param page        分页
+     * @param pdtAttrName 属性名称
+     * @param pdtCgyName  属性分类名称
+     * @return 结果
+     */
+    IPage<PmsProductAttributeVO> get(IPage<PmsProductAttributeVO> page, String pdtAttrName, String pdtCgyName);
 }
