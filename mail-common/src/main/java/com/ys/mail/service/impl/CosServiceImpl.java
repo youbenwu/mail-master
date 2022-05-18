@@ -12,8 +12,11 @@ import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.model.DeleteObjectRequest;
+import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
+import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.TransferProgress;
 import com.qcloud.cos.transfer.Upload;
@@ -23,9 +26,12 @@ import com.tencent.cloud.Response;
 import com.tencent.cloud.Scope;
 import com.ys.mail.config.CosConfig;
 import com.ys.mail.enums.CosFolderEnum;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
+import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.service.CosService;
 import com.ys.mail.util.BlankUtil;
+import com.ys.mail.util.LoggerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,6 +145,25 @@ public class CosServiceImpl implements CosService {
         return new COSClient(cred, clientConfig);
     }
 
+    @Override
+    public String getOssPath() {
+        // CDN: http://cos.huwing.cn/mail.huwing.cn/img/77e827c9ace741638850889d24207c62.jpg
+        return String.format("http://%s/%s", cosConfig.getCdnDomain(), cosConfig.getUploadFolder());
+    }
+
+    @Override
+    public Boolean isExistKey(String key) {
+        try {
+            return cosClient.doesObjectExist(cosConfig.getBucket(), key);
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+            throw new ApiException("COS服务异常");
+        } catch (CosClientException e) {
+            e.printStackTrace();
+            throw new ApiException("网络连接异常");
+        }
+    }
+
     /**
      * 同步上传
      *
@@ -150,29 +175,30 @@ public class CosServiceImpl implements CosService {
     @Override
     public URL upload(String bucketName, CosFolderEnum cosFolder, String key, File file) {
         try {
-            // 获取上传目录
-            String folder = CosFolderEnum.IMAGES_FOLDER.value();
-            if (BlankUtil.isNotEmpty(cosFolder)) folder = cosFolder.value();
-            // 拼接完整的key
-            key = folder + key;
+            // 获取key
+            key = getFullKey(cosFolder, key);
             // 尝试检测网络
             this.isExistKey(key);
             // 获取桶
-            if (BlankUtil.isEmpty(bucketName)) bucketName = cosConfig.getBucket();
+            if (BlankUtil.isEmpty(bucketName)) {
+                bucketName = cosConfig.getBucket();
+            }
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, file);
             // 开始上传
             Upload upload = transferManager.upload(putObjectRequest);
             // 同步阻塞
             upload.waitForCompletion();
             // 记录结果
-            LOGGER.info(upload.getDescription().replace("//", "/"));
+            LoggerUtil.info(LOGGER, upload.getDescription().replace("//", "/"));
             // 等待返回结果
             return cosClient.getObjectUrl(bucketName, key);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             throw new ApiException("文件上传失败");
         } finally {
-            if (file.exists()) FileUtil.del(file);
+            if (file.exists()) {
+                FileUtil.del(file);
+            }
         }
     }
 
@@ -191,7 +217,9 @@ public class CosServiceImpl implements CosService {
         try {
             // 获取上传目录
             String folder = CosFolderEnum.IMAGES_FOLDER.value();
-            if (BlankUtil.isNotEmpty(cosFolder)) folder = cosFolder.value();
+            if (BlankUtil.isNotEmpty(cosFolder)) {
+                folder = cosFolder.value();
+            }
             // 拼接完整的path
             path = folder + path;
             // 尝试检测网络
@@ -206,11 +234,13 @@ public class CosServiceImpl implements CosService {
             // 添加进度处理器
             // this.progressEvent(upload, file)
             // 记录结果
-            LOGGER.info(upload.getDescription().replace("//", "/"));
+            LoggerUtil.info(LOGGER, upload.getDescription().replace("//", "/"));
             return cosClient.getObjectUrl(bucketName, path);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
-            if (file.exists()) FileUtil.del(file);
+            if (file.exists()) {
+                FileUtil.del(file);
+            }
             throw new ApiException("文件上传失败");
         }
     }
@@ -243,7 +273,9 @@ public class CosServiceImpl implements CosService {
                     case TRANSFER_COMPLETED_EVENT:
                         // 更新状态完成
                         System.out.println("成功...");
-                        if (file.exists()) FileUtil.del(file);
+                        if (file.exists()) {
+                            FileUtil.del(file);
+                        }
                         break;
                     case TRANSFER_FAILED_EVENT:
                     case TRANSFER_PART_FAILED_EVENT:
@@ -267,23 +299,97 @@ public class CosServiceImpl implements CosService {
     }
 
     @Override
-    public String getOssPath() {
-        // CDN: http://cos.huwing.cn/mail.huwing.cn/img/77e827c9ace741638850889d24207c62.jpg
-        return String.format("http://%s/%s", cosConfig.getCdnDomain(), cosConfig.getUploadFolder());
+    public void download(String bucketName, CosFolderEnum cosFolder, String key, File localFile, boolean cover) {
+        try {
+            if (!cover && localFile.exists()) {
+                LoggerUtil.warn(LOGGER, "本地已经存在该文件：" + localFile.getAbsolutePath());
+                return;
+            }
+            // 获取key
+            key = getFullKey(cosFolder, key);
+            // 获取桶名称
+            if (BlankUtil.isEmpty(bucketName)) {
+                bucketName = cosConfig.getBucket();
+            }
+            // 判断key是否存在，并且尝试检测网络
+            Boolean existKey = this.isExistKey(key);
+            String message = BusinessErrorCode.ERR_KEY_NOT_EXIST.getMessage(key);
+            ApiAssert.isFalse(existKey, message);
+            // 构建请求对象
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
+            // 开始下载
+            Download download = transferManager.download(getObjectRequest, localFile);
+            // 同步阻塞
+            download.waitForCompletion();
+            // 记录结果
+            LoggerUtil.info(LOGGER, download.getDescription().replace("//", "/"));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            throw new ApiException("文件下载失败");
+        }
     }
 
     @Override
-    public Boolean isExistKey(String key) {
-        try {
-            key = cosConfig.getUploadFolder() + key;
-            return cosClient.doesObjectExist(cosConfig.getBucket(), key);
-        } catch (CosServiceException e) {
-            e.printStackTrace();
-            throw new ApiException("文件上传服务异常");
-        } catch (CosClientException e) {
-            e.printStackTrace();
-            throw new ApiException("网络连接异常");
+    public void download(CosFolderEnum cosFolder, String key, File localFile, boolean cover) {
+        this.download("", cosFolder, key, localFile, cover);
+    }
+
+    @Override
+    public void download(CosFolderEnum cosFolder, String key, File localFile) {
+        this.download("", cosFolder, key, localFile, false);
+    }
+
+    @Override
+    public String getFullKey(CosFolderEnum cosFolder, String key) {
+        // 获取指定下载目录
+        String folder = CosFolderEnum.IMAGES_FOLDER.value();
+        if (BlankUtil.isNotEmpty(cosFolder)) {
+            folder = cosFolder.value();
         }
+        // 拼接完整的key
+        key = String.format("%s%s", folder, key);
+        return key;
+    }
+
+    @Override
+    public TransferManager getTransferManager() {
+        return transferManager;
+    }
+
+    @Override
+    public COSClient getCOSClient() {
+        return cosClient;
+    }
+
+    @Override
+    public void deleteObject(CosFolderEnum cosFolder, String key) {
+        // 获取key
+        String fullKey = getFullKey(cosFolder, key);
+        // 获取桶名称
+        String bucketName = cosConfig.getBucket();
+        // 判断key是否存在，并且尝试检测网络
+        Boolean existKey = this.isExistKey(fullKey);
+        if (!existKey) {
+            String message = BusinessErrorCode.ERR_KEY_NOT_EXIST.getMessage(key);
+            LoggerUtil.warn(LOGGER, message);
+            return;
+        }
+        try {
+            // 构建删除请求
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucketName, fullKey);
+            // 调用SDK执行
+            cosClient.deleteObject(deleteObjectRequest);
+            // 记录结果
+            LoggerUtil.info(LOGGER, "Deleting File " + fullKey);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            throw new ApiException("文件删除失败");
+        }
+    }
+
+    @Override
+    public void deleteObject(String key) {
+        this.deleteObject(null, key);
     }
 
 }

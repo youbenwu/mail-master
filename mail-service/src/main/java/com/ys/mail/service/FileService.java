@@ -24,10 +24,10 @@ public interface FileService {
     /**
      * 异步文件上传，大小类型宽松处理
      *
-     * @param file     文件
-     * @param filePath 文件类型
-     * @param filename 文件名称，为空则随机生成
+     * @param file       文件
+     * @param filePath   文件类型
+     * @param retainName 是否保留原文件名(注意，文件名不能带中文)，默认为false->随机生成，true->保留
      * @return 结果
      */
-    CommonResult<String> asyncFileUpload(MultipartFile file, FilePathEnum filePath, String filename);
+    CommonResult<String> asyncFileUpload(MultipartFile file, FilePathEnum filePath, boolean retainName);
 }

@@ -17,6 +17,7 @@ public enum CommonResultCode implements IErrorCode {
     NOT_SENIOR_USER(408, "不是高级用户"),
     ILLEGAL_REQUEST(409, "非法操作"),
     ID_NO_EXIST(410, "ID不存在"),
+    NO_USER(411, "没有此用户"),
 
     VALIDATE_FAILED(1001, "参数检验失败"),
     REQUEST_PARAM_ISEMPTY(1002, "请求参数不允许为空"),
@@ -46,6 +47,8 @@ public enum CommonResultCode implements IErrorCode {
     ERR_USER_NON_PAYMENT(10021, "未付款"),
 
     ERR_DUPLICATE_KEY(10022, "重复参数"),
+    ERR_PARAM_EXIST(10023, "参数值【%s】已存在"),
+    ERR_PARAM_NOT_EXIST(10024, "参数值【%s】不存在"),
 
     ERROR_20001(20001, "用户不存在"),
     ERROR_20002(20002, "用户为空"),

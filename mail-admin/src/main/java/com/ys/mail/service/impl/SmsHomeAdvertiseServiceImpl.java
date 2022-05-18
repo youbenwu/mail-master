@@ -2,26 +2,24 @@ package com.ys.mail.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.Lists;
+import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.SmsHomeAdvertise;
+import com.ys.mail.exception.ApiAssert;
+import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.SmsHomeAdvertiseMapper;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.HomeAdvertiseParam;
 import com.ys.mail.model.admin.query.HomeAdvertiseQuery;
 import com.ys.mail.service.RedisService;
 import com.ys.mail.service.SmsHomeAdvertiseService;
-import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdWorker;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
 
 /**
  * <p>
@@ -41,13 +39,8 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
     private SmsHomeAdvertiseMapper homeAdvertiseMapper;
     @Autowired
     private RedisService redisService;
-
-    @Value("${redis.database}")
-    private String redisDatabase;
-    @Value("${redis.key.homeAdvertise}")
-    private String redisKeyHomeAdvertise;
-    @Value("${redis.key.homePage}")
-    private String redisKeyHomePage;
+    @Autowired
+    private RedisConfig redisConfig;
 
     @Override
     public CommonResult<Boolean> create(HomeAdvertiseParam param) {
@@ -62,7 +55,7 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
             homeAdvertise.setHomeAdvId(IdWorker.generateId());
         } else {
             SmsHomeAdvertise smsHomeAdvertise = this.getById(homeAdvId);
-            if (BlankUtil.isEmpty(smsHomeAdvertise)) return CommonResult.failed("修改失败，ID不存在");
+            ApiAssert.noValue(smsHomeAdvertise, CommonResultCode.ID_NO_EXIST);
         }
         homeAdvertise.setHomeAdvId(homeAdvId.equals(NumberUtils.LONG_ZERO) ? IdWorker.generateId() : homeAdvId);
         boolean b = saveOrUpdate(homeAdvertise);
@@ -72,14 +65,7 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
 
     private void delHomeAdvertise(boolean b) {
         if (b) {
-            String key = redisDatabase + ":" + redisKeyHomeAdvertise;
-            String homeKey = redisDatabase + ":" + redisKeyHomePage;
-            String homeKeyZero = homeKey + "Zero";
-            String homeKeyZeroZero = homeKey + "ZeroZero";
-            String homeKeyOneOne = homeKey + "OneOne";
-            ArrayList<String> keyList = Lists.newArrayList(key, homeKeyZero, homeKeyZeroZero, homeKeyOneOne);
-            redisService.del(keyList);
-            LOGGER.info("清除缓存成功:key=" + keyList);
+            LOGGER.info("清除缓存成功:count{}", redisService.keys(redisConfig.fullKey("home:*")));
         }
     }
 

@@ -70,4 +70,24 @@ public class FileTool extends FileUtil {
         return localFile;
     }
 
+    /**
+     * 判断路径是否存在
+     *
+     * @param path 路径
+     * @return 是否存在
+     */
+    public static boolean exists(String path) {
+        File file = new File(path);
+        return file.exists();
+    }
+
+    /**
+     * 获取操作系统中的临时目录
+     *
+     * @return 临时目录
+     */
+    public static String getSystemTempDir() {
+        return System.getProperty("java.io.tmpdir");
+    }
+
 }

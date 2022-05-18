@@ -12,6 +12,7 @@ import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.EnumTool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,11 +83,16 @@ public class FileController {
         return CommonResult.failed("图片批量上传失败");
     }
 
+    @ResponseBody
     @PostMapping(value = "/cos/async/fileUpload")
     @ApiOperation(value = "异步文件上传-COS", notes = "最大不超过200MB")
-    @ApiImplicitParam(name = "fileType", value = "文件类型：-1->开发测试,0->APK目录,1->视频存储", required = true, dataType = "int")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "fileType", value = "文件类型：-1->开发测试,0->APK目录,1->视频存储,2->音频存储", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "retainName", value = "是否保留原文件名(注意，文件名不能带中文)，默认为false->随机生成，true->保留", dataType = "boolean")
+    })
     public CommonResult<String> asyncFileUpload(@RequestParam(name = "file") MultipartFile multipartFile,
-                                                @RequestParam(name = "fileType") @EnumContains(enumClass = FilePathEnum.class) Integer fileType) {
-        return fileService.asyncFileUpload(multipartFile, EnumTool.getEnum(FilePathEnum.class, fileType), "");
+                                                @RequestParam(name = "fileType") @EnumContains(enumClass = FilePathEnum.class) Integer fileType,
+                                                @RequestParam(name = "retainName", defaultValue = "0") boolean retainName) {
+        return fileService.asyncFileUpload(multipartFile, EnumTool.getEnum(FilePathEnum.class, fileType), retainName);
     }
 }

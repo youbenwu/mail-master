@@ -7,6 +7,7 @@ import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.UmsUser;
 import com.ys.mail.entity.UmsUserInvite;
 import com.ys.mail.enums.ImgPathEnum;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.UmsUserInviteMapper;
 import com.ys.mail.mapper.UmsUserMapper;
@@ -16,7 +17,7 @@ import com.ys.mail.service.RedisService;
 import com.ys.mail.service.UmsUserInviteService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdWorker;
-import com.ys.mail.util.QRCodeUtil;
+import com.ys.mail.util.QrCodeUtil;
 import com.ys.mail.util.UserUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,25 +107,29 @@ public class UmsUserInviteServiceImpl extends ServiceImpl<UmsUserInviteMapper, U
         UmsUser currentUser = UserUtil.getCurrentUser();
         Long userId = currentUser.getUserId();
         // 校验高级用户
-        if (NumberUtils.INTEGER_ZERO.equals(currentUser.getRoleId()))
-            return CommonResult.failed(CommonResultCode.NOT_SENIOR_USER);
+        ApiAssert.isTrue(NumberUtils.INTEGER_ZERO.equals(currentUser.getRoleId()), CommonResultCode.NOT_SENIOR_USER);
         // 用户二维码key，对应COS存储路径
         String key = String.format("%s%d-%s.jpg", ImgPathEnum.QR_CODE_PATH.value(), userId, type);
-        Boolean existKey = cosService.isExistKey(key);
+        String fullKey = cosService.getFullKey(null, key);
+        Boolean existKey = cosService.isExistKey(fullKey);
         // 存在直接返回
-        if (existKey) return CommonResult.success(key);
+        if (existKey) {
+            return CommonResult.success(key);
+        }
         // 否则重新生成一张并上传到cos中，再返回,先创建临时文件
-        File tempFile = File.createTempFile("temp-qrcode", null);
+        File tempFile = File.createTempFile("temp-qrcode-", null);
         // 构建二维码填充内容：邀请链接（当更换路径时需要清空cos/qrcode中的历史二维码图片）
         // -- 测试环境:http://reg.huwing.cn
         // -- 生成环境:http://regproduct.huwing.cn
         String content = String.format(propInviteUrl + "/register?uid=%d&type=%s", userId, type);
         // 开始生成
-        Boolean encode = QRCodeUtil.encode(content, tempFile);
+        Boolean encode = QrCodeUtil.encode(content, tempFile);
         if (encode) {
             // 开始上传
             URL upload = cosService.upload(key, tempFile);
-            if (BlankUtil.isNotEmpty(upload)) return CommonResult.success(key);
+            if (BlankUtil.isNotEmpty(upload)) {
+                return CommonResult.success(key);
+            }
         }
         return CommonResult.failed("生成二维码失败");
     }

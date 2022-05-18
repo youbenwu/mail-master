@@ -1,38 +1,44 @@
 package com.ys.mail.enums;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.Accessors;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 文件地址分类枚举
  *
  * @author 007
  */
+@Getter
 @AllArgsConstructor
+@Accessors(fluent = true)
 public enum FilePathEnum implements IPairs<Integer, String, FilePathEnum> {
     /**
      * 开发测试，默认类型
      */
-    TEST_PATH(-1, "/test/"),
+    TEST_PATH(-1, "/test/", null),
     /**
-     * APK存储路径
+     * APK存储目录
      */
-    APK_PATH(0, "/apk/"),
+    APK_PATH(0, "/apk/", Collections.singletonList("apk")),
     /**
-     * 视频存储路径
+     * 视频存储目录
      */
-    VIDEO_PATH(1, "/video/"),
+    VIDEO_PATH(1, "/video/", Arrays.asList("avi", "wmv", "mpeg", "mp4", "mov", "flv", "rmvb", "3gp", "ts")),
+    /**
+     * 音频存储目录
+     */
+    AUDIO_PATH(1, "/audio/", Arrays.asList("mp3", "wav", "flac", "aac", "alac")),
     ;
 
-    final Integer type;
-    final String path;
-
-    @Override
-    public Integer key() {
-        return this.type;
-    }
-
-    @Override
-    public String value() {
-        return this.path;
-    }
+    final Integer key;
+    final String value;
+    /**
+     * 文件后缀，不同存储目录要求不同，为空则不进行检测
+     */
+    final List<String> suffix;
 }

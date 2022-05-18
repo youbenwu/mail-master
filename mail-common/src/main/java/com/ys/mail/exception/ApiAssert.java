@@ -24,7 +24,7 @@ public class ApiAssert {
      * @param message 内容
      */
     public static void fail(String message) {
-        throw new ApiException(message);
+        throw new BusinessException(message);
     }
 
     /**
@@ -33,7 +33,7 @@ public class ApiAssert {
      * @param errorCode 错误码
      */
     public static void fail(IErrorCode errorCode) {
-        throw new ApiException(errorCode);
+        throw new BusinessException(errorCode);
     }
 
     /**
@@ -107,6 +107,12 @@ public class ApiAssert {
     public static void isTrue(boolean condition, IErrorCode errorCode) {
         if (condition) {
             throw new BusinessException(errorCode);
+        }
+    }
+
+    public static void isTrue(boolean condition, String message) {
+        if (condition) {
+            throw new BusinessException(message);
         }
     }
 

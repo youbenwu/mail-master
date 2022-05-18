@@ -1,10 +1,14 @@
 package com.ys.mail.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReUtil;
+import com.ys.mail.constant.StringConstant;
 import com.ys.mail.enums.CosFolderEnum;
 import com.ys.mail.enums.FilePathEnum;
 import com.ys.mail.enums.ImgPathEnum;
-import com.ys.mail.exception.ApiException;
+import com.ys.mail.enums.RegularEnum;
+import com.ys.mail.exception.ApiAssert;
+import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.service.CosService;
@@ -17,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @Desc 文件管理
@@ -63,26 +69,44 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @SneakyThrows
-    public CommonResult<String> asyncFileUpload(MultipartFile file, FilePathEnum filePath, String filename) {
+    public CommonResult<String> asyncFileUpload(MultipartFile file, FilePathEnum filePath, boolean retainName) {
         // 文件校验
-        if (BlankUtil.isEmpty(file)) return CommonResult.failed(CommonResultCode.ERR_INTERFACE_PARAM);
-        // 文件名校验
-        String newFileName = this.getRandomName(file);
-        if (BlankUtil.isNotEmpty(filename)) {
-            if (filename.contains(".")) newFileName = filename;
-            else newFileName = filename + this.getSuffix(file);
+        ApiAssert.noValue(file, CommonResultCode.ERR_INTERFACE_PARAM);
 
+        // 文件名处理，默认原名称
+        String newFileName = file.getOriginalFilename();
+        // 文件名校验（不能包含中文）
+        boolean match = ReUtil.isMatch(RegularEnum.FILENAME.getReg(), newFileName);
+        ApiAssert.isFalse(match, BusinessErrorCode.ERR_FILE_NAME_FORMAT);
+        // 根据存储目录进行文件后缀检测，如：0->apk等
+        String suffix = this.getSuffix(file);
+        List<String> suffixList = filePath.suffix();
+        if (BlankUtil.isNotEmpty(suffixList)) {
+            String message = BusinessErrorCode.ERR_FILE_SUFFIX.getMessage(suffixList.toString());
+            ApiAssert.isFalse(suffixList.contains(suffix), message);
         }
+
+        // 随机生成
+        if (!retainName) {
+            newFileName = this.getRandomName(file);
+        }
+        // 完整的key
+        String fullKey = filePath.value() + newFileName;
+
         // 使用异步上传
-        String path = filePath.value() + newFileName;
-        cosService.asyncUpload(FileTool.multipartToFile(file), CosFolderEnum.FILE_FOLDER, path);
-        return CommonResult.success(path);
+        cosService.asyncUpload(FileTool.multipartToFile(file), CosFolderEnum.FILE_FOLDER, fullKey);
+        return CommonResult.success(fullKey);
     }
 
     private String getSuffix(MultipartFile file) {
         String suffix = file.getOriginalFilename();
-        if (BlankUtil.isEmpty(suffix)) throw new ApiException(String.format("请上传带后缀的文件：%s", file.getName()));
-        return suffix.substring(suffix.lastIndexOf(".") + 1);
+        if (null == suffix) {
+            return StringConstant.BLANK;
+        }
+        int lastIndexOf = suffix.lastIndexOf(".");
+        String message = BusinessErrorCode.ERR_FILE_NOT_SUFFIX.getMessage(file.getName());
+        ApiAssert.isTrue(lastIndexOf < 0, message);
+        return suffix.substring(lastIndexOf + 1).toLowerCase();
     }
 
     private String getRandomName(MultipartFile file) {
