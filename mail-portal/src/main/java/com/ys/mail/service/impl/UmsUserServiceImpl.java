@@ -201,7 +201,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
             user = new UmsUser();
             user.setUserId(IdWorker.generateId());
             // 先用6位生成随机
-            user.setNickname(NickNameUtil.getRandom(3));
+            user.setNickname(NickNameUtil.getChineseName(true, 2));
             user.setPhone(phone);
             //save(user);
             if (!BlankUtil.isEmpty(parentId)) {
