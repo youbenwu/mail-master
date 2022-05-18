@@ -92,6 +92,14 @@ public enum BusinessErrorCode implements IErrorCode {
     ERR_DATE_ILLEGAL(400300, "日期跨度不能小于%d天"),
     ERR_DATE_EXPIRE(400301, "该商品已过期，不能上架"),
 
+
+    ERR_KEY_NOT_EXIST(400400, "Path：%s 不存在"),
+
+
+    ERR_FILE_NAME_FORMAT(400500, "文件名称格式不正确"),
+    ERR_FILE_SUFFIX(400501, "文件后缀不正确，格式应为：%s"),
+    ERR_FILE_NOT_SUFFIX(400502, "请上传带后缀的文件：%s"),
+
     ;
 
     private int code;

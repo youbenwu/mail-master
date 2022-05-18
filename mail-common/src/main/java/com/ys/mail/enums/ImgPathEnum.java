@@ -9,6 +9,15 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public enum ImgPathEnum implements IPairs<Integer, String, ImgPathEnum> {
+
+    /**
+     * 下载二维码
+     */
+    DOWNLOAD_QRCODE_PATH(-3, "/download-qrcode/"),
+    /**
+     * 系统Logo
+     */
+    SYS_LOGO_PATH(-2, "/sysLogo/"),
     /**
      * 开发测试，默认类型
      */
@@ -56,7 +65,7 @@ public enum ImgPathEnum implements IPairs<Integer, String, ImgPathEnum> {
     /**
      * 创客商品图片案例
      */
-    CASE_PICS_PATH(10, "/casePics/");
+    CASE_PICS_PATH(10, "/casePics/"),
     ;
 
     final Integer type;

@@ -15,12 +15,12 @@ public enum CosFolderEnum implements IPairs<Integer, String, CosFolderEnum> {
     /**
      * 主要存储图片
      */
-    IMAGES_FOLDER(1, "/images"),
+    IMAGES_FOLDER(1, "images"),
 
     /**
      * 主要存储文件
      */
-    FILE_FOLDER(2, "/files");
+    FILE_FOLDER(2, "files");
 
     final Integer type;
     final String path;

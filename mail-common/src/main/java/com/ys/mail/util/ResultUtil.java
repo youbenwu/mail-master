@@ -2,15 +2,18 @@ package com.ys.mail.util;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.ys.mail.model.CommonResult;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @Desc 主要对一些结果封装统一数据
- * @Author CRH
- * @Create 2022-03-07 16:48
+ * 主要对一些结果封装统一数据
+ *
+ * @author CRH
+ * @date 2022-05-16 10:26
+ * @since 1.0
  */
 public class ResultUtil {
 
@@ -23,8 +26,10 @@ public class ResultUtil {
     public static void setUnifyParam(Map<String, Object> map, int time) {
         DateTime tillTime = DateUtil.date();
         DateTime offsetHour = DateUtil.offsetSecond(tillTime, time);
-        map.put("tillTime", tillTime);// 截止统计时间
-        map.put("refreshTime", offsetHour);// 预计刷新时间
+        // 截止统计时间
+        map.put("tillTime", tillTime);
+        // 预计刷新时间
+        map.put("refreshTime", offsetHour);
     }
 
     /**
@@ -56,5 +61,15 @@ public class ResultUtil {
             }
         }
         return resultList;
+    }
+
+    /**
+     * 处理结果
+     *
+     * @param result 结果条件
+     * @return 对应的结果
+     */
+    public static CommonResult<Boolean> isOk(boolean result) {
+        return result ? CommonResult.success(true) : CommonResult.failed(false);
     }
 }
