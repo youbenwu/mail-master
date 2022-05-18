@@ -380,7 +380,8 @@ public class ScheduleTask {
             return;
         }
         try {
-            int save = umsIncomeService.insertBatch(rebate(OmsOrder.OrderType.ZERO.value(), vos, ratio));
+            List<UmsIncome> rebate = rebate(OmsOrder.OrderType.FIVE.value(), vos, ratio);
+            int save = BlankUtil.isEmpty(rebate) ? NumberUtils.INTEGER_ZERO : umsIncomeService.insertBatch(rebate);
             LOGGER.info("创建普通订单数量:{},应返数量{}", save, vos.size());
         } catch (Exception e) {
             LOGGER.debug("scheduledTask6系统调度信息异常,单天执行的数量为0");
@@ -407,7 +408,8 @@ public class ScheduleTask {
             return;
         }
         try {
-            int save = umsIncomeService.insertBatch(rebate(OmsOrder.OrderType.FIVE.value(), vos, ratio));
+            List<UmsIncome> rebate = rebate(OmsOrder.OrderType.FIVE.value(), vos, ratio);
+            int save = BlankUtil.isEmpty(rebate) ? NumberUtils.INTEGER_ZERO : umsIncomeService.insertBatch(rebate);
             LOGGER.info("创建会员订单数量:{},应返数量{}", save, vos.size());
         } catch (Exception e) {
             LOGGER.debug("scheduledTask7系统调度信息异常,单天执行的数量为0");
