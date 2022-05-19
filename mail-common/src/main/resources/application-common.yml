@@ -55,8 +55,8 @@ config:
 
 # 腾讯云OSS配置
 cos:
-  secretId: AKIDJRJvGK8fv0sUosfCRP6XLs87pGQJvHMA # 永久身份
-  secretKey: YppXzB6j5AyVljQqyqRlnY3HDtIPGqAH # 永久密钥
+  secretId: AKIDjLjtoVxAMJ2YqthGafV6VkqjNmxuhGaf # 永久身份
+  secretKey: sVs0tXw74lCOK3YoqdBgz3tTvBD0Ysyq # 永久密钥
   bucket: test-1257583875 # 默认桶名称
   region: ap-guangzhou # 桶区域
   durationSeconds: 1800 # 30分钟，临时密钥有效时长，单位是秒
