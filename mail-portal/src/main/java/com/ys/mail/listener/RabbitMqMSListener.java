@@ -8,19 +8,17 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.rabbitmq.client.Channel;
 import com.ys.mail.config.RabbitMqSmsConfig;
 import com.ys.mail.entity.*;
+import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.mapper.*;
 import com.ys.mail.model.dto.*;
 import com.ys.mail.model.mq.MSOrderCheckDTO;
-import com.ys.mail.service.OmsCartItemService;
-import com.ys.mail.service.OmsOrderItemService;
-import com.ys.mail.service.OmsOrderService;
-import com.ys.mail.service.SmsFlashPromotionProductService;
+import com.ys.mail.service.*;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdGenerator;
 import com.ys.mail.util.IdWorker;
-import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -73,6 +71,8 @@ public class RabbitMqMSListener {
     private PmsVerificationCodeMapper verificationCodeMapper;
     @Autowired
     private OmsCartItemService cartItemService;
+    @Autowired
+    private SysSettingService settingService;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RabbitMqMSListener.class);
 
@@ -311,7 +311,10 @@ public class RabbitMqMSListener {
 
 
     public void groupMaster(String userId, Date date) {
-        Double commission = 0.003D;
+        Double commission = settingService.getSettingValue(SettingTypeEnum.four);
+        commission = BlankUtil.isEmpty(commission) ? 0.002D : commission;
+        commission = ObjectUtil.equal(commission, NumberUtils.DOUBLE_ZERO) ? 0.002D : commission;
+        //Double commission = 0.003D;
         try {
             // 获取id
             GetRequest getRequest = new GetRequest("group_master").id(userId);
