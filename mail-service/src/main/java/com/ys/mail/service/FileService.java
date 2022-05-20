@@ -6,9 +6,11 @@ import com.ys.mail.model.CommonResult;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @Desc 文件管理接口
- * @Author CRH
- * @Create 2022-01-24 13:12
+ * 文件管理接口
+ *
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 public interface FileService {
 

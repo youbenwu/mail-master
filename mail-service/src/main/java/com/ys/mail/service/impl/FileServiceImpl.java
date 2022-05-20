@@ -25,9 +25,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 /**
- * @Desc 文件管理
- * @Author CRH
- * @Create 2022-01-24 13:16
+ * 文件管理
+ *
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 @Service
 public class FileServiceImpl implements FileService {
@@ -58,8 +60,10 @@ public class FileServiceImpl implements FileService {
             return CommonResult.failed(FILE_SIZE_OVERSTEP);
         }
         // 图片格式校验
-        boolean b = IMG_FORMAT.toUpperCase().contains(this.getSuffix(file).toUpperCase());
-        if (!b) return CommonResult.failed(String.format("请选择%s格式的图片", IMG_FORMAT));
+        boolean result = IMG_FORMAT.toUpperCase().contains(this.getSuffix(file).toUpperCase());
+        if (!result) {
+            return CommonResult.failed(String.format("请选择%s格式的图片", IMG_FORMAT));
+        }
 
         // 上传
         String key = imgType.value() + this.getRandomName(file);

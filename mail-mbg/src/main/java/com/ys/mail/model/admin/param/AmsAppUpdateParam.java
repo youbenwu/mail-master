@@ -46,7 +46,7 @@ public class AmsAppUpdateParam {
     private String url;
 
     @NotBlank
-    @Pattern(regexp = "[a-zA-Z]+", message = "：名称格式错误")
+    @Pattern(regexp = "[a-zA-Z\\d]+", message = "：名称格式错误，只支持字母、数字")
     @ApiModelProperty(value = "二维码名称")
     private String qrcodeName;
 

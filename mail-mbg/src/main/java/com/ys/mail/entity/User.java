@@ -1,5 +1,8 @@
 package com.ys.mail.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -33,5 +36,10 @@ public class User extends BaseEntity<Long> {
 
     @ApiModelProperty(value = "手机号")
     private Long phone;
+
+    @TableLogic
+    @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty(value = "逻辑删除：0->未删除；1->删除")
+    private Integer deleted;
 
 }

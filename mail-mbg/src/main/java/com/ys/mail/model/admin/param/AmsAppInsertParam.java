@@ -33,12 +33,12 @@ public class AmsAppInsertParam {
     private String version;
 
     @NotBlank
-    @ApiModelProperty(value = "APP相对存储地址")
+    @ApiModelProperty(value = "APP相对存储地址，需要使用异步文件上传获取")
     @Pattern(regexp = "^/[a-zA-Z\\d]+/[a-zA-Z\\d_.-]+\\.apk$", message = "：请输入正确的相对路径，以(.apk)结尾")
     private String url;
 
     @NotBlank
-    @Pattern(regexp = "[a-zA-Z]+", message = "：名称格式错误")
+    @Pattern(regexp = "[a-zA-Z\\d]+", message = "：名称格式错误，只支持字母、数字")
     @ApiModelProperty(value = "二维码名称")
     private String qrcodeName;
 
