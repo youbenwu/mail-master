@@ -33,7 +33,7 @@ public class AmsAppVO implements Serializable {
     @ApiModelProperty(value = "APP相对存储地址")
     private String url;
 
-    @ApiModelProperty(value = "APP文件大小")
+    @ApiModelProperty(value = "APP文件大小，单位字节")
     private Long size;
 
     @ApiModelProperty(value = "APP文件上传状态：0->未上传，1->已上传")

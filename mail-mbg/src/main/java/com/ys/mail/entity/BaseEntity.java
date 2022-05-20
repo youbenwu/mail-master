@@ -42,11 +42,6 @@ public abstract class BaseEntity<T> implements Serializable {
     @TableField(fill = FieldFill.UPDATE)
     private Date updateTime;
 
-    @TableLogic
-    @TableField(fill = FieldFill.INSERT)
-    @ApiModelProperty(value = "逻辑删除：0->未删除；1->删除")
-    private Integer deleted;
-
     @ApiModelProperty(value = "备注")
     private String remark;
 

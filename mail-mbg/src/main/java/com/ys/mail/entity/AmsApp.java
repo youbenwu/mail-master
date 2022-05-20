@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -20,18 +21,14 @@ import java.util.Date;
  * @since 2022-05-13
  */
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(value = "AmsApp对象", description = "AmsApp对象")
-public class AmsApp implements Serializable {
+public class AmsApp extends BaseEntity<Long> implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(value = "APP主键ID")
-    @TableId(value = "id", type = IdType.INPUT)
-    private Long id;
 
     @ApiModelProperty(value = "APP名称")
     private String name;
@@ -64,13 +61,5 @@ public class AmsApp implements Serializable {
 
     @ApiModelProperty(value = "修改人ID")
     private Long pcUserId;
-
-    @ApiModelProperty(value = "注册时间")
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    @ApiModelProperty(value = "修改时间")
-    @TableField(fill = FieldFill.UPDATE)
-    private Date updateTime;
 
 }

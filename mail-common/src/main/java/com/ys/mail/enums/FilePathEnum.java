@@ -11,7 +11,9 @@ import java.util.List;
 /**
  * 文件地址分类枚举
  *
- * @author 007
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 @Getter
 @AllArgsConstructor

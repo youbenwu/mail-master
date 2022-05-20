@@ -37,7 +37,7 @@ public enum RegularEnum {
     /**
      * 文件名，格式：xxx.xxx / xxx001-xxx.xxx等
      */
-    FILENAME("^[a-zA-Z\\d-_.]+\\.[a-zA-Z]+$"),
+    FILENAME("^[^\\u4E00-\\u9FA5]+\\.[a-zA-Z\\d]+$"),
 
     ;
 
