@@ -207,7 +207,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
     private File getAppLogo(Integer type) {
         String fullPath = StrUtil.format("{}temp-logo-app{}.png", FileTool.getSystemTempDir(), type);
         File logo = new File(fullPath);
-        cosService.download(CosFolderEnum.IMAGES_FOLDER, String.format("/%s/app%d.png", ImgPathEnum.SYS_LOGO_PATH.value(), type), logo);
+        cosService.download(CosFolderEnum.IMAGES_FOLDER, String.format("%s%s%d.png", ImgPathEnum.SYS_LOGO_PATH.value(), "app", type), logo);
         return logo;
     }
 
