@@ -48,4 +48,7 @@ public class PartnerProductDTO implements Serializable {
 
     @ApiModelProperty(value = "保证金")
     private Long earnestMoney;
+
+    @ApiModelProperty(value = "副标题")
+    private String subTitle;
 }

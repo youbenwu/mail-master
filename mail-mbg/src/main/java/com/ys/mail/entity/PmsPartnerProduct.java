@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -22,6 +23,7 @@ import java.util.Date;
  * @since 2022-02-24
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(value = "PmsPartnerProduct对象", description = "合伙人产品表")
 public class PmsPartnerProduct implements Serializable {
@@ -74,8 +76,8 @@ public class PmsPartnerProduct implements Serializable {
     @ApiModelProperty(value = "案例图片,最多5张")
     private String casePics;
 
-    public PmsPartnerProduct() {
-    }
+    @ApiModelProperty(value = "副标题")
+    private String subTitle;
 
     public PmsPartnerProduct(Long partnerPdtId, Boolean publishStatus) {
         this.partnerPdtId = partnerPdtId;

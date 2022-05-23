@@ -37,7 +37,7 @@ public class PmsPartnerProductServiceImpl extends ServiceImpl<PmsPartnerProductM
 
     @Override
     public List<PartnerProductDTO> list(Byte more, String partnerPdtId) {
-        return partnerProductMapper.selectList(more, Long.valueOf(partnerPdtId),PmsPartnerProduct.TOTAL_PRICE_MAX);
+        return partnerProductMapper.selectList(more, Long.valueOf(partnerPdtId));
     }
 
     @Override

@@ -27,10 +27,9 @@ public interface PmsPartnerProductMapper extends BaseMapper<PmsPartnerProduct> {
      *
      * @param more         参数
      * @param partnerPdtId id
-     * @param totalPriceMax 参数
      * @return 返回值
      */
-    List<PartnerProductDTO> selectList(@Param("more") Byte more, @Param("partnerPdtId") Long partnerPdtId,@Param("totalPriceMax") Long totalPriceMax);
+    List<PartnerProductDTO> selectList(@Param("more") Byte more, @Param("partnerPdtId") Long partnerPdtId);
 
     /**
      * 查询详情

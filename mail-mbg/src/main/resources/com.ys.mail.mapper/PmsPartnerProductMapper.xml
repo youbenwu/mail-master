@@ -16,6 +16,7 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="case_pics" property="casePics"/>
+        <result column="sub_title" property="subTitle"/>
     </resultMap>
 
     <resultMap id="DtoResultMap" type="com.ys.mail.model.dto.PartnerProductDTO">
@@ -29,6 +30,7 @@
         <result column="pic" property="pic"/>
         <result column="partner_price" property="partnerPrice"/>
         <result column="earnest_money" property="earnestMoney"/>
+        <result column="sub_title" property="subTitle"/>
     </resultMap>
 
     <resultMap id="PoResultMap" type="com.ys.mail.model.po.PartnerProductPO">
@@ -48,12 +50,12 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         partner_pdt_id, product_id, partner_name, partner_price, earnest_money,
-        total_price, serve_desc, re_periods, is_publish_status, create_time, update_time,case_pics
+        total_price, serve_desc, re_periods, is_publish_status, create_time, update_time,case_pics, sub_title
     </sql>
 
     <select id="selectList" resultMap="DtoResultMap">
         select ppp.partner_pdt_id,ppp.product_id,ppp.partner_name,ppp.total_price,
-        ppp.is_publish_status,ppp.create_time,pp.sale,pp.pic
+        ppp.is_publish_status,ppp.create_time,ppp.sub_title,pp.sale,pp.pic
         from pms_product pp left join pms_partner_product ppp  on pp.product_id = ppp.product_id
         <where>
             ppp.is_publish_status = 1
@@ -61,7 +63,6 @@
                 and ppp.partner_pdt_id <![CDATA[ < ]]>  #{partnerPdtId}
             </if>
             and pp.deleted = 0
-            and ppp.total_price <![CDATA[ < ]]> #{totalPriceMax}
         </where>
         order by ppp.partner_pdt_id desc
         limit
