@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Api(tags = "前端创客产品")
 @Validated
-@RestControllerAdvice
+@RestController
 @RequestMapping("/partner/product")
 public class PmsPartnerProductController {
 
@@ -32,13 +32,13 @@ public class PmsPartnerProductController {
     private PmsPartnerProductService partnerProductService;
 
     @ApiOperation("查询创客商品列表-DT")
-    @GetMapping(value = "/{more:^0|^1}")
+    @GetMapping(value = "/{more:^[01]$}")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "more", value = "是否更多,少:0,多:1", dataType = "Byte", required = true),
-            @ApiImplicitParam(name = "partnerPdtId", value = "合伙人主键id,用于翻页,传0即查询最新的,最后一个id进行翻页", dataType = "String")
+            @ApiImplicitParam(name = "more", value = "是否更多，少:0，多:1", dataType = "Byte", required = true),
+            @ApiImplicitParam(name = "partnerPdtId", value = "合伙人主键id，用于翻页（可选）", dataType = "String")
     })
     public CommonResult<List<PartnerProductDTO>> list(@PathVariable Byte more,
-                                                      @RequestParam("partnerPdtId") @Pattern(regexp = "^0|^\\d{19}$") String partnerPdtId) {
+                                                      @RequestParam(value = "partnerPdtId",defaultValue = "0") @Pattern(regexp = "^0|^\\d{19}$") String partnerPdtId) {
         return CommonResult.success(partnerProductService.list(more, partnerPdtId));
     }
 

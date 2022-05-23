@@ -66,6 +66,9 @@ public class PcPartnerProductParam implements Serializable {
     @ApiModelProperty(value = "案例图片,最多5张")
     private String casePics;
 
+    @ApiModelProperty(value = "副标题")
+    private String subTitle;
+
     /**
      * 新增和修改构造函数
      *
