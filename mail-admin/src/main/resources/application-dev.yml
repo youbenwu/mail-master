@@ -52,7 +52,7 @@ logging:
         boot:
           autoconfigure: ERROR
   file:
-    path: D:/idea/mail_admin
+    path: D:/logs/qcy_mail/admin
 
 
 logstash:
