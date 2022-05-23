@@ -36,9 +36,15 @@ public class StringConstant {
      * 符号
      */
     public static final String SLASH = "/";
+    public static final String BACKSLASH = "\\";
     public static final String DOT = ".";
     public static final String BLANK = "";
     public static final String LEFT_ARROWS = "========》";
     public static final String RIGHT_ARROWS = "《========";
+
+    /**
+     * 标识
+     */
+    public static final String WINDOWS = "win";
 
 }

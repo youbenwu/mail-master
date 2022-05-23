@@ -81,13 +81,4 @@ public class FileTool extends FileUtil {
         return file.exists();
     }
 
-    /**
-     * 获取操作系统中的临时目录
-     *
-     * @return 临时目录
-     */
-    public static String getSystemTempDir() {
-        return System.getProperty("java.io.tmpdir");
-    }
-
 }
