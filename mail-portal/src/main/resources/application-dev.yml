@@ -46,7 +46,7 @@ logging:
     root: info
     com.ys.mail: debug
   file:
-    path: D:/idea/happyMail     #打印日志
+    path: D:/logs/qcy_mail/portal    #打印日志
 
 logstash:
   host: localhost

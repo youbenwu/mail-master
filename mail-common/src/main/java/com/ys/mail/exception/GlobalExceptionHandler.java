@@ -8,6 +8,7 @@ import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.StringUtils;
@@ -39,6 +40,9 @@ public class GlobalExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Value("${spring.profiles.active}")
+    private String active;
+
     @ResponseBody
     @ExceptionHandler(value = ApiException.class)
     public CommonResult<String> handler(ApiException e) {
@@ -54,10 +58,17 @@ public class GlobalExceptionHandler {
     public CommonResult<String> handler(BusinessException e) {
         String message = e.getMessage();
         // 打印简洁的业务异常
-        String title = String.format("\n%s业务异常::%s", StringConstant.LEFT_ARROWS, message);
+        String title = String.format("%s业务异常::%s", StringConstant.LEFT_ARROWS, message);
         String link = String.format("\n%s异常位置::%s", StringConstant.LEFT_ARROWS, e.getStackTrace()[1]);
-        String content = StringUtil.getColorContent(AnsiColorEnum.RED_BOLD, title + link);
-        logger.warn(content);
+        String content;
+        if (active.contains(StringConstant.ENV_DEV)) {
+            content = StringUtil.getColorContent(AnsiColorEnum.RED_BOLD, title + link);
+            logger.warn("");
+            System.out.println(content);
+        } else {
+            content = title + link;
+            logger.warn(content);
+        }
         // 返回结果
         if (e.getErrorCode() != null) {
             return CommonResult.failed(e.getErrorCode(), message);

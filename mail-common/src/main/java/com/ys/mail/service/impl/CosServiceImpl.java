@@ -31,7 +31,6 @@ import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.service.CosService;
 import com.ys.mail.util.BlankUtil;
-import com.ys.mail.util.LoggerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,7 +188,7 @@ public class CosServiceImpl implements CosService {
             // 同步阻塞
             upload.waitForCompletion();
             // 记录结果
-            LoggerUtil.info(LOGGER, upload.getDescription().replace("//", "/"));
+            LOGGER.info(upload.getDescription().replace("//", "/"));
             // 等待返回结果
             return cosClient.getObjectUrl(bucketName, key);
         } catch (Exception e) {
@@ -234,7 +233,7 @@ public class CosServiceImpl implements CosService {
             // 添加进度处理器
             // this.progressEvent(upload, file)
             // 记录结果
-            LoggerUtil.info(LOGGER, upload.getDescription().replace("//", "/"));
+            LOGGER.info(upload.getDescription().replace("//", "/"));
             return cosClient.getObjectUrl(bucketName, path);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -302,7 +301,7 @@ public class CosServiceImpl implements CosService {
     public void download(String bucketName, CosFolderEnum cosFolder, String key, File localFile, boolean cover) {
         try {
             if (!cover && localFile.exists()) {
-                LoggerUtil.warn(LOGGER, "本地已经存在该文件：" + localFile.getAbsolutePath());
+                LOGGER.warn("本地已经存在该文件：" + localFile.getAbsolutePath());
                 return;
             }
             // 获取key
@@ -322,7 +321,7 @@ public class CosServiceImpl implements CosService {
             // 同步阻塞
             download.waitForCompletion();
             // 记录结果
-            LoggerUtil.info(LOGGER, download.getDescription().replace("//", "/"));
+            LOGGER.info(download.getDescription().replace("//", "/"));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             throw new ApiException("文件下载失败");
@@ -371,7 +370,7 @@ public class CosServiceImpl implements CosService {
         Boolean existKey = this.isExistKey(fullKey);
         if (!existKey) {
             String message = BusinessErrorCode.ERR_KEY_NOT_EXIST.getMessage(key);
-            LoggerUtil.warn(LOGGER, message);
+            LOGGER.warn(message);
             return;
         }
         try {
@@ -380,7 +379,7 @@ public class CosServiceImpl implements CosService {
             // 调用SDK执行
             cosClient.deleteObject(deleteObjectRequest);
             // 记录结果
-            LoggerUtil.info(LOGGER, "Deleting File " + fullKey);
+            LOGGER.info("Deleting File " + fullKey);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             throw new ApiException("文件删除失败");

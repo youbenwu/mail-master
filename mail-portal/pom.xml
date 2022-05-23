@@ -110,7 +110,7 @@
 
         <dependency>
             <groupId>com.tencentcloudapi</groupId>
-            <artifactId>tencentcloud-sdk-java-common</artifactId>
+            <artifactId>tencentcloud-sdk-java</artifactId>
         </dependency>
     </dependencies>
 

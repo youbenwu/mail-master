@@ -212,7 +212,7 @@ public class StringUtil {
     }
 
     /**
-     * 获取带颜色编码的内容
+     * 获取带颜色编码的内容（只在Windows生效）
      *
      * @param colorEnum 颜色枚举
      * @param content   原始内容
