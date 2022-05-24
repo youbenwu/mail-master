@@ -30,21 +30,22 @@ public class SysSettingController {
     @Autowired
     private SysSettingService sysService;
 
-    @ApiOperation(value = "获取APP设置列表", notes = "该结果建议别在客户端进行缓存，需要时调用即可")
+    @ApiOperation(value = "获取APP设置", notes = "该结果建议别在客户端进行缓存，需要时调用即可")
     @GetMapping(value = "/list")
     public CommonResult<List<SysSetting>> list() {
         return CommonResult.success(this.getGroupName());
     }
 
-    @ApiOperation(value = "获取简单形式的APP设置列表", notes = "方便使用；该结果建议别在客户端进行缓存，需要时调用即可")
+    @ApiOperation(value = "获取简单形式的APP设置", notes = "注意：该结果建议别在客户端进行缓存，需要时调用即可<br/>" +
+            "使用时建议判空，避免读取不到该类型")
     @GetMapping(value = "/simpleList")
     public CommonResult<Map<String, Object>> simpleList() {
         List<SysSetting> list = this.getGroupName();
         Map<String, Object> resultMap = new LinkedHashMap<>();
         // 重新封装结果，简单形式，方便直接使用
         List<SysSetting> collect = list.stream().peek(s -> {
-            String key = EnumTool.getValue(SettingTypeEnum.class, s.getSettingType());
-            resultMap.put(key, sysService.getSettingValue(s));
+            String value = EnumTool.getValue(SettingTypeEnum.class, s.getSettingType());
+            resultMap.put(value, sysService.getSettingValue(s));
         }).collect(Collectors.toList());
         return CommonResult.success(resultMap);
     }
@@ -58,7 +59,7 @@ public class SysSettingController {
         String groupName = sysService.getGroupNameByType(SettingTypeEnum.two);
         List<SysSetting> availableList = sysService.getSettingByGroupName(groupName);
         return availableList.stream()
-                            .filter(s -> !s.getSettingType().equals(SettingTypeEnum.two.getType()))
+                            .filter(s -> !s.getSettingType().equals(SettingTypeEnum.two.key()))
                             .collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package com.ys.mail.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.AmsApp;
+import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.AmsAppInsertParam;
 import com.ys.mail.model.admin.param.AmsAppUpdateParam;
 import com.ys.mail.model.admin.query.AppQuery;
@@ -63,12 +64,12 @@ public interface AmsAppService extends IService<AmsApp> {
      *
      * @param content    二维码内容
      * @param qrcodeName 二维码名称
-     * @param useLogo    是否使用内嵌Logo
-     * @param logoType   内嵌Logo类型，0->APP1,1->APP2
+     * @param useLogo    是否使用Logo
+     * @param type       APP类型，0->APP1,1->APP2
      * @return 返回二维码的key
      * @throws Exception e
      */
-    String genQrCode(String content, String qrcodeName, boolean useLogo, Integer logoType) throws Exception;
+    String genQrCode(String content, String qrcodeName, boolean useLogo, Integer type) throws Exception;
 
     /**
      * 删除APP应用
@@ -77,4 +78,35 @@ public interface AmsAppService extends IService<AmsApp> {
      * @return 删除结果
      */
     boolean delete(Long id);
+
+    /**
+     * 应用状态检测
+     *
+     * @param id 应用ID
+     * @return 检测结果
+     */
+    boolean check(Long id);
+
+    /**
+     * 重新生成二维码
+     *
+     * @param id 应用ID
+     * @return 生成结果
+     */
+    boolean reloadGenQrcode(Long id);
+
+    /**
+     * 发布应用
+     *
+     * @param id 应用ID
+     * @return 发布结果
+     */
+    CommonResult<Boolean> release(Long id);
+
+    /**
+     * CDN刷新和预热
+     *
+     * @param id 应用ID
+     */
+    void purgeAndWarmUp(Long id);
 }

@@ -97,7 +97,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
 
         // 枚举检查
         if (!"-1".equals(settingType)) {
-            SettingTypeEnum enumByNumber = SettingTypeEnum.getByType(settingType);
+            SettingTypeEnum enumByNumber = EnumTool.getEnum(SettingTypeEnum.class, Integer.valueOf(settingType));
             if (BlankUtil.isEmpty(enumByNumber)) return CommonResult.failed("操作失败，该类型暂不能添加！", Boolean.FALSE);
             typeSetting = this.getOneByType(enumByNumber);
         }
@@ -210,7 +210,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
         List<SysSetting> allList = this.getCacheAll();
         List<SysSetting> collect = new ArrayList<>();
         for (SettingTypeEnum item : typeList) {
-            List<SysSetting> temp = allList.stream().filter(s -> s.getSettingType().equals(item.getType()))
+            List<SysSetting> temp = allList.stream().filter(s -> s.getSettingType().equals(item.key()))
                                            .collect(Collectors.toList());
             SysSetting sysSetting = null;
             if (BlankUtil.isNotEmpty(temp)) sysSetting = temp.get(0);
@@ -244,7 +244,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
         List<SysSetting> allList = this.getCacheAll();
         for (SysSetting item : allList) {
             if (!item.getEnable()) continue;
-            if (item.getSettingType().equals(settingType.getType())) {
+            if (item.getSettingType().equals(settingType.key())) {
                 String settingValue = item.getSettingValue();
                 if (BlankUtil.isEmpty(settingValue)) settingValue = item.getSettingDefaultValue();
                 return ConvertTypeUtil.convert(settingValue, item.getSettingValueType());

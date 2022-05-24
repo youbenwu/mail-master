@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
         String content;
         if (active.contains(StringConstant.ENV_DEV)) {
             content = StringUtil.getColorContent(AnsiColorEnum.RED_BOLD, title + link);
-            logger.warn("");
+            logger.warn(StringConstant.BLANK);
             System.out.println(content);
         } else {
             content = title + link;

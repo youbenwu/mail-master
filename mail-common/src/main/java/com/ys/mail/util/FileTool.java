@@ -1,6 +1,7 @@
 package com.ys.mail.util;
 
 import cn.hutool.core.io.FileUtil;
+import com.ys.mail.constant.StringConstant;
 import com.ys.mail.exception.ApiException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,19 +37,25 @@ public class FileTool extends FileUtil {
     /**
      * 文件大小转换
      */
-    public static String getSize(long size) {
-        String resultSize;
-        if (size / GB >= 1) {
-            //如果当前Byte的值大于等于1GB
-            resultSize = DF.format(size / (float) GB) + "GB";
-        } else if (size / MB >= 1) {
-            //如果当前Byte的值大于等于1MB
-            resultSize = DF.format(size / (float) MB) + "MB";
-        } else if (size / KB >= 1) {
-            //如果当前Byte的值大于等于1KB
-            resultSize = DF.format(size / (float) KB) + "KB";
-        } else {
-            resultSize = size + "B";
+    public static String getSize(Long size) {
+        String resultSize = StringConstant.BLANK;
+        if (BlankUtil.isNotEmpty(size)) {
+            String format;
+            if (size / GB >= 1) {
+                //如果当前Byte的值大于等于1GB
+                format = DF.format(size / (float) GB);
+                resultSize = DecimalUtil.toPlainString(format) + "GB";
+            } else if (size / MB >= 1) {
+                //如果当前Byte的值大于等于1MB
+                format = DF.format(size / (float) MB);
+                resultSize = DecimalUtil.toPlainString(format) + "MB";
+            } else if (size / KB >= 1) {
+                //如果当前Byte的值大于等于1KB
+                format = DF.format(size / (float) KB);
+                resultSize = DecimalUtil.toPlainString(format) + "KB";
+            } else {
+                resultSize = DecimalUtil.toPlainString(String.valueOf(size)) + "B";
+            }
         }
         return resultSize;
     }

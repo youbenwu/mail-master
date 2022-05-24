@@ -45,7 +45,7 @@ public class FileServiceImpl implements FileService {
     private final static String FILE_NULL = "请选择要上传的图片";
     private final static String IMG_FORMAT = "jpg,jpeg,gif,png";
     /**
-     * 图片限制500kb
+     * 默认，图片限制500kb
      */
     private final static Long LONG_FILE_MAX_SIZE = 1024 * 500L;
     private final static String FILE_SIZE_OVERSTEP = "文件大小不能大于500KB";
@@ -56,8 +56,15 @@ public class FileServiceImpl implements FileService {
         if (BlankUtil.isEmpty(file)) {
             return CommonResult.failed(FILE_NULL);
         }
-        if (file.getSize() > LONG_FILE_MAX_SIZE) {
-            return CommonResult.failed(FILE_SIZE_OVERSTEP);
+        // 根据不同类型校验文件大小
+        Long size = imgType.size();
+        String sizeName;
+        if (BlankUtil.isNotEmpty(size)) {
+            sizeName = FileTool.getSize(size);
+            ApiAssert.isTrue(file.getSize() > size, BusinessErrorCode.ERR_FILE_SIZE_EXCEED.getMessage(sizeName));
+        } else {
+            sizeName = FileTool.getSize(LONG_FILE_MAX_SIZE);
+            ApiAssert.isTrue(file.getSize() > LONG_FILE_MAX_SIZE, BusinessErrorCode.ERR_FILE_SIZE_EXCEED.getMessage(sizeName));
         }
         // 图片格式校验
         boolean result = IMG_FORMAT.toUpperCase().contains(this.getSuffix(file).toUpperCase());

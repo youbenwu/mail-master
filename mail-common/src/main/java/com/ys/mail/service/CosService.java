@@ -1,6 +1,9 @@
 package com.ys.mail.service;
 
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.model.ListObjectsRequest;
+import com.qcloud.cos.model.ObjectListing;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.transfer.TransferManager;
 import com.tencent.cloud.Credentials;
 import com.tencent.cloud.Response;
@@ -37,11 +40,19 @@ public interface CosService {
     COSClient getOssClient(Credentials credentials);
 
     /**
-     * 获取OSS路径
+     * 获取OSS图片路径
      *
      * @return 路径
      */
     String getOssPath();
+
+    /**
+     * 获取指定目录
+     *
+     * @param cosFolder 目录
+     * @return 前缀
+     */
+    String getOssPath(CosFolderEnum cosFolder);
 
     /**
      * 判断key是否存在COS中(默认桶)
@@ -159,4 +170,31 @@ public interface CosService {
      * @param key 文件Key
      */
     void deleteObject(String key);
+
+    /**
+     * 获取文件信息
+     *
+     * @param bucketName 桶名称
+     * @param cosFolder  文件夹
+     * @param key        key
+     * @return 文件信息
+     */
+    ObjectMetadata getObjectInfo(String bucketName, CosFolderEnum cosFolder, String key);
+
+    /**
+     * 获取文件信息
+     *
+     * @param cosFolder 文件夹
+     * @param key       key
+     * @return 文件信息
+     */
+    ObjectMetadata getObjectInfo(CosFolderEnum cosFolder, String key);
+
+    /**
+     * 获取对象列表
+     *
+     * @param request 请求条件
+     * @return 搜索结果
+     */
+    ObjectListing listObject(ListObjectsRequest request);
 }

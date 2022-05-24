@@ -23,4 +23,7 @@ public class AppQuery extends PageQuery implements Serializable {
     @ApiModelProperty(value = "APP名称")
     private String name;
 
+    @ApiModelProperty(value = "APP文件上传状态：0->未上传，1->已上传")
+    private Integer uploadStatus;
+
 }

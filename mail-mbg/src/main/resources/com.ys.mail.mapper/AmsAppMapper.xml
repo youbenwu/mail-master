@@ -4,40 +4,52 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.ys.mail.entity.AmsApp">
         <id column="id" property="id"/>
+
         <result column="name" property="name"/>
-        <result column="version" property="version"/>
         <result column="url" property="url"/>
         <result column="size" property="size"/>
+        <result column="type" property="type"/>
+        <result column="version_code" property="versionCode"/>
+        <result column="version_name" property="versionName"/>
         <result column="upload_status" property="uploadStatus"/>
         <result column="qrcode_url" property="qrcodeUrl"/>
         <result column="qrcode_name" property="qrcodeName"/>
-        <result column="logo_type" property="logoType"/>
         <result column="is_use_logo" property="useLogo"/>
+        <result column="update_title" property="updateTitle"/>
+        <result column="update_content" property="updateContent"/>
+        <result column="is_forced_update" property="forcedUpdate"/>
         <result column="pc_user_id" property="pcUserId"/>
+
+        <result column="remark" property="remark"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, `name`, version, url, `size` ,upload_status, qrcode_url, qrcode_name, logo_type, is_use_logo,pc_user_id, create_time, update_time
+        id, `name`, url, `size` , type, version_code, version_name, upload_status, qrcode_url, qrcode_name, is_use_logo,
+        update_title, update_content, is_forced_update, pc_user_id, remark, create_time, update_time
     </sql>
 
     <select id="getPage" resultType="com.ys.mail.model.admin.vo.AmsAppVO">
         SELECT
-                t1.id,
+                t1.`id`,
                 t1.`name`,
-                t1.version,
-                t1.url,
+                t1.`url`,
                 t1.`size`,
-                t1.upload_status,
-                t1.qrcode_url,
-                t1.qrcode_name,
-                t1.logo_type,
-                t1.is_use_logo use_logo,
-                t1.create_time,
-                t1.update_time,
-                t2.username
+                t1.`type`,
+                t1.`version_code`,
+                t1.`version_name`,
+                t1.`upload_status`,
+                t1.`qrcode_url`,
+                t1.`is_use_logo` use_logo,
+                t1.`update_title`,
+                t1.`update_content`,
+                t1.`is_forced_update` forcedUpdate,
+                t2.`username`,
+                t1.`remark`,
+                t1.`create_time`,
+                t1.`update_time`
         FROM ams_app t1 LEFT JOIN pc_user t2 ON t1.pc_user_id = t2.pc_user_id ${ew.customSqlSegment}
     </select>
 

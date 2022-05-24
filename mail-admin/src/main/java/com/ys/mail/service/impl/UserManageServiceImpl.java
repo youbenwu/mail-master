@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.StringConstant;
 import com.ys.mail.entity.*;
 import com.ys.mail.exception.ApiAssert;
@@ -20,6 +21,7 @@ import com.ys.mail.model.admin.vo.UmsUserBlackListVO;
 import com.ys.mail.model.admin.vo.UserImInfoVO;
 import com.ys.mail.override.ChainLinkedHashMap;
 import com.ys.mail.service.PcReviewService;
+import com.ys.mail.service.RedisService;
 import com.ys.mail.service.UserManageService;
 import com.ys.mail.util.*;
 import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
@@ -59,6 +61,10 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
     private SmsFlashPromotionProductMapper smsFlashPromotionProductMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RedisService redisService;
+    @Autowired
+    private RedisConfig redisConfig;
 
     @Override
     public CommonResult<IPage<UmsUserBlackListVO>> getPage(UmsUserQuery query) {
@@ -185,6 +191,9 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
         UmsUser umsUser = this.getById(userId);
         ApiAssert.noValue(umsUser, CommonResultCode.ERROR_20001);
         umsUser.setPayPassword(passwordEncoder.encode(StringConstant.PAY_PASSWORD));
+        // 清除缓存
+        String fullKey = redisConfig.fullKey("ums:user:" + umsUser.getPhone());
+        redisService.del(fullKey);
         return this.updateById(umsUser);
     }
 
