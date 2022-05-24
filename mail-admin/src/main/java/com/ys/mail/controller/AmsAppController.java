@@ -62,10 +62,35 @@ public class AmsAppController {
         return ResultUtil.isOk(result);
     }
 
-    // 检测APP是否已上传完成，手动检测
+    @ApiOperation("APP检测")
+    @PostMapping(value = "/check/{id:^\\d{19}$}")
+    // @LocalLockAnn(key = "check:arg[0]", expire = 60)
+    public CommonResult<Boolean> check(@PathVariable Long id) {
+        boolean result = amsAppService.check(id);
+        return ResultUtil.isOk(result);
+    }
 
-    // 清理cdn
+    @ApiOperation("重新生成二维码")
+    @PostMapping(value = "/reGenQrcode/{id:^\\d{19}$}")
+    // @LocalLockAnn(key = "reGenQrcode:arg[0]", expire = 60)
+    public CommonResult<Boolean> reloadGenQrcode(@PathVariable Long id) {
+        boolean result = amsAppService.reloadGenQrcode(id);
+        return ResultUtil.isOk(result);
+    }
 
-    // 强制重新生成二维码
+    @ApiOperation(value = "发布应用", notes = "需谨慎操作")
+    @PostMapping(value = "/release/{id:^\\d{19}$}")
+    // @LocalLockAnn(key = "release:arg[0]", expire = 60)
+    public CommonResult<Boolean> release(@PathVariable Long id) {
+        return amsAppService.release(id);
+    }
+
+    @ApiOperation(value = "CDN刷新预热", notes = "每天限制配额，刷新为10000条，预热为1000条")
+    @PostMapping(value = "/purgeAndWarmUp/{id:^\\d{19}$}")
+    // @LocalLockAnn(key = "purgeAndWarmUp:arg[0]", expire = 60)
+    public CommonResult<Boolean> purgeAndWarmUp(@PathVariable Long id) {
+        amsAppService.purgeAndWarmUp(id);
+        return ResultUtil.isOk(Boolean.TRUE);
+    }
 
 }

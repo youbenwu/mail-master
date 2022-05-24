@@ -86,8 +86,8 @@ public enum BusinessErrorCode implements IErrorCode {
 
     ERR_SMS_MISTAKE(400235, "发送短信失败"),
     ERR_PROMOTION_PDT_SALE(400236, "未到过期时间不能退款"),
-    PDT_SUPPLY_NOT(400237,"该商品无供应商价格,无法退款!"),
-    PDT_UNDER_SUPPLY_PRICE(400238,"当前价低于供应商价格,无法退款!"),
+    PDT_SUPPLY_NOT(400237, "该商品无供应商价格,无法退款!"),
+    PDT_UNDER_SUPPLY_PRICE(400238, "当前价低于供应商价格,无法退款!"),
 
     ERR_DATE_ILLEGAL(400300, "日期跨度不能小于%d天"),
     ERR_DATE_EXPIRE(400301, "该商品已过期，不能上架"),
@@ -97,6 +97,15 @@ public enum BusinessErrorCode implements IErrorCode {
     ERR_FILE_NAME_FORMAT(400500, "文件名称格式不正确"),
     ERR_FILE_SUFFIX(400501, "文件后缀不正确，格式应为：%s"),
     ERR_FILE_NOT_SUFFIX(400502, "请上传带后缀的文件：%s"),
+    ERR_FILE_SIZE_EXCEED(400503, "该类型的文件大小最大限制为 %s"),
+
+    UNFINISHED_APP_UPLOAD(400600, "APP未上传或未上传完成"),
+
+    ERR_SETTING_TYPE_NOT_EXIST(400700, "设置类型不存在，无法发布"),
+
+    CDN_URL_PURGE_QUOTA_EXCEED(400800, "每日CDN的URL刷新配额不足"),
+    CDN_PATH_PURGE_QUOTA_EXCEED(400801, "每日CDN的目录刷新配额不足"),
+    CDN_URL_PUSH_QUOTA_EXCEED(400802, "每日CDN的URL预热配额不足"),
 
     ;
 

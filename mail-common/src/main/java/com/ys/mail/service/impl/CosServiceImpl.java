@@ -12,9 +12,7 @@ import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
-import com.qcloud.cos.model.DeleteObjectRequest;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
@@ -146,8 +144,15 @@ public class CosServiceImpl implements CosService {
 
     @Override
     public String getOssPath() {
-        // CDN: http://cos.huwing.cn/mail.huwing.cn/img/77e827c9ace741638850889d24207c62.jpg
-        return String.format("http://%s/%s", cosConfig.getCdnDomain(), cosConfig.getUploadFolder());
+        return this.getOssPath(null);
+    }
+
+    @Override
+    public String getOssPath(CosFolderEnum cosFolder) {
+        if (BlankUtil.isEmpty(cosFolder)) {
+            cosFolder = CosFolderEnum.IMAGES_FOLDER;
+        }
+        return String.format("http://%s/%s", cosConfig.getCdnDomain(), cosFolder.value());
     }
 
     @Override
@@ -389,6 +394,40 @@ public class CosServiceImpl implements CosService {
     @Override
     public void deleteObject(String key) {
         this.deleteObject(null, key);
+    }
+
+    @Override
+    public ObjectMetadata getObjectInfo(String bucketName, CosFolderEnum cosFolder, String key) {
+        // 获取key
+        String fullKey = getFullKey(cosFolder, key);
+        // 判断key是否存在，并且尝试检测网络
+        Boolean existKey = this.isExistKey(fullKey);
+        if (!existKey) {
+            return null;
+        }
+        try {
+            // 发送请求
+            GetObjectRequest request = new GetObjectRequest(cosConfig.getBucket(), fullKey);
+            COSObject object = cosClient.getObject(request);
+            return object.getObjectMetadata();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            throw new ApiException("获取文件信息失败");
+        }
+    }
+
+    @Override
+    public ObjectMetadata getObjectInfo(CosFolderEnum cosFolder, String key) {
+        return this.getObjectInfo(cosConfig.getBucket(), cosFolder, key);
+    }
+
+    @Override
+    public ObjectListing listObject(ListObjectsRequest request) {
+        try {
+            return cosClient.listObjects(request);
+        } catch (Exception e) {
+            throw new ApiException("获取文件列表失败");
+        }
     }
 
 }

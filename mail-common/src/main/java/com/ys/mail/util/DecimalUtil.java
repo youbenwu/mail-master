@@ -1,5 +1,7 @@
 package com.ys.mail.util;
 
+import com.ys.mail.constant.StringConstant;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -122,6 +124,19 @@ public class DecimalUtil {
             return null;
         }
         return x.toPlainString();
+    }
+
+    /**
+     * 去除多余的零
+     *
+     * @param x 原字符串
+     * @return 转换结果
+     */
+    public static String toPlainString(String x) {
+        if (BlankUtil.isEmpty(x)) {
+            return StringConstant.BLANK;
+        }
+        return new BigDecimal(x).stripTrailingZeros().toPlainString();
     }
 
     /**
