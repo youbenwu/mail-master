@@ -109,9 +109,9 @@ public enum BusinessErrorCode implements IErrorCode {
 
     ;
 
-    private int code;
+    private final int code;
 
-    private String message;
+    private final String message;
 
     BusinessErrorCode(int code, String message) {
         this.code = code;
