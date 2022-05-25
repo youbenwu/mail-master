@@ -693,4 +693,18 @@
                      LEFT JOIN pms_product pp ON sfpp.product_id = pp.product_id
         WHERE user_id = #{userId}
     </select>
+
+    <select id="getAllBuyBack" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from sms_flash_promotion_product
+        <where>
+            flash_product_status <![CDATA[ > ]]> 1
+            and user_id <![CDATA[ > ]]> 0
+            and flash_promotion_origin_count <![CDATA[ > ]]> 0
+            <if test="ite == 0">
+                and partner_price is NULL
+            </if>
+        </where>;
+    </select>
 </mapper>

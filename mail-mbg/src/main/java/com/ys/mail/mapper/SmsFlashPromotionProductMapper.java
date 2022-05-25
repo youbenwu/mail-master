@@ -202,4 +202,9 @@ public interface SmsFlashPromotionProductMapper extends BaseMapper<SmsFlashPromo
      */
     List<UserSecKillDetailsDTO> getUserFlashDetailsData(@Param("userId") Long userId);
 
+    /**
+     * 查询出所有待回购的秒杀商品
+     * @return 返回值
+     */
+    List<SmsFlashPromotionProduct> getAllBuyBack(@Param("ite") Integer ite);
 }
