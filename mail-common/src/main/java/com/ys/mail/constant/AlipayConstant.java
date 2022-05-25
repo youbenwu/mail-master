@@ -92,7 +92,8 @@ public class AlipayConstant implements Serializable {
     /**
      * 鸿盛源科技
      */
-    public static final String JH_KJ = "飞虎科技";
+    // public static final String JH_KJ = "飞虎科技";
+    public static final String JH_KJ = "吉狐科技";
 
     /**
      * 飞虎科技应用私钥,飞虎
