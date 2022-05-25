@@ -53,7 +53,7 @@ public enum ImgPathEnum implements IPairs<Integer, String, ImgPathEnum> {
     /**
      * 轮播图
      */
-    ADVERTISE_PATH(6, "/advertise/", null),
+    ADVERTISE_PATH(6, "/advertise/", 3 * 1024 * 1024L),
     /**
      * 融云聊天
      */
