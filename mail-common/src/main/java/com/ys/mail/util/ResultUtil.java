@@ -72,4 +72,8 @@ public class ResultUtil {
     public static CommonResult<Boolean> isOk(boolean result) {
         return result ? CommonResult.success(true) : CommonResult.failed(false);
     }
+
+    public static CommonResult<Boolean> isOk(String message, boolean result) {
+        return result ? CommonResult.success(message, true) : CommonResult.failed(message, false);
+    }
 }

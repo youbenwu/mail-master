@@ -50,7 +50,7 @@ public class FigureConstant {
 
     public static final String STRING_EMPTY = "";
 
-    public static final double DOUBLE_TEN = 10;
+    public static final Long DOUBLE_TEN = 10L;
 
     public static final int ELEVEN = 11;
 
@@ -62,16 +62,6 @@ public class FigureConstant {
      * 时间戳:2022-02-10 20:45:00
      */
     public static final long NOE_TIME = 1644500700000L;
-
-    /**
-     * 旧比例
-     */
-    public static final double OLD_SPLIT_RATIO = 1.01D;
-
-    /**
-     * 新比例
-     */
-    public static final double NOW_SPLIT_RATIO = 1.005D;
 
     /**
      * 4

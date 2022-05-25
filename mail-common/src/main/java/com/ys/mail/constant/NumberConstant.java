@@ -117,5 +117,6 @@ public class NumberConstant {
     public static final Integer NINETY_NINE = 99;
     public static final Integer ONE_HUNDRED = 100;
     public static final Integer HUNDRED_ONE = 101;
+    public static final Integer HUNDRED_TWENTY = 120;
 
 }

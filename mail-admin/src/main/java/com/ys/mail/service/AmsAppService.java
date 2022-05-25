@@ -107,6 +107,7 @@ public interface AmsAppService extends IService<AmsApp> {
      * CDN刷新和预热
      *
      * @param id 应用ID
+     * @return 执行结果
      */
-    void purgeAndWarmUp(Long id);
+    String purgeAndWarmUp(Long id);
 }

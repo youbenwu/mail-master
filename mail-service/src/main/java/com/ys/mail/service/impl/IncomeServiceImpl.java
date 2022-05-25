@@ -71,10 +71,12 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
                                                .balance(newBalance.longValue())
                                                .todayIncome(income.getTodayIncome())
                                                .allIncome(income.getAllIncome())
-                                               .incomeType(UmsIncome.IncomeType.TEN.key()) // 10->提现费用
+                                               // 10->提现费用
+                                               .incomeType(UmsIncome.IncomeType.TEN.key())
                                                .incomeNo("").orderTradeNo("")
                                                .detailSource("扣除提现服务费:" + DecimalUtil.longToStrForDivider(rate.longValue()) + "元")
-                                               .payType(UmsIncome.PayType.THREE.key()) // 从余额中扣除
+                                               // 从余额中扣除
+                                               .payType(UmsIncome.PayType.THREE.key())
                                                .build();
                 boolean updateResult = this.save(umsIncome);
                 if (!updateResult) throw new ApiException("添加手续费失败");

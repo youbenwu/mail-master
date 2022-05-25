@@ -61,6 +61,7 @@ public enum BusinessErrorCode implements IErrorCode {
     REVIEW_EX_TIME_OVERSIZE(400165, "当天申请审核时间已过，需等到明天"),
     REVIEW_EX_PASS(400166, "当天审核已通过并提现，请留意到账信息"),
     REVIEW_MIN_EX_TIME_OVERSIZE(400167, "小额提现时间不在范围之内，暂无法操作"),
+    CURRENT_MAX_EX_OVERSIZE(400168, "由于金额较大，本次最高可以提现%s元"),
 
     USER_IMAGE_STRING_EXIST(400200, "该人脸已在其它账户被注册过！"),
     USER_IMAGE_STRING_UNREGISTERED(400201, "未注册人脸数据！"),
