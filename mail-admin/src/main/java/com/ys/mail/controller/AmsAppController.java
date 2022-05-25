@@ -86,7 +86,7 @@ public class AmsAppController {
         return amsAppService.release(id);
     }
 
-    @ApiOperation(value = "CDN刷新预热", notes = "当变更二维码或应用之后，再执行该操作\n" +
+    @ApiOperation(value = "APP刷新预热", notes = "当变更二维码或应用之后，再执行该操作\n" +
             "每天限制配额，刷新为10000条，预热为1000条，执行成功之后预计5~7分钟内生效")
     @PostMapping(value = "/purgeAndWarmUp/{id:^\\d{19}$}")
     @LocalLockAnn(key = "purgeAndWarmUp:arg[0]", expire = 60)

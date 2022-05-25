@@ -293,17 +293,18 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         if (BlankUtil.isEmpty(param.getFlashPromotionId())) {
             return CommonResult.validateFailed("flashPromotionId不能为空");
         }
-        Long divisionPrice = param.getPrice();//param.getQuantity();
+        //param.getQuantity();
+        Long divisionPrice = param.getPrice();
         Byte cpyType = param.getCpyType();
         LOGGER.info("单个产品价格:{}", divisionPrice);
         // 需在传递的 flashPromotionId 活动时间内
         SmsFlashPromotionProduct promotionProduct = flashPromotionProductMapper.selectGroupFlashPromotionCount(param.getProductId(), divisionPrice, param.getFlashPromotionId(), cpyType);
 
         // 用户不能购买自己上架的产品(当随机到的产品为自己上传的，则不能进行秒杀)
-        Long productUserId = promotionProduct.getUserId();
-        if (BlankUtil.isNotEmpty(productUserId)) {
-            ApiAssert.isTrue(productUserId.equals(userId), BusinessErrorCode.FLASH_PRODUCT_NO_BUY);
-        }
+        // Long productUserId = promotionProduct.getUserId();
+        // if (BlankUtil.isNotEmpty(productUserId)) {
+        //     ApiAssert.isTrue(productUserId.equals(userId), BusinessErrorCode.FLASH_PRODUCT_NO_BUY);
+        // }
 
         // 扣减缓存中的库存
         if (countRedis == null) {
