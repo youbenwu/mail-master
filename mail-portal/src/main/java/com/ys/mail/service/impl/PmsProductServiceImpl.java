@@ -121,9 +121,20 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
 
     @Override
     public ProductInfoDTO getProductInfo(Long productId, Boolean flag) {
+        // 获取商品信息
         ProductInfoDTO productInfoDTO = productMapper.selectPdtInfo(productId, flag);
-        Long pdtCollectId = productMapper.selectByUserIdOrPdtId(productId, UserUtil.getCurrentUser().getUserId());
+
+        // 当用户没有登录时不进行获取
+        UmsUser currentUser = UserUtil.getCurrentUserOrNull();
+
+        Long pdtCollectId = NumberUtils.LONG_ZERO;
+        if (BlankUtil.isNotEmpty(currentUser)) {
+            // 判断用户是否收藏该商品
+            pdtCollectId = productMapper.selectByUserIdOrPdtId(productId, currentUser.getUserId());
+        }
+
         productInfoDTO.setPdtCollectId(BlankUtil.isEmpty(pdtCollectId) ? NumberUtils.LONG_ZERO : pdtCollectId);
+        // 返回结果
         return productInfoDTO;
     }
 

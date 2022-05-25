@@ -2,24 +2,19 @@ package com.ys.mail.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.PmsProduct;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.query.PmsProductQuery;
 import com.ys.mail.model.dto.ProductInfoDTO;
 import com.ys.mail.model.vo.PmsProductVO;
 import com.ys.mail.service.PmsProductService;
-import com.ys.mail.util.BlankUtil;
-import com.ys.mail.util.IdWorker;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 /**
  * <p>
@@ -41,17 +36,7 @@ public class PmsProductController {
     @ApiOperation("商品添加")
     @PutMapping(value = "/add")
     public CommonResult<Boolean> add(@RequestBody PmsProduct pmsProduct) {
-        Long id = pmsProduct.getProductId();
-        pmsProduct.setProductId(id.equals(NumberUtils.LONG_ZERO) ? IdWorker.generateId() : id);
-
-        // 恢复会员价
-        Integer promotionType = pmsProduct.getPromotionType();
-        if (BlankUtil.isNotEmpty(promotionType) && !promotionType.equals(NumberConstant.TWO)) {
-            pmsProduct.setMebPrice(NumberUtils.LONG_ZERO);
-            pmsProduct.setDisCount(new BigDecimal(1));
-        }
-
-        Boolean result = productService.saveOrUpdate(pmsProduct);
+        boolean result = productService.addOrUpdate(pmsProduct);
         return CommonResult.success(result);
     }
 

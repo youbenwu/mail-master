@@ -3,7 +3,6 @@ package com.ys.mail.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.SmsHomeAdvertise;
 import com.ys.mail.entity.UmsUser;
-import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.mapper.SmsHomeAdvertiseMapper;
 import com.ys.mail.model.vo.HomePageVO;
 import com.ys.mail.service.*;
@@ -66,29 +65,39 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
 
     @Override
     public HomePageVO homePage(Byte cpyType) {
-        // 判断是否是高级用户,高级用户才能看到限时秒杀,0普通用户,1高级用户
-        UmsUser currentUser = UserUtil.getCurrentUser();
+        HomePageVO homePageVO;
+        UmsUser currentUser = UserUtil.getCurrentUserOrNull();
+
+        // 拼接redis key
         StringBuilder sb = new StringBuilder();
         sb.append(redisDatabase).append(":").append(redisKeyHomePage);
-        HomePageVO homePageVO;
-        if (currentUser.getRoleId().equals(NumberUtils.INTEGER_ZERO)) {
-            // 分为0->轻创营和1->卖乐吧
-            homePageVO = getHomePage(sb.append("Zero"), NumberUtils.INTEGER_ZERO, cpyType);
+        if (BlankUtil.isNotEmpty(currentUser)) {
+            // 判断是否是高级用户,高级用户才能看到限时秒杀,0普通用户,1高级用户
+            if (currentUser.getRoleId().equals(NumberUtils.INTEGER_ZERO)) {
+                // 普通用户
+                homePageVO = getHomePage(sb.append("Zero"), NumberUtils.INTEGER_ZERO, cpyType);
+            } else {
+                // 高级用户
+                homePageVO = getHomePage(cpyType.equals(NumberUtils.BYTE_ZERO) ? sb.append("ZeroZero") : sb.append("OneOne"), NumberUtils.INTEGER_ONE, cpyType);
+            }
         } else {
-            homePageVO = getHomePage(cpyType.equals(NumberUtils.BYTE_ZERO) ? sb.append("ZeroZero") : sb.append("OneOne"), NumberUtils.INTEGER_ONE, cpyType);
+            // 普通用户
+            homePageVO = getHomePage(sb.append("Zero"), NumberUtils.INTEGER_ZERO, cpyType);
         }
+
         return homePageVO;
     }
 
     /**
-     *   .homeGroupBuyVO(HomeGroupBuyVO.builder()
-     *   .groupSum(userService.count() * 1000)
-     *     // 团购商品
-     *    .groupBuyDTOList(groupBuyService.getNewestGroupBuy())
-     *   .build()
-     *   )
-     * @param sb 拼接字符串
-     * @param ite 是否高级用户
+     * .homeGroupBuyVO(HomeGroupBuyVO.builder()
+     * .groupSum(userService.count() * 1000)
+     * // 团购商品
+     * .groupBuyDTOList(groupBuyService.getNewestGroupBuy())
+     * .build()
+     * )
+     *
+     * @param sb      拼接字符串
+     * @param ite     是否高级用户
      * @param cpyType 轻创营还是卖了吧
      * @return 返回值
      */
@@ -97,13 +106,13 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
         HomePageVO homePageVO = (HomePageVO) redisTemplate.opsForValue().get(key);
         if (BlankUtil.isEmpty(homePageVO)) {
             homePageVO = HomePageVO.builder()
-                    // 轮播图
-                    .homeAdvertises(homeAdvertiseService.getAllAdvertise())
-                    // 秒杀商品
-                    .secondProductDTO(promotionService.getSecondProduct(ite, cpyType))
-                    // COS路径前缀
-                    .cosFilePath(cosService.getOssPath())
-                    .build();
+                                   // 轮播图
+                                   .homeAdvertises(homeAdvertiseService.getAllAdvertise())
+                                   // 秒杀商品
+                                   .secondProductDTO(promotionService.getSecondProduct(ite, cpyType))
+                                   // COS路径前缀
+                                   .cosFilePath(cosService.getOssPath())
+                                   .build();
             if (!BlankUtil.isEmpty(homePageVO)) {
                 redisTemplate.opsForValue().set(key, homePageVO, redisExpireHomePage, TimeUnit.SECONDS);
             }

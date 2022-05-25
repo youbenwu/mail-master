@@ -19,6 +19,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserUtil {
 
+    /**
+     * 获取当前用户对象
+     *
+     * @return 用户对象
+     */
     public static UmsUser getCurrentUser() {
         UmsUser user;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -30,5 +35,18 @@ public class UserUtil {
             throw new ApiException(CommonResultCode.ERR_LOGIN_FAILURE);
         }
         return user;
+    }
+
+    /**
+     * 获取当前用户对象并允许判断是否已登录
+     *
+     * @return 当已经登录则返回对象，未登录则返回null
+     */
+    public static UmsUser getCurrentUserOrNull() {
+        try {
+            return getCurrentUser();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

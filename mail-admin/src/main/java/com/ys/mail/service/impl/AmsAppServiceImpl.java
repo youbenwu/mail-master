@@ -145,7 +145,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
                 // 删除旧二维码
                 cosService.deleteObject(qrcodeUrl);
                 // 二维码内容
-                String content = String.format("%s%s?%s", cosService.getOssPath(), url, RandomUtil.randomString(32));
+                String content = String.format("%s%s?%s", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), url, RandomUtil.randomString(32));
                 // 开始上传
                 String key = this.genQrCode(content, qrcodeName, param.getUseLogo(), param.getType());
                 // 填充二维码地址

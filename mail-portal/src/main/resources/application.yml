@@ -58,6 +58,8 @@ secure:
       - /user/hulatu/oauth
       - /unionPay/notifyUrl
       - /unionPay/aliPayNotify
+      - /index/homePage/*
+      - /partner/product/*
 
 #自定义一键登录参数
 oauth:

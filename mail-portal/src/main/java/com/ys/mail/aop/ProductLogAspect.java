@@ -4,6 +4,7 @@ import com.ys.mail.annotation.ProductLog;
 import com.ys.mail.entity.SysProductLog;
 import com.ys.mail.entity.UmsUser;
 import com.ys.mail.service.SysProductLogService;
+import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IPUtil;
 import com.ys.mail.util.IdWorker;
 import com.ys.mail.util.UserUtil;
@@ -52,6 +53,12 @@ public class ProductLogAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
 
+        // 获取当前登录用户名(如果不登录则跳过)
+        UmsUser currentUser = UserUtil.getCurrentUserOrNull();
+        if (BlankUtil.isEmpty(currentUser)) {
+            return;
+        }
+
         SysProductLog productLog = new SysProductLog();
 
         // 获取注解上的操作描述
@@ -74,7 +81,7 @@ public class ProductLogAspect {
         Integer integerZero = NumberUtils.INTEGER_ZERO;
         if (args != null && paramNames != null) {
             StringBuilder params = new StringBuilder();
-            if(args.length > integerZero){
+            if (args.length > integerZero) {
                 Long arg = (Long) args[integerZero];
                 productLog.setProductId(arg);
             }
@@ -85,11 +92,7 @@ public class ProductLogAspect {
         }
 
         productLog.setIp(IPUtil.getIpAddress());
-
-        // 获取当前登录用户名
-        UmsUser currentUser = UserUtil.getCurrentUser();
         productLog.setUserId(currentUser.getUserId());
-
         productLog.setTime((int) time);
         productLog.setProductLogId(IdWorker.generateId());
         productLogService.save(productLog);

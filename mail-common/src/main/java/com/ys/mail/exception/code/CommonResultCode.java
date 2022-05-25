@@ -18,6 +18,7 @@ public enum CommonResultCode implements IErrorCode {
     ILLEGAL_REQUEST(409, "非法操作"),
     ID_NO_EXIST(410, "ID不存在"),
     NO_USER(411, "没有此用户"),
+    NULL_USER_ID(412, "ID不能为空"),
 
     VALIDATE_FAILED(1001, "参数检验失败"),
     REQUEST_PARAM_ISEMPTY(1002, "请求参数不允许为空"),
