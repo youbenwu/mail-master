@@ -43,7 +43,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * <p>
@@ -90,7 +89,8 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(qrcodeName));
         try {
             // 二维码内容
-            String content = String.format("%s%s?%s", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), param.getUrl(), RandomUtil.randomString(32));
+            String content = String.format("%s%s?", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), param.getUrl());
+            content = this.paddingUrl(content);
             String key = this.genQrCode(content, qrcodeName, param.getUseLogo(), param.getType());
 
             // 构建插入对象
@@ -247,7 +247,8 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 删除下载二维码
         cosService.deleteObject(qrcodeUrl);
         // 二维码内容
-        String content = String.format("%s%s?%s", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), url, RandomUtil.randomString(32));
+        String content = String.format("%s%s?", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), url);
+        content = this.paddingUrl(content);
         try {
             // 开始上传
             String key = this.genQrCode(content, qrcodeName, useLogo, type);
@@ -305,7 +306,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
     }
 
     @Override
-    public void purgeAndWarmUp(Long id) {
+    public String purgeAndWarmUp(Long id) {
         // 获取记录
         AmsApp amsApp = this.getById(id);
         ApiAssert.noValue(amsApp, CommonResultCode.ID_NO_EXIST);
@@ -316,8 +317,8 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 校验每日刷新用量配额(中国境内)
         DescribePurgeQuotaResponse dpqResponse = cdnService.describePurgeQuota();
         Quota[] urlPurge = dpqResponse.getUrlPurge();
-        Long availableUrl = urlPurge[0].getAvailable();
-        ApiAssert.isTrue(availableUrl == 0, BusinessErrorCode.CDN_URL_PURGE_QUOTA_EXCEED);
+        Long availableUrlPurgeNumber = urlPurge[0].getAvailable();
+        ApiAssert.isTrue(availableUrlPurgeNumber == 0, BusinessErrorCode.CDN_URL_PURGE_QUOTA_EXCEED);
 
         // 刷新二维码
         String fullQrcodeUrl = cosService.getOssPath() + amsApp.getQrcodeUrl();
@@ -326,12 +327,15 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 校验每日预热用量配额
         DescribePushQuotaResponse dpqResponse2 = cdnService.describePushQuota();
         Quota[] urlPush = dpqResponse2.getUrlPush();
-        availableUrl = urlPush[0].getAvailable();
-        ApiAssert.isTrue(availableUrl == 0, BusinessErrorCode.CDN_URL_PUSH_QUOTA_EXCEED);
+        Long availableUrlPushNumber = urlPush[0].getAvailable();
+        ApiAssert.isTrue(availableUrlPushNumber == 0, BusinessErrorCode.CDN_URL_PUSH_QUOTA_EXCEED);
 
-        // 预热二维码、APP
+        // 只预热APP
         String fullAppUrl = cosService.getOssPath(CosFolderEnum.FILE_FOLDER) + amsApp.getUrl();
-        cdnService.pushUrlsCache(Arrays.asList(fullQrcodeUrl, fullAppUrl));
+        cdnService.pushUrlsCache(fullAppUrl);
+
+        // 返回结果
+        return String.format("执行成功，当前URL刷新剩余%s条，URL预热剩余%s条", availableUrlPurgeNumber - 1, availableUrlPushNumber - 1);
     }
 
     /**
@@ -358,6 +362,15 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         File logo = new File(fullPath);
         cosService.download(CosFolderEnum.IMAGES_FOLDER, String.format("%s%s%d.png", ImgPathEnum.SYS_LOGO_PATH.value(), "app", type), logo);
         return logo;
+    }
+
+    private String paddingUrl(String content) {
+        int length = content.length();
+        int result = NumberConstant.HUNDRED_TWENTY - length;
+        if (result > 0) {
+            content += RandomUtil.randomString(result);
+        }
+        return content;
     }
 
 }

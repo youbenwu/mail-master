@@ -84,12 +84,24 @@ public class PcReview implements Serializable {
 
     @AllArgsConstructor
     public enum ReviewState implements IPairs<Integer, String, ReviewState> {
-        MINUS_ONE(-1, "已失效"),// 系统调度触发
-        ZERO(0, "待审核"),// 基础状态，只有当数据为0时，方可做其他操作
-        ONE(1, "已通过"),// 人工审核
-        TWO(2, "不通过"),// 人工审核
-        THREE(3, "已关闭"),// 人工审核
-        FOUR(4, "已取消"),// 该状态由用户主动取消
+        /**
+         * 系统调度触发
+         */
+        MINUS_ONE(-1, "已失效"),
+        /**
+         * 默认，只有当数据为0时，方可做其他操作
+         */
+        ZERO(0, "待审核"),
+        /**
+         * 后天审核操作
+         */
+        ONE(1, "已通过"),
+        TWO(2, "不通过"),
+        THREE(3, "已关闭"),
+        /**
+         * 该状态由用户主动取消
+         */
+        FOUR(4, "已取消"),
         ;
         final Integer type;
         final String name;

@@ -62,7 +62,7 @@ public class AmsAppController {
         return ResultUtil.isOk(result);
     }
 
-    @ApiOperation("APP检测")
+    @ApiOperation(value = "APP检测", notes = "当重新上传文件之后，可以手动执行该操作或等待系统自动更新")
     @PostMapping(value = "/check/{id:^\\d{19}$}")
     @LocalLockAnn(key = "check:arg[0]", expire = 60)
     public CommonResult<Boolean> check(@PathVariable Long id) {
@@ -78,19 +78,21 @@ public class AmsAppController {
         return ResultUtil.isOk(result);
     }
 
-    @ApiOperation(value = "发布应用", notes = "需谨慎操作")
+    @ApiOperation(value = "发布应用", notes = "当变更应用信息之后，再执行该操作\n" +
+            "另外需谨慎操作，该操作将直接修改系统设置")
     @PostMapping(value = "/release/{id:^\\d{19}$}")
     @LocalLockAnn(key = "release:arg[0]", expire = 60)
     public CommonResult<Boolean> release(@PathVariable Long id) {
         return amsAppService.release(id);
     }
 
-    @ApiOperation(value = "CDN刷新预热", notes = "每天限制配额，刷新为10000条，预热为1000条")
+    @ApiOperation(value = "CDN刷新预热", notes = "当变更二维码或应用之后，再执行该操作\n" +
+            "每天限制配额，刷新为10000条，预热为1000条，执行成功之后预计5~7分钟内生效")
     @PostMapping(value = "/purgeAndWarmUp/{id:^\\d{19}$}")
     @LocalLockAnn(key = "purgeAndWarmUp:arg[0]", expire = 60)
     public CommonResult<Boolean> purgeAndWarmUp(@PathVariable Long id) {
-        amsAppService.purgeAndWarmUp(id);
-        return ResultUtil.isOk(Boolean.TRUE);
+        String result = amsAppService.purgeAndWarmUp(id);
+        return ResultUtil.isOk(result, Boolean.TRUE);
     }
 
 }

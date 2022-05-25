@@ -23,4 +23,7 @@ public class PcReviewVO extends PcReview implements Serializable {
 
     @ApiModelProperty(value = "申请人昵称")
     private String nickname;
+
+    @ApiModelProperty(value = "手续费,1元就是100")
+    private Long expenditure;
 }

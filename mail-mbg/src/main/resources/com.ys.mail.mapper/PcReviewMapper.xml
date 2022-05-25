@@ -65,9 +65,13 @@
                pr.update_time,
                pr.deleted,
                pu.username,
-               uu.nickname
-        FROM ((pc_review pr LEFT JOIN pc_user pu ON pr.pc_user_id = pu.pc_user_id)
-                LEFT JOIN ums_user uu ON pr.user_id = uu.user_id) ${ew.customSqlSegment}
+               uu.nickname,
+               ui.expenditure
+        FROM
+            pc_review pr LEFT JOIN pc_user pu ON pr.pc_user_id = pu.pc_user_id
+                         LEFT JOIN ums_user uu ON pr.user_id = uu.user_id
+                         LEFT JOIN ums_income ui ON pr.rate_income_id = ui.income_id
+        ${ew.customSqlSegment}
     </select>
 
     <select id="getAwaitReview" resultType="com.ys.mail.model.admin.dto.excel.ReviewCollectDTO">

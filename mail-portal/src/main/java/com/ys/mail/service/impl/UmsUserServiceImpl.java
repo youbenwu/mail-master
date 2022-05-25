@@ -60,6 +60,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -391,58 +393,63 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
     public CommonResult<String> depositAlipay(DepositAlipayParam param) throws AlipayApiException {
         UmsUser currentUser = UserUtil.getCurrentUser();
         // 校验支付密码与支付名称
-        if (BlankUtil.isEmpty(currentUser.getPayPassword())) { // 校验是否设置密码
+        if (BlankUtil.isEmpty(currentUser.getPayPassword())) {
+            // 校验是否设置密码
             return CommonResult.failed(CommonResultCode.ERR_TEM_PAY_CODE);
-        } else if (!passwordEncoder.matches(param.getPayPassword(), currentUser.getPayPassword())) { // 校验输入密码
+        } else if (!passwordEncoder.matches(param.getPayPassword(), currentUser.getPayPassword())) {
+            // 校验输入密码
             return CommonResult.failed(CommonResultCode.ERR_NOT_PAY_CODE);
         }
         // 实时读取系统设置
         Double temp = sysSettingService.getSettingValue(SettingTypeEnum.eight);
-        Long maxSingleLimit = DecimalUtil.strToLongForMultiply(temp);// 单笔最大限额，读取出来需要乘以100
-        Integer maxExCount = sysSettingService.getSettingValue(SettingTypeEnum.nine);// 每日最大提现次数
+        // 单笔最大限额，读取出来需要乘以100
+        Long maxSingleLimit = DecimalUtil.strToLongForMultiply(temp);
+        // 每日最大提现次数
+        Integer maxExCount = sysSettingService.getSettingValue(SettingTypeEnum.nine);
         temp = sysSettingService.getSettingValue(SettingTypeEnum.ten);
-        Long maxSecondsEx = DecimalUtil.strToLongForMultiply(temp);// 单次最大秒提阈值，读取出来需要乘以100
-        Boolean openWithdraw = sysSettingService.getSettingValue(SettingTypeEnum.eleven);// 是否开启APP端提现，默认为false
+        // 单次最大秒提阈值，读取出来需要乘以100
+        Long maxSecondsEx = DecimalUtil.strToLongForMultiply(temp);
+        // 是否开启APP端提现，默认为false
+        Boolean openWithdraw = sysSettingService.getSettingValue(SettingTypeEnum.eleven);
         // 暂停提现
-        if (!openWithdraw) return CommonResult.failed("系统维护中，请稍后重试");
-        // 日志模板
-        List<String> template = new ArrayList<>();
-        template.add("【提现日志】==> [ID：{},昵称：{}]的用户发起提现，预计提现金额为：[{}]元");
-        template.add("【提现日志】==> [ID：{},昵称：{}]的用户发起提现，提现失败原因：{}");
-        template.add("【提现日志】==> [ID：{},昵称：{}]的用户发起提现，{}");
-        template.add("【提现日志】==> [ID：{},昵称：{}]的用户发起提现，预提现金额为：[{}]元，由于金额小于[{}]元无需审核，直接提现");
+        ApiAssert.isFalse(openWithdraw, "系统维护中，请稍后重试");
         // 时间定义
         String today = DateTool.getTodayNow();
         // 提取公共变量
         Long userId = currentUser.getUserId();
         String nickname = currentUser.getNickname();
         String transAmount = param.getTransAmount();
-        LOGGER.info(template.get(0), userId, nickname, transAmount);
+        LOGGER.info("【提现日志】==> [ID：{},昵称：{}]的用户发起提现，预计提现金额为：[{}]元", userId, nickname, transAmount);
 
         // 检查个人当天的审核次数
         PcReview review = reviewService.getNewestRecord(userId, today);
-        if (BlankUtil.isNotEmpty(review) && Objects.equals(review.getReviewState(), PcReview.ReviewState.ZERO.key())) {
-            return CommonResult.failed(BusinessErrorCode.ERR_DEPOSIT_MONEY_REVIEWING);
-        }
+        boolean condition = BlankUtil.isNotEmpty(review) && Objects.equals(review.getReviewState(), PcReview.ReviewState.ZERO.key());
+        ApiAssert.isTrue(condition, BusinessErrorCode.ERR_DEPOSIT_MONEY_REVIEWING);
+
         // 检查个人当天的提现次数
         if (umsIncomeService.getTodayCount(userId, UmsIncome.IncomeType.TWO.key(), today) >= maxExCount) {
-            String message = BusinessErrorCode.ERR_DEPOSIT_MONEY_EX_COUNT.getMessage();
-            message = String.format(message, maxExCount);
-            LOGGER.info(template.get(1), userId, nickname, message);
+            String message = BusinessErrorCode.ERR_DEPOSIT_MONEY_EX_COUNT.getMessage(maxExCount);
+            LOGGER.info("【提现日志】==> [ID：{},昵称：{}]的用户发起提现，提现失败原因：{}", userId, nickname, message);
             return CommonResult.failed(BusinessErrorCode.ERR_DEPOSIT_MONEY_EX_COUNT, message);
         }
         // 校验最小金额与余额是否足够,查询最新的账户收益（有则且次数且大于设置的次数时则不能提现）
         UmsIncome income = umsIncomeService.selectNewestByUserId(userId);
-        Long balance = income.getBalance(); // 当前余额 5000 00
-        Long money = DecimalUtil.strToLongForMultiply(transAmount); // 提现金额，乘以100
-        if (BlankUtil.isEmpty(money)) return CommonResult.failed("提现异常");
-        if (money < FigureConstant.DOUBLE_TEN) { // 提现金额不能小于0.1
+        // 当前余额 如：5000 00
+        Long balance = income.getBalance();
+        // 提现金额，乘以100
+        Long money = DecimalUtil.strToLongForMultiply(transAmount);
+        ApiAssert.noValue(money, BusinessErrorCode.ERR_ALIPAY_DEPOSIT);
+
+        // 金额校验
+        if (FigureConstant.DOUBLE_TEN.compareTo(Objects.requireNonNull(money)) > 0) {
+            // 提现金额不能小于0.1
             return CommonResult.failed(BusinessErrorCode.ERR_DEPOSIT_MONEY_LENGTH);
-        } else if (BlankUtil.isEmpty(income) || balance < money) { // 余额不足
+        } else if (BlankUtil.isEmpty(income) || balance < money) {
+            // 余额不足
             return CommonResult.failed(CommonResultCode.ERR_USER_DEPOSIT);
-        } else if (BlankUtil.isNotEmpty(maxSingleLimit) && money > maxSingleLimit) { // 单笔最大限额
-            String message = BusinessErrorCode.REVIEW_DEPOSIT_MONEY_MAX.getMessage();
-            message = String.format(message, DecimalUtil.longToStrForDivider(maxSingleLimit));
+        } else if (BlankUtil.isNotEmpty(maxSingleLimit) && money > maxSingleLimit) {
+            // 单笔最大限额
+            String message = BusinessErrorCode.REVIEW_DEPOSIT_MONEY_MAX.getMessage(DecimalUtil.longToStrForDivider(maxSingleLimit));
             return CommonResult.failed(BusinessErrorCode.REVIEW_DEPOSIT_MONEY_MAX, message);
         }
         // 提现大于该值，则需要审核
@@ -465,7 +472,8 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         UmsUser currentUser = UserUtil.getCurrentUser();
         String alipayName = currentUser.getAlipayName();
         Long userId = currentUser.getUserId();
-        JSON depositTimeRange = sysSettingService.getSettingValue(SettingTypeEnum.nineteen);// 提现的时间范围
+        // 提现的时间范围
+        JSON depositTimeRange = sysSettingService.getSettingValue(SettingTypeEnum.nineteen);
         if (BlankUtil.isNotEmpty(depositTimeRange)) {
             // 解析时间规则
             JSONObject jsonObject = JSONObject.parseObject(depositTimeRange.toString());
@@ -511,15 +519,17 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
                                            .income(NumberUtils.LONG_ZERO)
                                            .expenditure(money).balance(finalBalance)
                                            .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
-                                           .incomeType(UmsIncome.IncomeType.TWO.key()) // 2->余额提现
+                                           // 2->余额提现
+                                           .incomeType(UmsIncome.IncomeType.TWO.key())
                                            .incomeNo(response.getOrderId())
                                            // .incomeNo("")
                                            .orderTradeNo(orderSn)
                                            .detailSource("提现到账成功:" + transAmount + "元")
-                                           .payType(UmsIncome.PayType.TWO.key()) // 提现到支付宝
+                                           // 提现到支付宝
+                                           .payType(UmsIncome.PayType.TWO.key())
                                            .build();
             updateResult = umsIncomeService.save(umsIncome);
-            if (!updateResult) throw new ApiException("添加流水记录失败");
+            ApiAssert.isFalse(updateResult, "添加流水记录失败");
         } else {
             LOGGER.info("提现异常日志：{}-{}", BusinessErrorCode.ERR_ALIPAY_DEPOSIT.getMessage(), response.getSubMsg());
         }
@@ -536,7 +546,8 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
      * @return 结果
      */
     private CommonResult<String> reviewAmount(PcReview review, UmsIncome income, Long money) {
-        String todayBeforeTime = sysSettingService.getSettingValue(SettingTypeEnum.seven);// 最晚提交申请审核时间 是否在21点前
+        // 最晚提交申请审核时间 是否在21点前
+        String todayBeforeTime = sysSettingService.getSettingValue(SettingTypeEnum.seven);
         UmsUser currentUser = UserUtil.getCurrentUser();
         Long userId = currentUser.getUserId();
         boolean updateResult;
@@ -545,38 +556,52 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
             // 提现小于等于审核金额，判断审核结果
             if (money <= review.getReviewMoney()) {
                 switch (EnumTool.getEnum(PcReview.ReviewState.class, review.getReviewState())) {
-                    case MINUS_ONE:// 已失效
+                    case MINUS_ONE:
+                        // 已失效
                         return CommonResult.failed(BusinessErrorCode.REVIEW_EX_TIME_LOSE);
-                    case ZERO:// 审核中
+                    case ZERO:
+                        // 审核中
                         return CommonResult.failed(BusinessErrorCode.ERR_DEPOSIT_MONEY_REVIEWING);
-                    case ONE:// 审核已通过，后台审核时已直接转账
+                    case ONE:
+                        // 审核已通过，后台审核时已直接转账
                         return CommonResult.failed(BusinessErrorCode.REVIEW_EX_PASS);
-                    case TWO:// 审核不通过
+                    case TWO:
+                        // 审核不通过
                         return CommonResult.failed(BusinessErrorCode.REVIEW_EX_REFUSED.getMessage() + "，原因是(" + review.getReviewDescribe() + ")");
-                    case THREE:// 审核关闭，允许重新发起审核
+                    case THREE:
+                        // 审核关闭，允许重新发起审核
                         break;
-                    case FOUR:// 审核已被用户手动取消，当天无法再申请
+                    case FOUR:
+                        // 审核已被用户手动取消，当天无法再申请
                         return CommonResult.failed(BusinessErrorCode.REVIEW_EX_COUNT_OVERSIZE);
                     default:
                         return CommonResult.failed("该笔审核状态异常，请联系客服");
                 }
-            } else { // 金额大于审核金额，需要重新审核
-                if (review.getReviewState() != 3) {
-                    return CommonResult.failed(BusinessErrorCode.REVIEW_EX_COUNT_OVERSIZE);
-                }
+            } else {
+                // 金额大于审核金额，需要重新审核
+                boolean condition = review.getReviewState().equals(PcReview.ReviewState.THREE.key());
+                ApiAssert.isFalse(condition, BusinessErrorCode.REVIEW_EX_COUNT_OVERSIZE);
             }
         }
 
         // 判断截止申请时间点
-        if (DateTool.localTimeIsAfter(todayBeforeTime))
-            return CommonResult.failed(BusinessErrorCode.REVIEW_EX_TIME_OVERSIZE);
+        ApiAssert.isTrue(DateTool.localTimeIsAfter(todayBeforeTime), BusinessErrorCode.REVIEW_EX_TIME_OVERSIZE);
+
+        long balance = income.getBalance();
+
+        // 大额提现限制（默认只能提取总余额的70%）
+        Double largeAmountRatio = sysSettingService.getSettingValue(SettingTypeEnum.fifteen);
+        if (BlankUtil.isNotEmpty(largeAmountRatio)) {
+            double maxAmount = balance * largeAmountRatio;
+            String message = BusinessErrorCode.CURRENT_MAX_EX_OVERSIZE.getMessage(new BigDecimal(maxAmount).divide(new BigDecimal(100), 2, RoundingMode.DOWN));
+            ApiAssert.isTrue(money > maxAmount, message);
+        }
 
         // 扣除手续费
         Map<String, Long> resultMap = incomeService.deductCharges(income, money, userId);
         Long rateIncomeId = resultMap.get("rateIncomeId");
         Long newBalance = resultMap.get("balance");
         Long newMoney = resultMap.get("money");
-        long balance = income.getBalance();
         long finalBalance = balance - money;
         if (BlankUtil.isNotEmpty(newBalance) && BlankUtil.isNotEmpty(newMoney)) {
             money = newMoney;
@@ -587,18 +612,18 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         UmsIncome umsIncome = UmsIncome.builder().incomeId(IdWorker.generateId()).userId(userId)
                                        .income(NumberUtils.LONG_ZERO).expenditure(money).balance(finalBalance)
                                        .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
-                                       .incomeType(UmsIncome.IncomeType.FOUR.key()) // 4->审核资金
+                                       .incomeType(UmsIncome.IncomeType.FOUR.key())
                                        .incomeNo("").orderTradeNo("").detailSource("系统审核中:" + transAmount + "元")
                                        .payType(UmsIncome.PayType.THREE.key()).build();
         updateResult = umsIncomeService.save(umsIncome);
-        if (!updateResult) throw new ApiException("审核扣除资金失败");
+        ApiAssert.isFalse(updateResult, "审核扣除失败");
 
         // 添加审核
         PcReview pcReview = PcReview.builder().reviewId(IdWorker.generateId()).userId(userId).reviewMoney(money)
                                     .rateIncomeId(rateIncomeId).alipayAccount(currentUser.getAlipayAccount())
                                     .alipayName(currentUser.getAlipayName()).build();
         updateResult = reviewService.save(pcReview);
-        if (!updateResult) throw new ApiException("添加审核记录失败");
+        ApiAssert.isFalse(updateResult, "添加审核记录失败");
         return CommonResult.success(BusinessErrorCode.REVIEW_DEPOSIT_MONEY_EXCEED.getMessage(), String.valueOf(finalBalance));
     }
 
