@@ -90,7 +90,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(qrcodeName));
         try {
             // 二维码内容
-            String content = String.format("%s%s?%s", cosService.getOssPath(), param.getUrl(), RandomUtil.randomString(32));
+            String content = String.format("%s%s?%s", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), param.getUrl(), RandomUtil.randomString(32));
             String key = this.genQrCode(content, qrcodeName, param.getUseLogo(), param.getType());
 
             // 构建插入对象
@@ -309,6 +309,9 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 获取记录
         AmsApp amsApp = this.getById(id);
         ApiAssert.noValue(amsApp, CommonResultCode.ID_NO_EXIST);
+
+        // 检测APP状态（当状态为已上传才允许发布）
+        ApiAssert.isFalse(amsApp.getUploadStatus().equals(NumberConstant.ONE), BusinessErrorCode.UNFINISHED_APP_UPLOAD);
 
         // 校验每日刷新用量配额(中国境内)
         DescribePurgeQuotaResponse dpqResponse = cdnService.describePurgeQuota();
