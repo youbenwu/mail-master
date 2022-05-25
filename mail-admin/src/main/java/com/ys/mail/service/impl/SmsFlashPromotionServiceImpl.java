@@ -81,11 +81,8 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult<Boolean> updateHome(Long flashPromotionId, Boolean homeStatus) {
-        boolean b = flashPromotionMapper.updateHome();
-        if (b) {
-            SmsFlashPromotion flashPromotion = new SmsFlashPromotion(flashPromotionId, homeStatus);
-            b = updateById(flashPromotion);
-        }
+        SmsFlashPromotion flashPromotion = new SmsFlashPromotion(flashPromotionId, homeStatus);
+        boolean b = updateById(flashPromotion);
         // 清除首页缓存
         flashPromotionProductService.delHomeSecondProduct(true);
         return b ? CommonResult.success(true) : CommonResult.failed(false);

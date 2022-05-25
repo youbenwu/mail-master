@@ -25,7 +25,7 @@ public enum ImgPathEnum implements IPairs<Integer, String, ImgPathEnum> {
     /**
      * 开发测试，默认类型
      */
-    TEST_PATH(-1, "/test/", null),
+    TEST_PATH(-1, "/test/", 2 * 1024 * 1024L),
     /**
      * 系统设置
      */
@@ -33,7 +33,7 @@ public enum ImgPathEnum implements IPairs<Integer, String, ImgPathEnum> {
     /**
      * 商品图片
      */
-    RELATIVE_PATH(1, "/product/", null),
+    RELATIVE_PATH(1, "/product/", 1024 * 1024L),
     /**
      * 用户头像
      */

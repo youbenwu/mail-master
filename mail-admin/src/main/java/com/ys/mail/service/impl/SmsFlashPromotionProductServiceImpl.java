@@ -95,6 +95,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
                 smsFlashPromotionProduct.setPdtStoreObj(JSON.toJSONString(storeObjDTO));
             }
         }
+        // 清除缓存
+        this.delHomeSecondProduct(true);
         return saveOrUpdate(smsFlashPromotionProduct);
     }
 
@@ -112,7 +114,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Override
     public boolean delete(Long flashPromotionPdtId) {
         boolean b = removeById(flashPromotionPdtId);
-        delHomeSecondProduct(b);
+        this.delHomeSecondProduct(b);
         return b;
     }
 
