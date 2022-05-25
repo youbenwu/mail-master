@@ -395,6 +395,11 @@
     </select>
 
 
+
+
+
+
+
     <update id="updateSale">
         update pms_product
         set sale = sale + #{quantity}

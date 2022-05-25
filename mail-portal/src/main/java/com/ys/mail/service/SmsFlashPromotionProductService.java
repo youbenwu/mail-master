@@ -160,4 +160,10 @@ public interface SmsFlashPromotionProductService extends IService<SmsFlashPromot
      * @return 返回值
      */
     CommonResult<Boolean> refund(Long flashPromotionPdtId);
+
+    /**
+     * 查询中所有系统回购的产品
+     * @return 返回值
+     */
+    List<SmsFlashPromotionProduct> getAllBuyBack(Integer ite);
 }

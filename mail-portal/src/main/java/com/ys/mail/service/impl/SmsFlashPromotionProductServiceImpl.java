@@ -937,4 +937,9 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         return CommonResult.success(Boolean.TRUE);
     }
 
+    @Override
+    public List<SmsFlashPromotionProduct> getAllBuyBack(Integer ite) {
+        return flashPromotionProductMapper.getAllBuyBack(ite);
+    }
+
 }
