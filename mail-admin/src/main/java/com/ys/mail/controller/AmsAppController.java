@@ -72,11 +72,11 @@ public class AmsAppController {
         return ResultUtil.isOk(result);
     }
 
-    @ApiOperation("重新生成二维码")
-    @PostMapping(value = "/reGenQrcode/{id:^\\d{19}$}")
-    @LocalLockAnn(key = "reGenQrcode:arg[0]", expire = 60)
-    public CommonResult<Boolean> reloadGenQrcode(@PathVariable Long id) {
-        boolean result = amsAppService.reloadGenQrcode(id);
+    @ApiOperation("生成二维码")
+    @PostMapping(value = "/genQrcode/{id:^\\d{19}$}")
+    @LocalLockAnn(key = "genQrcode:arg[0]", expire = 60)
+    public CommonResult<Boolean> genQrcode(@PathVariable Long id) {
+        boolean result = amsAppService.genQrcode(id);
         return ResultUtil.isOk(result);
     }
 
@@ -97,7 +97,7 @@ public class AmsAppController {
         return ResultUtil.isOk(result, Boolean.TRUE);
     }
 
-    @ApiOperation(value = "获取APP二维码下载链接信息", notes = "只能获取当前已发布的信息，无需登录")
+    @ApiOperation(value = "获取二维码链接信息", notes = "只能获取当前已发布的信息，无需登录")
     @GetMapping(value = "/qrcodeInfo")
     public CommonResult<Map<String, String>> qrcodeInfo() {
         Map<String, String> result = amsAppService.qrcodeInfo();

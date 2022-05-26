@@ -17,6 +17,7 @@
         <result column="update_title" property="updateTitle"/>
         <result column="update_content" property="updateContent"/>
         <result column="is_forced_update" property="forcedUpdate"/>
+        <result column="is_released" property="released"/>
         <result column="pc_user_id" property="pcUserId"/>
 
         <result column="remark" property="remark"/>
@@ -45,6 +46,7 @@
                 t1.`update_title`,
                 t1.`update_content`,
                 t1.`is_forced_update` forcedUpdate,
+                t1.`is_released` released,
                 t2.`username`,
                 t1.`remark`,
                 t1.`create_time`,

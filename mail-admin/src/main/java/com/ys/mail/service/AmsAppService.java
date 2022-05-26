@@ -86,7 +86,7 @@ public interface AmsAppService extends IService<AmsApp> {
      * @param id 应用ID
      * @return 生成结果
      */
-    boolean reloadGenQrcode(Long id);
+    boolean genQrcode(Long id);
 
     /**
      * 发布应用

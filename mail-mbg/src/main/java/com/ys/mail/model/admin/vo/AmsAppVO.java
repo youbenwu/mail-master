@@ -1,6 +1,5 @@
 package com.ys.mail.model.admin.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -57,9 +56,11 @@ public class AmsAppVO implements Serializable {
     @ApiModelProperty(value = "更新内容")
     private String updateContent;
 
-    @ApiModelProperty(value = "是否强制更新，0->不强制,1->强制")
-    @TableField("is_forced_update")
+    @ApiModelProperty(value = "是否强制更新，false->不强制,true->强制")
     private Boolean forcedUpdate;
+
+    @ApiModelProperty(value = "是否已发布，false-未发布，true->已发布")
+    private Boolean released;
 
     @ApiModelProperty(value = "修改人名称")
     private String username;

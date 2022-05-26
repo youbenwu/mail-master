@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -89,18 +90,11 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(name));
 
         try {
-            // 二维码内容
-            String content = String.format("%s%s?", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), param.getUrl());
-            content = this.paddingUrl(content);
-            String key = this.genQrCode(content, param.getUseLogo(), param.getType());
-
             // 构建插入对象
             AmsApp amsApp = new AmsApp();
             BeanUtils.copyProperties(param, amsApp);
             amsApp.setId(IdWorker.generateId());
             amsApp.setPcUserId(PcUserUtil.getCurrentUser().getPcUserId());
-            // 填充二维码地址
-            amsApp.setQrcodeUrl(key);
 
             // 更新记录到数据库中
             return this.save(amsApp);
@@ -117,22 +111,17 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 名称重复检测：当新名称与旧名称不一致时需要检测
         String name = param.getName();
         String url = param.getUrl();
-        String qrcodeUrl = amsApp.getQrcodeUrl();
+        Integer type = param.getType();
+
         if (!amsApp.getName().equals(name)) {
             boolean existsName = this.isExistsName(name);
             ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(name));
         }
 
         try {
-            // 如果APP链接变更，则删除文件
-            boolean urlUpdated = !amsApp.getUrl().equals(url);
+            // 如果APP链接或平台类型变更时，则删除文件
+            boolean urlUpdated = !amsApp.getUrl().equals(url) || !amsApp.getType().equals(type);
             if (urlUpdated) {
-                // 删除旧文件
-                this.deleteFile(amsApp.getUrl(), qrcodeUrl);
-                // 重新生成二维码
-                String content = String.format("%s%s?", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), param.getUrl());
-                content = this.paddingUrl(content);
-                this.genQrCode(content, param.getUseLogo(), param.getType());
                 // 重置状态
                 amsApp.setUploadStatus(NumberConstant.ZERO);
                 amsApp.setSize(Long.valueOf(NumberConstant.ZERO));
@@ -184,10 +173,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         AmsApp amsApp = this.getById(id);
         ApiAssert.noValue(amsApp, CommonResultCode.ID_NO_EXIST);
         // 删除数据库记录
-        boolean result = this.removeById(id);
-        // 删除文件
-        this.deleteFile(amsApp.getUrl(), amsApp.getQrcodeUrl());
-        return result;
+        return this.removeById(id);
     }
 
     @Override
@@ -225,18 +211,18 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
     }
 
     @Override
-    public boolean reloadGenQrcode(Long id) {
+    public boolean genQrcode(Long id) {
         // 获取记录
         AmsApp amsApp = this.getById(id);
         ApiAssert.noValue(amsApp, CommonResultCode.ID_NO_EXIST);
+        // 检测APP上传状态，只有为已上传才可以进行发布
+        Integer uploadStatus = amsApp.getUploadStatus();
+        ApiAssert.isFalse(uploadStatus.equals(NumberConstant.ONE), BusinessErrorCode.UNFINISHED_APP_UPLOAD);
 
         // 获取应用信息
         String url = amsApp.getUrl();
-        String qrcodeUrl = amsApp.getQrcodeUrl();
         Boolean useLogo = amsApp.getUseLogo();
         Integer type = amsApp.getType();
-        // 删除下载二维码
-        cosService.deleteObject(qrcodeUrl);
         // 二维码内容
         String content = String.format("%s%s?", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), url);
         content = this.paddingUrl(content);
@@ -245,6 +231,8 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
             String key = this.genQrCode(content, useLogo, type);
             // 填充二维码地址
             amsApp.setQrcodeUrl(key);
+            // 将当前类型APP的二维码置空
+            this.resetQrcodeUrl(type);
             // 更新到数据库中
             return this.updateById(amsApp);
         } catch (Exception e) {
@@ -262,12 +250,13 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         ApiAssert.isFalse(uploadStatus.equals(NumberConstant.ONE), BusinessErrorCode.UNFINISHED_APP_UPLOAD);
         // 根据类型获取设置信息
         Integer type = amsApp.getType();
+        Integer appType;
         if (type.equals(NumberConstant.ZERO)) {
-            type = SettingTypeEnum.twenty_seven.key();
+            appType = SettingTypeEnum.twenty_seven.key();
         } else {
-            type = SettingTypeEnum.twenty_eight.key();
+            appType = SettingTypeEnum.twenty_eight.key();
         }
-        SettingTypeEnum typeEnum = EnumTool.getEnum(SettingTypeEnum.class, type);
+        SettingTypeEnum typeEnum = EnumTool.getEnum(SettingTypeEnum.class, appType);
         SysSetting setting = sysSettingService.getOneByType(typeEnum);
         ApiAssert.noValue(setting, BusinessErrorCode.ERR_SETTING_TYPE_NOT_EXIST);
 
@@ -285,7 +274,9 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
                                                    .packageSize(amsApp.getSize())
                                                    .updateTime(amsApp.getUpdateTime()).build();
 
+
         // 更新应用信息
+        this.resetReleased(type);
         amsApp.setReleased(Boolean.TRUE);
         this.updateById(amsApp);
 
@@ -353,6 +344,30 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
 
         // 返回数据
         return map;
+    }
+
+    /**
+     * 根据类型将发布状态置为0
+     *
+     * @param type APP类型
+     */
+    private void resetReleased(Integer type) {
+        LambdaUpdateWrapper<AmsApp> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.set(AmsApp::getReleased, NumberConstant.ZERO)
+               .eq(AmsApp::getType, type);
+        this.update(wrapper);
+    }
+
+    /**
+     * 根据类型置空二维码
+     *
+     * @param type APP类型
+     */
+    private void resetQrcodeUrl(Integer type) {
+        LambdaUpdateWrapper<AmsApp> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.set(AmsApp::getQrcodeUrl, StringConstant.BLANK)
+               .eq(AmsApp::getType, type);
+        this.update(wrapper);
     }
 
     /**
