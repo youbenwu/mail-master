@@ -52,24 +52,15 @@ public interface AmsAppService extends IService<AmsApp> {
     boolean isExistsName(String name);
 
     /**
-     * 检查二维码名称
-     *
-     * @param qrcodeName 二维码名称
-     * @return 是否已存在，false->表示不存在，true->表示已存在
-     */
-    boolean isExistsQrcodeName(String qrcodeName);
-
-    /**
      * 生成二维码并上传到默认目录
      *
      * @param content    二维码内容
-     * @param qrcodeName 二维码名称
      * @param useLogo    是否使用Logo
      * @param type       APP类型，0->APP1,1->APP2
      * @return 返回二维码的key
      * @throws Exception e
      */
-    String genQrCode(String content, String qrcodeName, boolean useLogo, Integer type) throws Exception;
+    String genQrCode(String content, boolean useLogo, Integer type) throws Exception;
 
     /**
      * 删除APP应用
