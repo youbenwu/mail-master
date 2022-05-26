@@ -54,9 +54,6 @@ public class AmsApp extends BaseEntity<Long> implements Serializable {
     @ApiModelProperty(value = "二维码存储路径")
     private String qrcodeUrl;
 
-    @ApiModelProperty(value = "二维码名称")
-    private String qrcodeName;
-
     @ApiModelProperty(value = "是否使用Logo，0->不使用，1->使用")
     @TableField("is_use_logo")
     private Boolean useLogo;

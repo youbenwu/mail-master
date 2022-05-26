@@ -45,11 +45,6 @@ public class AmsAppInsertParam {
     @ApiModelProperty(value = "APP版本名称", required = true)
     private String versionName;
 
-    @NotBlank
-    @Pattern(regexp = "[a-zA-Z\\d]+", message = "：名称格式错误，只支持字母、数字")
-    @ApiModelProperty(value = "二维码名称", required = true)
-    private String qrcodeName;
-
     @NotNull
     @ApiModelProperty(value = "是否使用Logo，0->不使用，1->使用", required = true)
     private Boolean useLogo;

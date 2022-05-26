@@ -85,14 +85,11 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         boolean existsName = this.isExistsName(name);
         ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(name));
 
-        String qrcodeName = param.getQrcodeName();
-        existsName = this.isExistsQrcodeName(qrcodeName);
-        ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(qrcodeName));
         try {
             // 二维码内容
             String content = String.format("%s%s?", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), param.getUrl());
             content = this.paddingUrl(content);
-            String key = this.genQrCode(content, qrcodeName, param.getUseLogo(), param.getType());
+            String key = this.genQrCode(content, param.getUseLogo(), param.getType());
 
             // 构建插入对象
             AmsApp amsApp = new AmsApp();
@@ -116,41 +113,27 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         ApiAssert.noValue(amsApp, CommonResultCode.ID_NO_EXIST);
         // 名称重复检测：当新名称与旧名称不一致时需要检测
         String name = param.getName();
-        String qrcodeName = param.getQrcodeName();
         String url = param.getUrl();
         String qrcodeUrl = amsApp.getQrcodeUrl();
-        boolean existsName;
         if (!amsApp.getName().equals(name)) {
-            existsName = this.isExistsName(name);
+            boolean existsName = this.isExistsName(name);
             ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(name));
-        }
-        if (!amsApp.getQrcodeName().equals(qrcodeName)) {
-            existsName = this.isExistsQrcodeName(qrcodeName);
-            ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(qrcodeName));
         }
 
         try {
             // 如果APP链接变更，则删除文件
             boolean urlUpdated = !amsApp.getUrl().equals(url);
             if (urlUpdated) {
-                // 删除旧APP文件
-                cosService.deleteObject(CosFolderEnum.FILE_FOLDER, amsApp.getUrl());
+                // 删除旧文件
+                this.deleteFile(amsApp.getUrl(), qrcodeUrl);
+                // 重新生成二维码
+                String content = String.format("%s%s?", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), param.getUrl());
+                content = this.paddingUrl(content);
+                this.genQrCode(content, param.getUseLogo(), param.getType());
                 // 重置状态
                 amsApp.setUploadStatus(NumberConstant.ZERO);
                 amsApp.setSize(Long.valueOf(NumberConstant.ZERO));
                 amsApp.setReleased(Boolean.FALSE);
-            }
-
-            // 当二维码名称或者APP变更时，重新生成二维码
-            if (!amsApp.getQrcodeName().equals(param.getQrcodeName()) || urlUpdated) {
-                // 删除旧二维码
-                cosService.deleteObject(qrcodeUrl);
-                // 二维码内容
-                String content = String.format("%s%s?%s", cosService.getOssPath(CosFolderEnum.FILE_FOLDER), url, RandomUtil.randomString(32));
-                // 开始上传
-                String key = this.genQrCode(content, qrcodeName, param.getUseLogo(), param.getType());
-                // 填充二维码地址
-                amsApp.setQrcodeUrl(key);
             }
 
             // 构建更新对象
@@ -173,16 +156,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
     }
 
     @Override
-    public boolean isExistsQrcodeName(String qrcodeName) {
-        SqlLambdaQueryWrapper<AmsApp> wrapper = new SqlLambdaQueryWrapper<>();
-        wrapper.eq(AmsApp::getQrcodeName, qrcodeName)
-               .last(StringConstant.LIMIT_ONE);
-        AmsApp amsApp = this.getOne(wrapper);
-        return BlankUtil.isNotEmpty(amsApp);
-    }
-
-    @Override
-    public String genQrCode(String content, String qrcodeName, boolean useLogo, Integer type) throws Exception {
+    public String genQrCode(String content, boolean useLogo, Integer type) throws Exception {
         // 二维码临时文件
         File qrcode = File.createTempFile("temp-qrcode-", ".png");
         // 生成二维码
@@ -194,7 +168,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
             QrCodeUtil.encode(content, qrcode);
         }
         // 构建二维码上传key
-        String key = ImgPathEnum.DOWNLOAD_QRCODE_PATH.value() + qrcodeName + ".png";
+        String key = ImgPathEnum.DOWNLOAD_QRCODE_PATH.value() + genQrcodeName(type);
         // 上传到指定目录
         cosService.upload(key, qrcode);
         // 返回Key
@@ -256,7 +230,6 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 获取应用信息
         String url = amsApp.getUrl();
         String qrcodeUrl = amsApp.getQrcodeUrl();
-        String qrcodeName = amsApp.getQrcodeName();
         Boolean useLogo = amsApp.getUseLogo();
         Integer type = amsApp.getType();
         // 删除下载二维码
@@ -266,7 +239,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         content = this.paddingUrl(content);
         try {
             // 开始上传
-            String key = this.genQrCode(content, qrcodeName, useLogo, type);
+            String key = this.genQrCode(content, useLogo, type);
             // 填充二维码地址
             amsApp.setQrcodeUrl(key);
             // 更新到数据库中
@@ -386,6 +359,16 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
             content += RandomUtil.randomString(result);
         }
         return content;
+    }
+
+    private String genQrcodeName(Integer type) {
+        String result;
+        if (BlankUtil.isNotEmpty(type) && type.equals(NumberConstant.ZERO)) {
+            result = StringConstant.APP0;
+        } else {
+            result = StringConstant.APP1;
+        }
+        return result + StringConstant.PNG;
     }
 
 }

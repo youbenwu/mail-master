@@ -13,7 +13,6 @@
         <result column="version_name" property="versionName"/>
         <result column="upload_status" property="uploadStatus"/>
         <result column="qrcode_url" property="qrcodeUrl"/>
-        <result column="qrcode_name" property="qrcodeName"/>
         <result column="is_use_logo" property="useLogo"/>
         <result column="update_title" property="updateTitle"/>
         <result column="update_content" property="updateContent"/>
@@ -27,7 +26,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, `name`, url, `size` , type, version_code, version_name, upload_status, qrcode_url, qrcode_name, is_use_logo,
+        id, `name`, url, `size` , type, version_code, version_name, upload_status, qrcode_url, is_use_logo,
         update_title, update_content, is_forced_update, pc_user_id, remark, create_time, update_time
     </sql>
 

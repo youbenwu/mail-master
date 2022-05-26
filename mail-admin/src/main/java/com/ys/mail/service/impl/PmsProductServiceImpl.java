@@ -58,6 +58,8 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
         String productName = pmsProduct.getProductName();
         boolean existsName;
         if (id.equals(NumberUtils.LONG_ZERO)) {
+            // 拷贝属性
+            BeanUtils.copyProperties(pmsProduct, dbProduct);
             // 添加
             dbProduct.setProductId(IdWorker.generateId());
             // 名称重复检测
