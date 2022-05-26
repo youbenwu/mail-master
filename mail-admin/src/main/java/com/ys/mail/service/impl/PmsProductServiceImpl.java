@@ -58,26 +58,26 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
         String productName = pmsProduct.getProductName();
         boolean existsName;
         if (id.equals(NumberUtils.LONG_ZERO)) {
+            // 名称重复检测
+            existsName = this.isExistsProductName(productName);
+            ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(productName));
             // 拷贝属性
             BeanUtils.copyProperties(pmsProduct, dbProduct);
             // 添加
             dbProduct.setProductId(IdWorker.generateId());
-            // 名称重复检测
-            existsName = this.isExistsProductName(productName);
-            ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(productName));
         } else {
             // 修改
             dbProduct = this.getById(id);
             ApiAssert.noValue(dbProduct, CommonResultCode.ID_NO_EXIST);
-
-            // 拷贝属性
-            BeanUtils.copyProperties(pmsProduct, dbProduct);
 
             // 名称重复检测
             if (!dbProduct.getProductName().equals(productName)) {
                 existsName = this.isExistsProductName(productName);
                 ApiAssert.isTrue(existsName, CommonResultCode.ERR_PARAM_EXIST.getMessage(productName));
             }
+
+            // 拷贝属性
+            BeanUtils.copyProperties(pmsProduct, dbProduct);
 
             // 恢复会员价
             Integer promotionType = pmsProduct.getPromotionType();
