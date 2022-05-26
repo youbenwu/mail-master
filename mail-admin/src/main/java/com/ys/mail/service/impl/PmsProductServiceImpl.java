@@ -55,7 +55,6 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
         ApiAssert.noValue(id, CommonResultCode.NULL_USER_ID);
 
         PmsProduct dbProduct = new PmsProduct();
-        BeanUtils.copyProperties(pmsProduct, dbProduct);
         String productName = pmsProduct.getProductName();
         boolean existsName;
         if (id.equals(NumberUtils.LONG_ZERO)) {
@@ -68,6 +67,9 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
             // 修改
             dbProduct = this.getById(id);
             ApiAssert.noValue(dbProduct, CommonResultCode.ID_NO_EXIST);
+
+            // 拷贝属性
+            BeanUtils.copyProperties(pmsProduct, dbProduct);
 
             // 名称重复检测
             if (!dbProduct.getProductName().equals(productName)) {
