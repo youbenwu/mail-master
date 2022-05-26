@@ -231,10 +231,14 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     public QuickBuyProductInfoDTO quickBuyProductInfo(QuickBuyProductQuery qo) {
         QuickBuyProductInfoDTO infoDTO = flashPromotionProductMapper.quickBuyProductInfo(qo);
         if (!BlankUtil.isEmpty(infoDTO)) {
-            Long userId = UserUtil.getCurrentUser().getUserId();
-            Long pdtCollectId = productMapper.selectByUserIdOrPdtId(Long.valueOf(qo.getProductId()), userId);
-            infoDTO.setPdtCollectId(BlankUtil.isEmpty(pdtCollectId) ? NumberUtils.LONG_ZERO : pdtCollectId);
-            infoDTO.setAddress(addressService.getByUserId(userId));
+            UmsUser currentUser = UserUtil.getCurrentUserOrNull();
+            if (BlankUtil.isNotEmpty(currentUser)) {
+                Long userId = currentUser.getUserId();
+                Long pdtCollectId = productMapper.selectByUserIdOrPdtId(Long.valueOf(qo.getProductId()), userId);
+                infoDTO.setPdtCollectId(BlankUtil.isEmpty(pdtCollectId) ? NumberUtils.LONG_ZERO : pdtCollectId);
+                infoDTO.setAddress(addressService.getByUserId(userId));
+            }
+
             Long partnerId = infoDTO.getPartnerId();
             UmsPartner umsPartner = partnerMapper.selectById(partnerId);
             if (ObjectUtils.isNotEmpty(umsPartner)) {

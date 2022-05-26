@@ -2,7 +2,8 @@ package com.ys.mail.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -44,6 +45,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -260,9 +263,9 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 根据类型获取设置信息
         Integer type = amsApp.getType();
         if (type.equals(NumberConstant.ZERO)) {
-            type = NumberConstant.TWENTY_SEVEN;
+            type = SettingTypeEnum.twenty_seven.key();
         } else {
-            type = NumberConstant.TWENTY_EIGHT;
+            type = SettingTypeEnum.twenty_eight.key();
         }
         SettingTypeEnum typeEnum = EnumTool.getEnum(SettingTypeEnum.class, type);
         SysSetting setting = sysSettingService.getOneByType(typeEnum);
@@ -270,9 +273,11 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
 
         // 构建发布信息
         AppReleaseInfoDTO build = AppReleaseInfoDTO.builder()
+                                                   .id(amsApp.getId())
                                                    .appName(amsApp.getName())
                                                    .versionCode(Integer.valueOf(amsApp.getVersionCode()))
                                                    .versionName(amsApp.getVersionName())
+                                                   .fullQrcodeUrl(cosService.getOssPath() + amsApp.getQrcodeUrl())
                                                    .updateTitle(amsApp.getUpdateTitle())
                                                    .updateContent(amsApp.getUpdateContent())
                                                    .forcedUpdate(amsApp.getForcedUpdate())
@@ -285,7 +290,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         this.updateById(amsApp);
 
         // 更新设置
-        setting.setSettingValue(JSON.toJSONString(build));
+        setting.setSettingValue(JSONObject.toJSONString(build));
         SysSettingParam param = new SysSettingParam();
         BeanUtils.copyProperties(setting, param);
         param.setSysSettingId(String.valueOf(setting.getSysSettingId()));
@@ -326,6 +331,30 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         return String.format("执行成功，当前URL刷新剩余%s条，URL预热剩余%s条", availableUrlPurgeNumber - 1, availableUrlPushNumber - 1);
     }
 
+    @Override
+    public Map<String, String> qrcodeInfo() {
+        Map<String, String> map = new LinkedHashMap<>();
+        // 获取设置信息
+        JSON updateInfo = sysSettingService.getSettingValue(SettingTypeEnum.twenty_seven);
+
+        // 解析内容
+        JSONObject jsonObject;
+        if (BlankUtil.isNotEmpty(updateInfo)) {
+            jsonObject = JSONObject.parseObject(updateInfo.toString());
+            String fullQrcodeUrl = String.valueOf(jsonObject.get("fullQrcodeUrl"));
+            map.put("appZero", fullQrcodeUrl);
+        }
+        updateInfo = sysSettingService.getSettingValue(SettingTypeEnum.twenty_eight);
+        if (BlankUtil.isNotEmpty(updateInfo)) {
+            jsonObject = JSONObject.parseObject(updateInfo.toString());
+            String fullQrcodeUrl = String.valueOf(jsonObject.get("fullQrcodeUrl"));
+            map.put("appOne", fullQrcodeUrl);
+        }
+
+        // 返回数据
+        return map;
+    }
+
     /**
      * 删除应用和文件
      *
@@ -364,9 +393,9 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
     private String genQrcodeName(Integer type) {
         String result;
         if (BlankUtil.isNotEmpty(type) && type.equals(NumberConstant.ZERO)) {
-            result = StringConstant.APP0;
+            result = StringConstant.APP_ZERO;
         } else {
-            result = StringConstant.APP1;
+            result = StringConstant.APP_ONE;
         }
         return result + StringConstant.PNG;
     }

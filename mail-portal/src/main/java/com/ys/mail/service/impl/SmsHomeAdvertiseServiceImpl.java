@@ -82,7 +82,7 @@ public class SmsHomeAdvertiseServiceImpl extends ServiceImpl<SmsHomeAdvertiseMap
             }
         } else {
             // 普通用户
-            homePageVO = getHomePage(sb.append("Zero"), NumberUtils.INTEGER_ZERO, cpyType);
+            homePageVO = getHomePage(cpyType.equals(NumberUtils.BYTE_ZERO) ? sb.append("ZeroZero") : sb.append("OneOne"), NumberUtils.INTEGER_ONE, cpyType);
         }
 
         return homePageVO;

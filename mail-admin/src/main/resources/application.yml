@@ -62,5 +62,6 @@ secure:
       - /pc/user/logout
       - /pc/product/collect/get
       - /testManage/*
+      - /applicationManager/qrcodeInfo
 
 

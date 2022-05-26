@@ -23,8 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +46,6 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
     @Autowired
     private SmsFlashPromotionMapper flashPromotionMapper;
     @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
     private PmsSkuStockService skuStockService;
     @Autowired
     private OmsOrderService orderService;
@@ -63,13 +59,6 @@ public class SmsFlashPromotionServiceImpl extends ServiceImpl<SmsFlashPromotionM
             new LinkedBlockingQueue<>(1024),
             new ThreadFactoryBuilder().setNameFormat("export-report-pool-thread-%d").setDaemon(false)
                                       .setPriority(Thread.NORM_PRIORITY).build());
-
-    @Value("${redis.database}")
-    private String redisDatabase;
-    @Value("${redis.key.homeAllSecondProduct}")
-    private String redisKeyHomeAllSecondProduct;
-    @Value("${redis.expire.homePage}")
-    private Long redisExpireHomePage;
 
     @Override
     public List<FlashPromotionProductPO> getAllNewestSecond(Byte robBuyType, MapQuery mapQuery) {

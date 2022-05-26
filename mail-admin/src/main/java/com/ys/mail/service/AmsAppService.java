@@ -9,6 +9,8 @@ import com.ys.mail.model.admin.param.AmsAppUpdateParam;
 import com.ys.mail.model.admin.query.AppQuery;
 import com.ys.mail.model.admin.vo.AmsAppVO;
 
+import java.util.Map;
+
 /**
  * <p>
  * 服务类
@@ -54,9 +56,9 @@ public interface AmsAppService extends IService<AmsApp> {
     /**
      * 生成二维码并上传到默认目录
      *
-     * @param content    二维码内容
-     * @param useLogo    是否使用Logo
-     * @param type       APP类型，0->APP1,1->APP2
+     * @param content 二维码内容
+     * @param useLogo 是否使用Logo
+     * @param type    APP类型，0->APP1,1->APP2
      * @return 返回二维码的key
      * @throws Exception e
      */
@@ -101,4 +103,11 @@ public interface AmsAppService extends IService<AmsApp> {
      * @return 执行结果
      */
     String purgeAndWarmUp(Long id);
+
+    /**
+     * 获取已经发布的二维码下载链接信息
+     *
+     * @return 结果
+     */
+    Map<String, String> qrcodeInfo();
 }

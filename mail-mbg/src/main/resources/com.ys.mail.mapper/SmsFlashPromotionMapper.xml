@@ -157,6 +157,9 @@
         LEFT JOIN ums_partner up ON pp.partner_id = up.partner_id
         <where>
             sfp.is_publish_status = 1 and fpp.flash_product_status = 2
+            AND NOW() <![CDATA[ <= ]]> sfp.`end_time`
+            AND DATE(sfp.`end_time`) = CURRENT_DATE()
+            AND DATE(sfp.`start_time`) = CURRENT_DATE()
             <choose>
                 <when test="robBuyType == 0">
                     and fpp.user_id is null
@@ -176,6 +179,9 @@
         from sms_flash_promotion
         where is_publish_status = 1
         and is_home_status = 1  and cpy_type = #{cpyType}
+        AND NOW() <![CDATA[ <= ]]> `end_time`
+        AND DATE(`end_time`) = CURRENT_DATE()
+        AND DATE(`start_time`) = CURRENT_DATE()
         limit 1;
     </select>
 
