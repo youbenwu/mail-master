@@ -126,6 +126,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
                 amsApp.setUploadStatus(NumberConstant.ZERO);
                 amsApp.setSize(Long.valueOf(NumberConstant.ZERO));
                 amsApp.setReleased(Boolean.FALSE);
+                amsApp.setQrcodeUrl(StringConstant.BLANK);
             }
 
             // 构建更新对象

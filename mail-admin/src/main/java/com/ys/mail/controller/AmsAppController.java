@@ -66,7 +66,7 @@ public class AmsAppController {
 
     @ApiOperation(value = "APP检测", notes = "当重新上传文件之后，可以手动执行该操作或等待系统自动更新")
     @PostMapping(value = "/check/{id:^\\d{19}$}")
-    @LocalLockAnn(key = "check:arg[0]", expire = 60)
+    @LocalLockAnn(key = "check:arg[0]", expire = 10)
     public CommonResult<Boolean> check(@PathVariable Long id) {
         boolean result = amsAppService.check(id);
         return ResultUtil.isOk(result);
