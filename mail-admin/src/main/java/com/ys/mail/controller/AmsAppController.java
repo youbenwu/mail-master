@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * <p>
  * 前端控制器
@@ -93,6 +95,13 @@ public class AmsAppController {
     public CommonResult<Boolean> purgeAndWarmUp(@PathVariable Long id) {
         String result = amsAppService.purgeAndWarmUp(id);
         return ResultUtil.isOk(result, Boolean.TRUE);
+    }
+
+    @ApiOperation(value = "获取APP二维码下载链接信息", notes = "只能获取当前已发布的信息，无需登录")
+    @GetMapping(value = "/qrcodeInfo")
+    public CommonResult<Map<String, String>> qrcodeInfo() {
+        Map<String, String> result = amsAppService.qrcodeInfo();
+        return CommonResult.success(result);
     }
 
 }

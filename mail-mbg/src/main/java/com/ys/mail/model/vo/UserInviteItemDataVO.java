@@ -34,6 +34,9 @@ public class UserInviteItemDataVO implements Serializable {
     @ApiModelProperty(value = "被邀请时间")
     private Date inviteTime;
 
+    @ApiModelProperty(value = "昵称")
+    private String nickname;
+
     @ApiModelProperty("被邀请人的电话")
     @Sensitive(type = SensitiveTypeEnum.PHONE_NUM)
     private String phone;

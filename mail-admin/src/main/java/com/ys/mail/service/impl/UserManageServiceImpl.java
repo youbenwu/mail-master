@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ys.mail.config.GlobalConfig;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.StringConstant;
 import com.ys.mail.entity.*;
@@ -65,6 +66,8 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
     private RedisService redisService;
     @Autowired
     private RedisConfig redisConfig;
+    @Autowired
+    private GlobalConfig globalConfig;
 
     @Override
     public CommonResult<IPage<UmsUserBlackListVO>> getPage(UmsUserQuery query) {
@@ -93,7 +96,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
 
     @Override
     public void exportExcel(boolean condition, HttpServletResponse response) {
-        String fileName = "平台用户汇总数据";
+        String fileName = globalConfig.getProjectName() + "-平台用户汇总数据";
         try (CostTimeUtil ignored = new CostTimeUtil("导出" + fileName)) {
             // 查询所有用户信息
             List<UmsUser> userList = this.list();
@@ -166,7 +169,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
 
     @Override
     public void exportUserDetailsExcel(Long userId, HttpServletResponse response) {
-        String fileName = "个人明细数据";
+        String fileName = globalConfig.getProjectName() + "-个人明细数据";
         try (CostTimeUtil ignored = new CostTimeUtil("导出" + fileName)) {
             // 查询用户基本信息
             UmsUser umsUser = this.getById(userId);

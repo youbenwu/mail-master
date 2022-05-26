@@ -46,13 +46,13 @@ public class StringConstant {
      * 标识
      */
     public static final String WINDOWS = "win";
-    public static final String APP0 = "app0";
-    public static final String APP1 = "app1";
+    public static final String APP_ZERO = "appZero";
+    public static final String APP_ONE = "appOne";
 
     /**
      * 文件后缀
      */
-    public static final String PNG = "png";
+    public static final String PNG = ".png";
 
 
 }

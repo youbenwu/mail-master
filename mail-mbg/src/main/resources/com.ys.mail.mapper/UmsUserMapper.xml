@@ -68,6 +68,7 @@
         SELECT
                 uu.user_id,
                 uu.phone,
+                uu.nickname,
                 uu.head_portrait head,
                 uui.create_time invite_time,
                 0 team_num,

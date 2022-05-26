@@ -307,7 +307,7 @@
         WHERE sfp.`cpy_type` = a.`cpy_type`
         AND NOW() &lt; sfp.`start_time`
         AND sfp.`is_publish_status` = 1
-        ORDER BY sfp.`start_time` ASC
+        ORDER BY sfp.`start_time`
         LIMIT 1 ) AS `start_time`,
         a.flash_promotion_price as `price`
         FROM sms_flash_promotion_product a
@@ -403,7 +403,7 @@
         AND NOW() BETWEEN sfp.`start_time` and sfp.`end_time`
        <!-- AND sfpp.`cpy_type`  = #{cpyType}-->
         GROUP BY sfpp.`product_id` , sfpp.`flash_promotion_price`
-        ORDER BY sfpp.`flash_promotion_pdt_id` ASC
+        ORDER BY sfpp.`flash_promotion_pdt_id`
     </select>
     <select id="selectGroupFlashPromotionCountList" resultMap="BaseResultMap">
         SELECT
@@ -418,7 +418,7 @@
         AND sfpp.`flash_promotion_price` = #{price}
         AND sfpp.`flash_promotion_id` = #{flashPromotionId}
         GROUP BY sfpp.`flash_promotion_pdt_id`
-        ORDER BY sfpp.`flash_promotion_pdt_id` ASC
+        ORDER BY sfpp.`flash_promotion_pdt_id`
     </select>
     <select id="selectUserIncomeSQL" resultMap="BaseResultMap">
         SELECT
@@ -531,7 +531,7 @@
             `start_time` &gt;= NOW()
           AND `is_publish_status` = 1
           AND is_home_status = 1
-          ORDER BY `start_time` ASC
+          ORDER BY `start_time`
           LIMIT 1;
     </select>
     <select id="selectCpyNewestSecond" resultMap="AppDtoBaseResultMap">
@@ -549,7 +549,9 @@
                pp.pic pp_pic
         FROM sms_flash_promotion_product sfpp
                  left join pms_product pp  ON  sfpp.product_id = pp.product_id
-        where sfpp.flash_promotion_id = #{flashPromotionPdtId} and user_id is null
+        where
+                sfpp.flash_promotion_id = #{flashPromotionPdtId} and user_id is null
+                AND sfpp.flash_product_status = 2
         GROUP BY sfpp.`product_id`,sfpp.`flash_promotion_price`,sfpp.`cpy_type`
         order by sfpp.flash_promotion_pdt_id desc
             limit 6;

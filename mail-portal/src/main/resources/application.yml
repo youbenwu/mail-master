@@ -60,6 +60,9 @@ secure:
       - /unionPay/aliPayNotify
       - /index/homePage/*
       - /partner/product/*
+      - /flash/promotion/product/getAllNewestSecond
+      - /flash/promotion/product/getAllNewestSecondPage
+      - /flash/promotion/product/info
 
 #自定义一键登录参数
 oauth:
