@@ -37,6 +37,7 @@ import com.ys.mail.service.SysSettingService;
 import com.ys.mail.util.*;
 import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -219,17 +220,31 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         ApiAssert.noValue(amsApp, CommonResultCode.ID_NO_EXIST);
         // 获取文件信息
         ObjectMetadata objectInfo = cosService.getObjectInfo(CosFolderEnum.FILE_FOLDER, amsApp.getUrl());
+        boolean needUpdate = true;
+        Long size = amsApp.getSize();
+        Integer uploadStatus = amsApp.getUploadStatus();
         if (BlankUtil.isNotEmpty(objectInfo)) {
             // 设置大小
             long contentLength = objectInfo.getContentLength();
-            amsApp.setSize(contentLength);
-            amsApp.setUploadStatus(NumberConstant.ONE);
+            if (contentLength == NumberUtils.LONG_ZERO && size.equals(NumberUtils.LONG_ZERO)) {
+                needUpdate = false;
+            } else {
+                amsApp.setSize(contentLength);
+                amsApp.setUploadStatus(NumberConstant.ONE);
+            }
         } else {
-            amsApp.setSize(Long.valueOf(NumberConstant.ZERO));
-            amsApp.setUploadStatus(NumberConstant.ZERO);
+            if (size.equals(NumberUtils.LONG_ZERO) && uploadStatus.equals(NumberConstant.ZERO)) {
+                needUpdate = false;
+            } else {
+                amsApp.setSize(Long.valueOf(NumberConstant.ZERO));
+                amsApp.setUploadStatus(NumberConstant.ZERO);
+            }
         }
         // 更新到数据库中
-        return this.updateById(amsApp);
+        if (needUpdate) {
+            return this.updateById(amsApp);
+        }
+        return Boolean.TRUE;
     }
 
     @Override
