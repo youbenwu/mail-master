@@ -46,7 +46,7 @@ public class OmsOrderController {
         return CommonResult.success(list);
     }
 
-    @ApiOperation(value = "订单导出接口", notes = "该接口分页参数无效，只有其他过滤条件有效")
+    @ApiOperation(value = "订单导出接口", notes = "该接口分页参数无效，只有其他过滤条件有效，最大查询2000条")
     @PostMapping(value = "/exportExcel")
     public void exportExcel(@Validated OmsOrderQuery query, HttpServletResponse response) {
         service.exportExcel(query, "平台订单数据", response);

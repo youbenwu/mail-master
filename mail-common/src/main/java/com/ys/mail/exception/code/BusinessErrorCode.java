@@ -90,8 +90,10 @@ public enum BusinessErrorCode implements IErrorCode {
     PDT_SUPPLY_NOT(400237, "该商品无供应商价格,无法退款!"),
     PDT_UNDER_SUPPLY_PRICE(400238, "当前价低于供应商价格,无法退款!"),
 
+    ERR_PROMOTION_NOT_DATE(400239, "未到时间无法退货退款"),
     ERR_DATE_ILLEGAL(400300, "日期跨度不能小于%d天"),
     ERR_DATE_EXPIRE(400301, "该商品已过期，不能上架"),
+    ALLOW_PRODUCT_REFUND(400302, "该商品已经满足退款条件"),
 
 
     ERR_KEY_NOT_EXIST(400400, "Path：%s 不存在"),

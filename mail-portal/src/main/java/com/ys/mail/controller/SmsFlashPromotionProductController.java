@@ -231,10 +231,10 @@ public class SmsFlashPromotionProductController {
     /**
      * 手动触发退款
      */
-    @ApiOperation("我的店铺退款")
+    @ApiOperation(value = "我的店铺退款", notes = "flashPromotionPdtId，秒杀商品ID")
     @PostMapping(value = "/userIncome/{id:^\\d{19}$}")
     @LocalLockAnn(key = "userIncome:arg[0]")
-    public CommonResult<Boolean> userIncome(@PathVariable("id") Long flashPromotionPdtId){
+    public CommonResult<Boolean> userIncome(@PathVariable("id") Long flashPromotionPdtId) {
 
         return flashPromotionProductService.refund(flashPromotionPdtId);
     }

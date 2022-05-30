@@ -3,6 +3,7 @@ package com.ys.mail.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.GlobalConfig;
+import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.OmsOrder;
 import com.ys.mail.mapper.OmsOrderItemMapper;
 import com.ys.mail.mapper.OmsOrderMapper;
@@ -93,8 +94,8 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
 
     @Override
     public void exportExcel(OmsOrderQuery query, String fileName, HttpServletResponse response) {
-        // 取消分页
-        query.setPageSize(NumberUtils.INTEGER_MINUS_ONE);
+        // 设置最大分页
+        query.setPageSize(NumberConstant.TWO_THOUSAND);
         // 构建条件
         SqlQueryWrapper<PcUserOrderVO> wrapper = this.getWrapper(query);
         // 查询订单和订单详情
