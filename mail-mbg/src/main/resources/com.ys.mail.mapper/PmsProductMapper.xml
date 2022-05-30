@@ -308,12 +308,12 @@
             psk.sku_stock_id,
             psk.sp_data,
             <if test="flag">
-                psk.price * pp.dis_count as meb_price,
-                psk.price,
+                IF(pp.promotion_type = 2, psk.price * pp.dis_count, psk.price) AS meb_price,
             </if>
-            <if test="!flag">
-                IF(pp.promotion_type = 2, psk.price * pp.dis_count, psk.price) AS price,
-            </if>
+            psk.price,
+<!--            <if test="!flag">-->
+<!--                IF(pp.promotion_type = 2, psk.price * pp.dis_count, psk.price) AS price,-->
+<!--            </if>-->
             pp.dis_count
         from pms_product pp LEFT JOIN pms_sku_stock psk on pp.product_id = psk.product_id
         where pp.deleted = 0 AND pp.is_publish_status = 1  and psk.sku_stock_id = #{skuStockId};
