@@ -162,7 +162,7 @@ public class ScheduleTask {
             // 相等才会进来
             if (BlankUtil.isNotEmpty(vo) && vo.getTotalAmount().equals(vo.getTotalPrice() * vo.getProductQuantity())) {
                 Integer rePeriods = vo.getRePeriods();
-                long partnerPrice = vo.getPartnerPrice() * vo.getProductQuantity();
+                long partnerPrice = vo.getEarnestMoney() * vo.getProductQuantity();
                 BigDecimal periods = DecimalUtil.toBigDecimal(partnerPrice)
                                                 .divide(new BigDecimal(rePeriods), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
                 BigDecimal divide = periods.divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
