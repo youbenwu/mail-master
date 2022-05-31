@@ -503,12 +503,12 @@
                promotion_type, create_time, update_time, deleted,is_handpick_status,is_delicacy_status,
                is_style_status,is_live_status,comment_sum,
                <if test="flag">
-                   meb_price,
-                   price,
+                   IF(promotion_type = 2, meb_price, price) meb_price,
                </if>
-                <if test="!flag">
-                    IF(promotion_type = 2, meb_price, price) AS price,
-                </if>
+               price,
+<!--                <if test="!flag">-->
+<!--                    IF(promotion_type = 2, meb_price, price) AS price,-->
+<!--                </if>-->
                dis_count,
                partner_id
         from pms_product where product_id = #{productId} AND deleted = 0 and is_publish_status = 1
