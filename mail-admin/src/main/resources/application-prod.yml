@@ -44,7 +44,6 @@ spring:
       simple:
         acknowledge-mode: manual
 
-
 logging:
   level:
     root: info
@@ -53,8 +52,8 @@ logging:
       springframework:
         boot:
           autoconfigure: ERROR
-    #file:
-    #path: D:/idea/mail_admin 服务器上有日志
+    file:
+      path: /home/project/qcy_mail/logs/admin # 服务器上日志存储位置
 
 
 logstash:

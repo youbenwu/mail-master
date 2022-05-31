@@ -246,42 +246,46 @@
         WHERE sfp.`cpy_type` = #{cpyType}
         AND sfp.`start_time` &gt;= NOW()
         AND sfp.`is_publish_status` = 1
-        ORDER BY sfp.`start_time` ASC
+        ORDER BY sfp.`start_time`
         LIMIT 1
     </select>
     <select id="selectTime" resultMap="BaseResultMap">
         SELECT * FROM `sms_flash_promotion` AS sfp WHERE #{timeStr} BETWEEN sfp.`start_time` AND sfp.`end_time` LIMIT 1
     </select>
     <select id="currentPlatformPromotionId" resultType="com.ys.mail.model.dto.SmsFlashPromotionDTO">
-        SELECT
-        sfp.`flash_promotion_id`,
-        sfp.`flash_promotion_title`,
-        sfp.`start_time`,
-        sfp.`end_time`,
-        sfp.`is_publish_status` AS publishStatus,
-        sfp.`is_home_status` AS homeStatus,
-        sfp.`cpy_type`
+        SELECT sfp.`flash_promotion_id`,
+               sfp.`flash_promotion_title`,
+               sfp.`start_time`,
+               sfp.`end_time`,
+               sfp.`is_publish_status` AS publishStatus,
+               sfp.`is_home_status`    AS homeStatus,
+               sfp.`cpy_type`
         FROM `sms_flash_promotion` AS sfp
         WHERE sfp.`cpy_type` = #{cpyType}
-        AND NOW() &lt; sfp.`end_time`
-        AND sfp.`is_publish_status` = 1
-        ORDER BY sfp.`end_time` ASC LIMIT 1;
+          AND NOW() <![CDATA[ < ]]> sfp.`end_time`
+          AND sfp.`is_publish_status` = 1
+        ORDER BY sfp.`end_time`
+        LIMIT 1;
     </select>
     <select id="selectToDayPromotionIds" resultType="java.lang.Long">
         SELECT sfp.`flash_promotion_id` FROM `sms_flash_promotion` AS sfp WHERE sfp.`end_time` BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00') AND DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59')
     </select>
     <select id="findFlashPromotionId" resultType="com.ys.mail.model.dto.TemporaryWorkerMasters">
-       SELECT GROUP_CONCAT(sfp.`flash_promotion_id`) AS `flashPromotionId` ,sfp.`end_time` AS `date` FROM `sms_flash_promotion` AS sfp WHERE sfp.`end_time` > NOW() AND sfp.`is_publish_status` = 1 GROUP BY DATE_FORMAT(sfp.`end_time`,"%Y-%m-%d") ORDER BY sfp.`end_time` DESC
+       SELECT GROUP_CONCAT(sfp.`flash_promotion_id`) AS `flashPromotionId` ,sfp.`end_time` AS `date` FROM `sms_flash_promotion` AS sfp WHERE sfp.`end_time` <![CDATA[ > ]]> NOW() AND sfp.`is_publish_status` = 1 GROUP BY DATE_FORMAT(sfp.`end_time`,'%Y-%m-%d') ORDER BY sfp.`end_time` DESC
     </select>
 
 
     <select id="findFlashPromotionIds" resultType="com.ys.mail.model.dto.TemporaryWorkerMasters">
-        SELECT GROUP_CONCAT(sfp.`flash_promotion_id`) AS `flashPromotionId` ,sfp.`end_time` AS `date` FROM `sms_flash_promotion` AS sfp WHERE DATE_FORMAT(sfp.`end_time`,"%Y%m%d") = #{date} AND sfp.`is_publish_status` = 1 GROUP BY DATE_FORMAT(sfp.`end_time`,"%Y-%m-%d") ORDER BY sfp.`end_time` DESC LIMIT 1
+        SELECT GROUP_CONCAT(sfp.`flash_promotion_id`) AS `flashPromotionId` ,sfp.`end_time` AS `date` FROM `sms_flash_promotion` AS sfp WHERE DATE_FORMAT(sfp.`end_time`,'%Y%m%d') = #{date} AND sfp.`is_publish_status` = 1 GROUP BY DATE_FORMAT(sfp.`end_time`,'%Y-%m-%d') ORDER BY sfp.`end_time` DESC LIMIT 1
     </select>
     <select id="findNewestFlashPromotion" resultMap="BaseResultMap">
-        SELECT sfp.`flash_promotion_id`,sfp.`start_time` FROM `sms_flash_promotion` AS sfp WHERE sfp.`flash_promotion_id` != #{flashPromotionId}
-        AND sfp.`is_publish_status` = 1 AND sfp.`cpy_type` = #{cpyType} AND sfp.`start_time` &gt; NOW()
-        ORDER BY sfp.`start_time` ASC
+        SELECT sfp.`flash_promotion_id`, sfp.`start_time`
+        FROM `sms_flash_promotion` AS sfp
+        WHERE sfp.`flash_promotion_id` != #{flashPromotionId}
+          AND sfp.`is_publish_status` = 1
+          AND sfp.`cpy_type` = #{cpyType}
+          AND sfp.`start_time` <![CDATA[ > ]]> NOW()
+        ORDER BY sfp.`start_time`
         LIMIT 1
     </select>
 

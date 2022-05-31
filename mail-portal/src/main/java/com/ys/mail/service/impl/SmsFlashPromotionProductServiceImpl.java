@@ -1,6 +1,8 @@
 package com.ys.mail.service.impl;
 
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -539,8 +541,16 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             sfpp.setOrderId(orderInfo.getOrderId());
             // 合伙人原价格      如果置换-则拿  置换后产品价格  否则 拿订单的合伙人原价格
             sfpp.setPartnerPrice(br ? skuStock.getPrice() : orderInfo.getPartnerPrice());
-            // 加入截止日期
-            sfpp.setExpireTime(orderInfo.getExpireTime());
+
+            // 获取设置中定义的秒杀上架截止时间的最低天数（自动延长时间），如：7天
+            Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_four);
+            Optional.ofNullable(days).map(map -> {
+                // 加入截止日期
+                DateTime offsetDay = DateUtil.offsetDay(DateTool.getNow(), days);
+                sfpp.setExpireTime(offsetDay);
+                return days;
+            });
+
             // true 置换成功
             boolean b = saveOrUpdate(sfpp);
 
@@ -769,17 +779,20 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Override
     public MyStorePO getMyStore(Integer pageSize, Byte cpyType) {
         return MyStorePO.builder()
-                        .storeDtoS(getMyStore(flashPromotionProductMapper.selectMyStore(pageSize, UserUtil.getCurrentUser()
+                        .storeDtoS(getMyStore(flashPromotionProductMapper.selectMyStore(pageSize, UserUtil
+                                .getCurrentUser()
                                 .getUserId(), cpyType)))
                         .msgVO(historyService.getShopMsg())
                         .build();
     }
 
-    private List<MyStoreDTO> getMyStore(List<MyStoreDTO> dTos){
+    private List<MyStoreDTO> getMyStore(List<MyStoreDTO> dTos) {
         dTos.stream().filter(Objects::nonNull).forEach(
-                x->{
+                x -> {
                     long time = System.currentTimeMillis();
-                    if(BlankUtil.isNotEmpty(x) && BlankUtil.isNotEmpty(x.getExpireTime()) && time > x.getExpireTime().getTime() && !x.getFlashProductStatus().equals(SettingTypeEnum.five.key())){
+                    if (BlankUtil.isNotEmpty(x) && BlankUtil.isNotEmpty(x.getExpireTime()) && time > x.getExpireTime()
+                                                                                                      .getTime() && !x
+                            .getFlashProductStatus().equals(SettingTypeEnum.five.key())) {
                         x.setFlashProductStatus(NumberUtils.INTEGER_MINUS_ONE);
                     }
                 }
@@ -790,7 +803,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     @Override
     public List<MyStoreDTO> getAllProduct(Byte cpyType, String flashPromotionPdtId) {
         Long id = BlankUtil.isEmpty(flashPromotionPdtId) ? null : Long.valueOf(flashPromotionPdtId);
-        return getMyStore(flashPromotionProductMapper.selectAllProduct(cpyType, id, UserUtil.getCurrentUser().getUserId()));
+        return getMyStore(flashPromotionProductMapper.selectAllProduct(cpyType, id, UserUtil.getCurrentUser()
+                                                                                            .getUserId()));
     }
 
     @Override
@@ -885,8 +899,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     public synchronized CommonResult<Boolean> refund(Long flashPromotionPdtId) {
 
         SmsFlashPromotionProduct promotionProduct = this.getById(flashPromotionPdtId);
-        ApiAssert.noValue(promotionProduct,BusinessErrorCode.GOODS_NOT_EXIST);
-        ApiAssert.noValue(promotionProduct.getFlashProductStatus(),BusinessErrorCode.NPE_PARAM);
+        ApiAssert.noValue(promotionProduct, BusinessErrorCode.GOODS_NOT_EXIST);
+        ApiAssert.noValue(promotionProduct.getFlashProductStatus(), BusinessErrorCode.NPE_PARAM);
         Long partnerPrice = promotionProduct.getPartnerPrice();
         Long flashPromotionPrice = promotionProduct.getFlashPromotionPrice();
         Long publisherId = promotionProduct.getPublisherId();
@@ -894,32 +908,31 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         Long userId = promotionProduct.getUserId();
         Integer flashPromotionCount = promotionProduct.getFlashPromotionCount();
         Date expireTime = promotionProduct.getExpireTime();
-        ApiAssert.noEq(UserUtil.getCurrentUser().getUserId(),userId,BusinessErrorCode.GOODS_NOT_EXIST);
-        if(BlankUtil.isNotEmpty(expireTime) && DateTool.isExpireTime(expireTime)){
+        ApiAssert.noEq(UserUtil.getCurrentUser().getUserId(), userId, BusinessErrorCode.GOODS_NOT_EXIST);
+        if (BlankUtil.isNotEmpty(expireTime) && DateTool.isExpireTime(expireTime)) {
             promotionProduct.setFlashProductStatus(NumberConstant.MINUS_ONE);
         }
         Integer status = promotionProduct.getFlashProductStatus();
-        if(!ObjectUtil.equal(status,NumberUtils.INTEGER_MINUS_ONE)){
+        if (!ObjectUtil.equal(status, NumberUtils.INTEGER_MINUS_ONE)) {
             return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_PDT_SALE);
         }
-        ApiAssert.noValue(partnerPrice,BusinessErrorCode.PDT_SUPPLY_NOT);
-        if(BlankUtil.isNotEmpty(flashPromotionPrice) && flashPromotionPrice.compareTo(partnerPrice) < NumberUtils.INTEGER_ZERO){
+        ApiAssert.noValue(partnerPrice, BusinessErrorCode.PDT_SUPPLY_NOT);
+        if (BlankUtil.isNotEmpty(flashPromotionPrice) && flashPromotionPrice.compareTo(partnerPrice) < NumberUtils.INTEGER_ZERO) {
             return CommonResult.failed(BusinessErrorCode.PDT_UNDER_SUPPLY_PRICE);
         }
-        if(BlankUtil.isEmpty(promotionProduct.getUserId()) || BlankUtil.isEmpty(productId) || BlankUtil.isEmpty(flashPromotionCount) ||
-                ObjectUtil.equal(flashPromotionCount,NumberUtils.INTEGER_ZERO)){
+        if (BlankUtil.isEmpty(promotionProduct.getUserId()) || BlankUtil.isEmpty(productId) || BlankUtil.isEmpty(flashPromotionCount) ||
+                ObjectUtil.equal(flashPromotionCount, NumberUtils.INTEGER_ZERO)) {
             return CommonResult.failed(BusinessErrorCode.NPE_PARAM);
         }
 
         UmsIncome umsIncome = umsIncomeMapper.selectNewestByUserId(userId);
         boolean empty = BlankUtil.isEmpty(umsIncome);
-        long income = empty ? NumberUtils.LONG_ZERO : umsIncome.getIncome();
         long balance = empty ? NumberUtils.LONG_ZERO : umsIncome.getBalance();
         long allIncome = empty ? NumberUtils.LONG_ZERO : umsIncome.getAllIncome();
         UmsIncome build = UmsIncome.builder()
                 .incomeId(IdWorker.generateId())
                 .userId(userId)
-                .income(income + partnerPrice)
+                .income(partnerPrice)
                 .expenditure(NumberUtils.LONG_ZERO)
                 .balance(balance + partnerPrice)
                 .allIncome(allIncome + partnerPrice)
@@ -932,10 +945,10 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
                 .orderTradeNo(FigureConstant.STRING_EMPTY)
                 .build();
         SmsFlashPromotionProduct build1 = SmsFlashPromotionProduct.builder()
-                .flashPromotionPdtId(flashPromotionPdtId)
-                .flashProductStatus(SmsFlashPromotionProduct.FlashProductStatus.FIVE.key())
-                .flashPromotionCount(NumberUtils.INTEGER_ZERO)
-                .build();
+                                                                  .flashPromotionPdtId(flashPromotionPdtId)
+                                                                  .flashProductStatus(SmsFlashPromotionProduct.FlashProductStatus.FIVE.key())
+                                                                  .flashPromotionCount(NumberUtils.INTEGER_ZERO)
+                                                                  .build();
         umsIncomeMapper.insert(build);
         this.updateById(build1);
         return CommonResult.success(Boolean.TRUE);

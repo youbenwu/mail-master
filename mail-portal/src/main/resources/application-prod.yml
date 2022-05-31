@@ -46,8 +46,8 @@ logging:
   level:
     root: info
     com.ys.mail: info
-    #file:
-    # path: D:/idea/happyMail     #打印日志 日志关掉,服务器上有日志记录
+  file:
+    path: /home/project/qcy_mail/logs/portal # 服务器上日志存储位置
 
 logstash:
   host: localhost
