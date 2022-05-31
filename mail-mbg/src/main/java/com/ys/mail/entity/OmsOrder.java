@@ -9,6 +9,7 @@ import com.ys.mail.enums.IPairs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -191,7 +192,9 @@ public class OmsOrder implements Serializable {
     @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
     private Date expireTime;
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum PayType implements IPairs<Integer, String, PayType> {
         /**
          * 支付类型
@@ -201,21 +204,14 @@ public class OmsOrder implements Serializable {
         TWO(2, "支付宝"),
         THREE(3, "余额支付"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
+        public static final String DOCUMENT = "支付状态：0->未支付，1->云闪付，2->支付宝，3->余额支付";
     }
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum OrderStatus implements IPairs<Integer, String, OrderStatus> {
         /**
          * 订单状态
@@ -230,21 +226,14 @@ public class OmsOrder implements Serializable {
         SEVEN(7, "待评价"),
         EIGHT(8, "已核销"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
+        public static final String DOCUMENT = "订单状态：0->待付款，1->待发货，2->已发货，3->已完成，4->已关闭，5->无效订单，6->已付款，7->待评价，8->已核销";
     }
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum OrderType implements IPairs<Integer, String, OrderType> {
         /**
          * 订单类型
@@ -254,20 +243,11 @@ public class OmsOrder implements Serializable {
         TWO(2, "拼团订单"),
         THREE(3, "付费会员订单"),
         FOUR(4, "创客订单"),
-        FIVE(5,"会员订单"),
+        FIVE(5, "会员订单"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
+        public static final String DOCUMENT = "订单类型：0->正常订单，1->秒杀订单，2->拼团订单，3->付费会员订单，4->创客订单，5->会员订单";
     }
 
 }

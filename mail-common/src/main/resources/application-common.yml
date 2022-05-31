@@ -2,6 +2,8 @@
 global:
   dev-mode: true # 开发模式，false：表示执行关键步骤，true：表示不执行，方便开发
   project-name: 轻创营 # 项目名称
+  app-zero-name: 轻创营 # APP客户端名称
+  app-one-name: 卖乐吧
 
 # 自定义redis key timeout: 验证码
 redis:
@@ -61,12 +63,28 @@ cos:
   region: ap-guangzhou # 桶区域
   durationSeconds: 1800 # 30分钟，临时密钥有效时长，单位是秒
   uploadFolder: images # 上传主目录
-  cdnDomain: test-1257583875.cos.ap-guangzhou.myqcloud.com # 默认域名或CDN加速域名
+  cdnDomain: test-1257583875.cos.ap-guangzhou.myqcloud.com # 源站地址，默认不走CDN
+#  cdnDomain: testcos.huwing.cn # 默认域名或CDN加速域名，开发环境无需开启cdn，避免浪费流量
   threadPool: 32 # 线程数
   allowPrefixes: # 临时凭证的白名单
     - "*"
   allowActions: # 临时凭证的权限
     - "*:*"
+
+# 腾讯云OSS配置
+#cos:
+#  secretId: AKIDjLjtoVxAMJ2YqthGafV6VkqjNmxuhGaf # 永久身份
+#  secretKey: sVs0tXw74lCOK3YoqdBgz3tTvBD0Ysyq # 永久密钥
+#  bucket: qcy-1257583875 # 默认桶名称
+#  region: ap-guangzhou # 桶区域
+#  durationSeconds: 1800 # 30分钟，临时密钥有效时长，单位是秒
+#  uploadFolder: images # 上传主目录
+#  cdnDomain: cos.jitiger.cn # 默认域名或CDN加速域名
+#  threadPool: 32 # 线程数
+#  allowPrefixes: # 临时凭证的白名单
+#    - "*"
+#  allowActions: # 临时凭证的权限
+#    - "*:*"
 
 #cfr:
 #  daWeiHu:

@@ -50,7 +50,6 @@
         <result column="partner_id" property="partnerId"/>
         <result column="buyer_logon_id" property="buyerLogonId"/>
         <result column="expire_time" property="expireTime"/>
-
     </resultMap>
 
     <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.OmsOrderVO">
@@ -70,8 +69,6 @@
             <result column="product_price" property="productPrice"/>
             <result column="is_appraise" property="appraise"/>
             <result column="product_quantity" property="productQuantity"/>
-            <result column="kd_code" property="kdCode"/>
-            <result column="kd_name" property="kdName"/>
             <result column="product_name" property="productName"/>
             <result column="product_id" property="productId"/>
             <result column="product_pic" property="productPic"/>
@@ -113,6 +110,29 @@
             <result column="product_quantity" property="productQuantity"/>
             <result column="product_name" property="productName"/>
             <result column="product_id" property="productId"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="OrderDetailsVOMap" type="com.ys.mail.model.admin.vo.OrderDetailsVO" extends="BaseResultMap">
+        <result column="nickname" property="nickname"/>
+        <result column="phone" property="phone"/>
+        <!--一对多，方式一-->
+        <collection property="omsOrderItem" ofType="com.ys.mail.model.vo.OmsOrderItemVO" column="order_id">
+            <id column="order_item_id" jdbcType="BIGINT" property="orderItemId"/>
+            <result column="order_id" property="orderId"/>
+            <result column="product_id" property="productId"/>
+            <result column="pdt_cgy_name" property="pdtCgyName"/>
+            <result column="order_sn" property="orderSn"/>
+            <result column="product_pic" property="productPic"/>
+            <result column="product_name" property="productName"/>
+            <result column="product_brand" property="productBrand"/>
+            <result column="product_sn" property="productSn"/>
+            <result column="product_price" property="productPrice"/>
+            <result column="product_quantity" property="productQuantity"/>
+            <result column="product_sku_id" property="productSkuId"/>
+            <result column="product_attr" property="spData"/>
+            <result column="create_time" property="createTime"/>
+            <result column="is_appraise" property="appraise"/>
         </collection>
     </resultMap>
 
@@ -162,12 +182,12 @@
 
     <select id="getUserOrderList" resultType="com.ys.mail.model.vo.UserOrderVO">
         SELECT
-            oo.order_id,
-            oo.payment_time,
-            oo.pay_amount,
-            ooi.product_name
+        oo.order_id,
+        oo.payment_time,
+        oo.pay_amount,
+        ooi.product_name
         FROM
-            oms_order oo LEFT JOIN oms_order_item ooi ON oo.order_id = ooi.order_id
+        oms_order oo LEFT JOIN oms_order_item ooi ON oo.order_id = ooi.order_id
         <where>
             oo.order_type = 1
             AND oo.trans_id > 0
@@ -513,27 +533,26 @@
     </resultMap>
 
     <select id="selectByPidPrPdtOrder" resultMap="PidPrPdtResultMap">
-        select
-        oo.order_id,
-        oo.user_id,
-        sum(oo.total_amount) total_amount,
-        sum(ooi.product_quantity) product_quantity,
-        ppp.partner_pdt_id,
-        ppp.partner_name,
-        ppp.partner_price,
-        ppp.earnest_money,
-        ppp.total_price,
-        ppp.re_periods,
-        uui.parent_id
+        select oo.order_id,
+               oo.user_id,
+               sum(oo.total_amount)      total_amount,
+               sum(ooi.product_quantity) product_quantity,
+               ppp.partner_pdt_id,
+               ppp.partner_name,
+               ppp.partner_price,
+               ppp.earnest_money,
+               ppp.total_price,
+               ppp.re_periods,
+               uui.parent_id
         from oms_order oo
-        left join oms_order_item ooi on oo.order_id = ooi.order_id
-        left join pms_partner_product ppp on ooi.partner_pdt_id = ppp.partner_pdt_id
-        left join ums_user_invite uui on oo.user_id = uui.user_id
+                     left join oms_order_item ooi on oo.order_id = ooi.order_id
+                     left join pms_partner_product ppp on ooi.partner_pdt_id = ppp.partner_pdt_id
+                     left join ums_user_invite uui on oo.user_id = uui.user_id
         where oo.order_type = 4
-        and oo.trans_id <![CDATA[ > ]]> 0
-        and TO_DAYS( NOW( ) ) - TO_DAYS(oo.payment_time) <![CDATA[ <= ]]> 1
-        and oo.total_amount <![CDATA[ >= ]]> 1680000
-        and ppp.is_publish_status = 1
+          and oo.trans_id <![CDATA[ > ]]> 0
+          and TO_DAYS(NOW()) - TO_DAYS(oo.payment_time) <![CDATA[ <= ]]> 1
+          and oo.total_amount <![CDATA[ >= ]]> 1680000
+          and ppp.is_publish_status = 1
         GROUP BY uui.parent_id
     </select>
 
@@ -547,19 +566,27 @@
     </resultMap>
 
     <select id="selectByOrdinaryReMoney" resultMap="OReResultMap">
-        SELECT
-        count(*) quantity,
-        sum( oo.total_amount ) total_amount,
-        uui.parent_id
-        FROM
-        oms_order oo
-        LEFT JOIN ums_user_invite uui ON oo.user_id = uui.user_id
-        WHERE
-        oo.trans_id <![CDATA[ > ]]> 0
-        AND oo.order_type = #{ite}
-        AND TO_DAYS( NOW( ) ) - TO_DAYS( oo.payment_time ) <![CDATA[ <= ]]> 1
-        AND oo.pay_type > 0
-        GROUP BY
-        uui.parent_id
+        SELECT count(*)             quantity,
+               sum(oo.total_amount) total_amount,
+               uui.parent_id
+        FROM oms_order oo
+                     LEFT JOIN ums_user_invite uui ON oo.user_id = uui.user_id
+        WHERE oo.trans_id <![CDATA[ > ]]> 0
+          AND oo.order_type = #{ite}
+          AND TO_DAYS(NOW()) - TO_DAYS(oo.payment_time) <![CDATA[ <= ]]> 1
+          AND oo.pay_type > 0
+        GROUP BY uui.parent_id
+    </select>
+
+    <select id="getOrderDetails" resultMap="OrderDetailsVOMap">
+        SELECT oo.*,
+               t2.*,
+               t3.pdt_cgy_name,
+               uu.nickname,
+               uu.phone
+        FROM oms_order oo
+                     LEFT JOIN oms_order_item t2 ON oo.order_id = t2.order_id
+                     LEFT JOIN pms_product_category t3 ON t2.pdt_cgy_id = t3.pdt_cgy_id
+                     LEFT JOIN ums_user uu ON oo.user_id = uu.user_id ${ew.customSqlSegment}
     </select>
 </mapper>

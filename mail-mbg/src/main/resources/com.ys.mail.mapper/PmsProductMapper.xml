@@ -341,6 +341,9 @@
         left join pms_product_category c on c.pdt_cgy_id=a.pdt_cgy_id
         left join pms_product_attribute_category d on d.pdt_attribute_cgy_id=a.pdt_attribute_cgy_id
         <where>
+            <if test="query.productId != null and query.productId !=''">
+                AND a.product_id = #{query.productId}
+            </if>
             <if test="query.deleted != null and query.deleted !=''">
                 AND a.deleted = #{query.deleted}
             </if>

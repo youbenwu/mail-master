@@ -59,7 +59,7 @@ public class IndexController {
         return CommonResult.success(result);
     }
 
-    @ApiOperation("大尾狐自营列表-DT")
+    @ApiOperation("自营列表-DT")
     @GetMapping("/getAll/{productId:^0|^\\d{19}$}")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "productId", value = "商品id,翻页,首次传进来为0,翻页每次传最后一个id", dataType = "Long", required = true)

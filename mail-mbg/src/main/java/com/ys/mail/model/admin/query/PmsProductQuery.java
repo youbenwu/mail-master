@@ -16,9 +16,10 @@ import lombok.EqualsAndHashCode;
 @ApiModel(value = "PmsProductQuery", description = "后台商品查询接口参数")
 public class PmsProductQuery extends Query {
 
+    @ApiModelProperty(value = "商品ID")
+    private Long productId;
     @ApiModelProperty(value = "商品名称")
     private String productName;
-
     @ApiModelProperty(value = "商品分类id")
     @BlankOrPattern(regexp = "^\\d{19}$", message = "ID不合法，请检查！")
     private String pdtCgyId;

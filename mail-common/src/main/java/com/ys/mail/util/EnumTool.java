@@ -1,6 +1,8 @@
 package com.ys.mail.util;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.ys.mail.constant.StringConstant;
+import com.ys.mail.constant.WarningsConstant;
 import com.ys.mail.enums.IPairs;
 
 import java.lang.reflect.Field;
@@ -10,10 +12,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * @Desc 枚举工具类（依赖 hutool 工具）
+ * 枚举工具类（依赖 HuTool 工具）
  * - 配合接口，更方便使用 {@link IPairs}
- * @Author CRH
- * @Create 2022-02-25 18:16
+ *
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 public class EnumTool {
 
@@ -67,6 +71,7 @@ public class EnumTool {
      * @return 返回key对应的枚举
      * - 查找不到则返回null，所以需要判空
      */
+    @SuppressWarnings(WarningsConstant.UNCHECKED)
     public static <K, V, C extends Enum<C>> C getEnum(Class<? extends IPairs<K, V, C>> iPairsClass, K key) {
         IPairs<K, V, C>[] enumConstants = iPairsClass.getEnumConstants();
         return (C) Arrays.stream(enumConstants).filter(e -> e.key().equals(key)).findFirst().orElse(null);
@@ -80,9 +85,52 @@ public class EnumTool {
      * @return 返回key对应的枚举值
      * - 查找不到则返回null，所以需要判空
      */
+    @SuppressWarnings(WarningsConstant.UNCHECKED)
     public static <K, V, C extends Enum<C>> V getValue(Class<? extends IPairs<K, V, C>> iPairsClass, K key) {
         IPairs<K, V, C> iPairs = (IPairs<K, V, C>) getEnum(iPairsClass, key);
         return Optional.ofNullable(iPairs).map(IPairs::value).orElse(null);
+    }
+
+    /**
+     * 生成 JAVA静态常量 枚举文档 <br/>
+     * 注意：一般为首次或当枚举类型变更时调用，通过测试类执行即可
+     *
+     * @param iPairsClass 枚举类，必须实现{@link IPairs}接口才可以使用该方法
+     * @param docName     文档名称：如 用户类型、订单状态等
+     * @return 生成的Java静态常量代码，拷贝到枚举类中即可
+     */
+    public static <K, V, C extends Enum<C>> String documentCode(Class<? extends IPairs<K, V, C>> iPairsClass, String docName) {
+        String document = document(iPairsClass, docName);
+        String sb = "public static final String DOCUMENT" +
+                StringConstant.EQUAL_SIGN +
+                StringConstant.DOUBLE_QUOTE +
+                StringConstant.PLACEHOLDER_S +
+                StringConstant.DOUBLE_QUOTE +
+                StringConstant.EN_SEMICOLON;
+        return String.format(sb, document);
+    }
+
+    /**
+     * 生成枚举文档，常用于API接口中使用 <br/>
+     * 注意：一般为首次或当枚举类型变更时调用，通过测试类执行即可
+     *
+     * @param iPairsClass 枚举类，必须实现{@link IPairs}接口才可以使用该方法
+     * @param docName     文档名称：如 用户类型、订单状态等
+     * @return 生成枚举中所有属性拼接后的文档
+     */
+    public static <K, V, C extends Enum<C>> String document(Class<? extends IPairs<K, V, C>> iPairsClass, String docName) {
+        IPairs<K, V, C>[] enumConstants = iPairsClass.getEnumConstants();
+        StringBuilder sb = new StringBuilder();
+
+        if (BlankUtil.isNotEmpty(docName)) {
+            sb.append(docName)
+              .append(StringConstant.ZH_COLON);
+        }
+
+        Arrays.stream(enumConstants).forEach(e -> {
+            sb.append(e.key()).append(StringConstant.SIMPLE_ARROWS).append(e.value()).append(StringConstant.ZH_COMMA);
+        });
+        return sb.substring(0, sb.length() - 1);
     }
 
     /**
@@ -94,6 +142,7 @@ public class EnumTool {
      * @param <E>       enum
      * @return boolean
      */
+    @SuppressWarnings(WarningsConstant.UNCHECKED)
     private static <E extends Enum<E>> E of(Class<? extends Enum<?>> enumClass, String fieldName, Object value) {
         if (value instanceof CharSequence) {
             value = value.toString().trim();
@@ -114,7 +163,9 @@ public class EnumTool {
             e = (E) Arrays.stream(enums)
                           .filter(en -> StringUtil.compareKey(ReflectUtil.getFieldValue(en, field), finalValue))
                           .findFirst().orElse(null);
-            if (null != e) break;
+            if (null != e) {
+                break;
+            }
         }
         return e;
     }

@@ -39,7 +39,9 @@ public class ChainLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements Map
      * @return this
      */
     public ChainLinkedHashMap<K, V> putObj(K key, V value, boolean condition) {
-        if (condition) super.put(key, value);
+        if (condition) {
+            super.put(key, value);
+        }
         return this;
     }
 

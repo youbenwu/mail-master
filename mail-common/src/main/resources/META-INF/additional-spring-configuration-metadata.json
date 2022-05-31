@@ -8,6 +8,14 @@
       "name": "global.project-name",
       "type": "java.lang.String",
       "description": "Description for global.project-name."
+    }, {
+      "name": "global.app-zero-name",
+      "type": "java.lang.String",
+      "description": "Description for global.app-zero-name."
+    }, {
+      "name": "global.app-one-name",
+      "type": "java.lang.String",
+      "description": "Description for global.app-one-name."
     }
   ]
 }

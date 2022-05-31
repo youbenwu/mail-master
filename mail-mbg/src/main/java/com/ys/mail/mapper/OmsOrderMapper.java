@@ -9,10 +9,7 @@ import com.ys.mail.model.admin.dto.ExportOrderDTO;
 import com.ys.mail.model.admin.dto.excel.OrderCollectDTO;
 import com.ys.mail.model.admin.dto.excel.UserOrderDetailsDTO;
 import com.ys.mail.model.admin.param.ExportOrderParam;
-import com.ys.mail.model.admin.vo.OrdinaryReMoneyVO;
-import com.ys.mail.model.admin.vo.PcUserOrderVO;
-import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
-import com.ys.mail.model.admin.vo.PrPdtOrderVO;
+import com.ys.mail.model.admin.vo.*;
 import com.ys.mail.model.dto.OmsOrderDTO;
 import com.ys.mail.model.dto.OrderInfoDTO;
 import com.ys.mail.model.dto.QuickOrderDTO;
@@ -23,7 +20,6 @@ import com.ys.mail.model.vo.PartnerTodayResultsVO;
 import com.ys.mail.model.vo.UserOrderVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
 
 import java.util.List;
 
@@ -141,14 +137,24 @@ public interface OmsOrderMapper extends BaseMapper<OmsOrder> {
 
     /**
      * 查询出创客待返还给推荐人
+     *
      * @return 返回值
      */
     List<PidPrPdtOrderVO> selectByPidPrPdtOrder();
 
     /**
      * 查询出返佣对象
-     * @param ite  参数
+     *
+     * @param ite 参数
      * @return 返回值
      */
     List<OrdinaryReMoneyVO> selectByOrdinaryReMoney(@Param("ite") Integer ite);
+
+    /**
+     * 获取订单与详情
+     *
+     * @param wrapper 条件
+     * @return 列表
+     */
+    List<OrderDetailsVO> getOrderDetails(@Param(Constants.WRAPPER) Wrapper<PcUserOrderVO> wrapper);
 }

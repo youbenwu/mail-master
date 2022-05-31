@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.OmsOrderItem;
 import com.ys.mail.mapper.OmsOrderItemMapper;
 import com.ys.mail.model.vo.OmsOrderItemSearchVO;
-import com.ys.mail.model.vo.OmsOrderItemVO;
 import com.ys.mail.model.vo.OrderItemSkuVO;
 import com.ys.mail.service.OmsOrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +25,6 @@ public class OmsOrderItemServiceImpl extends ServiceImpl<OmsOrderItemMapper, Oms
 
     @Autowired
     private OmsOrderItemMapper omsOrderItemMapper;
-
-    @Override
-    public List<OmsOrderItemVO> getItemList(Long orderId) {
-        List<OmsOrderItemVO> result = omsOrderItemMapper.getItemList(orderId);
-        return result;
-    }
 
     @Override
     public List<Long> getOrderIdsByProductName(String productName, Long orderId, Integer pageSize) {

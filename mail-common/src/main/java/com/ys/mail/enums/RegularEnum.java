@@ -21,9 +21,10 @@ public enum RegularEnum {
     /**
      * 主键ID，19位，只适用于长度固定的ID
      */
+    @Deprecated
     ID("^\\d{19}$"),
     /**
-     * 新格式ID：至少一位数字即可，移除19位限制，防止后续ID长度变化，适用更多场景
+     * 主键KEY：至少一位数字即可，移除位数限制，防止后续ID长度变化，适用更多场景
      */
     KEY("^\\d+$"),
     /**
@@ -38,6 +39,7 @@ public enum RegularEnum {
      * 文件名，格式：xxx.xxx / xxx001-xxx.xxx等
      */
     FILENAME("^[^\\u4E00-\\u9FA5]+\\.[a-zA-Z\\d]+$"),
+    ZERO_ONE("[01]"),
 
     ;
 

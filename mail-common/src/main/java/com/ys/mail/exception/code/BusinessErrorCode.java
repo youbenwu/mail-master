@@ -101,6 +101,7 @@ public enum BusinessErrorCode implements IErrorCode {
     ERR_FILE_SIZE_EXCEED(400503, "该类型的文件大小最大限制为 %s"),
 
     UNFINISHED_APP_UPLOAD(400600, "APP未上传或未上传完成"),
+    APP_NOT_GENERATE_QRCODE(400601, "APP未生成二维码，无法发布"),
 
     ERR_SETTING_TYPE_NOT_EXIST(400700, "设置类型不存在，无法发布"),
 

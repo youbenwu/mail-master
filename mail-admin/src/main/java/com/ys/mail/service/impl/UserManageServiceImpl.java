@@ -169,7 +169,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
 
     @Override
     public void exportUserDetailsExcel(Long userId, HttpServletResponse response) {
-        String fileName = globalConfig.getProjectName() + "-个人明细数据";
+        String fileName = "个人明细数据";
         try (CostTimeUtil ignored = new CostTimeUtil("导出" + fileName)) {
             // 查询用户基本信息
             UmsUser umsUser = this.getById(userId);
@@ -182,10 +182,11 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
             this.addUserSecKillData(userId, workbookMap);
             // 定义名称
             String fullName = String.format("%s-%s", umsUser.getNickname(), fileName);
-            if (BlankUtil.isNotEmpty(umsUser.getAlipayName()))
+            if (BlankUtil.isNotEmpty(umsUser.getAlipayName())) {
                 fullName = String.format("%s-%s", umsUser.getAlipayName(), fileName);
+            }
             // 导出Excel
-            ExcelTool.writeExcel(workbookMap, fullName, response);
+            ExcelTool.writeExcel(workbookMap, globalConfig.getProjectName() + "-" + fullName, response);
         }
     }
 
@@ -215,7 +216,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
                    .putObj("实收金额", f.getTotalAmount())
                    .putObj("商品数量", f.getFlashPromotionCount())
                    .putObj("秒杀商品状态", EnumTool.getValue(SmsFlashPromotionProduct.FlashProductStatus.class, f.getFlashProductStatus()))
-                   .putObj("客户端类型", NumberUtils.INTEGER_ZERO.equals(f.getCpyType()) ? "大尾狐" : "呼啦兔")
+                   .putObj("客户端类型", globalConfig.appName(f.getCpyType()))
                    .putObj("创建时间", f.getCreateTime())
                    .putObj("更新时间", f.getUpdateTime())
                    .putObj("商品名称", f.getProductName());
@@ -239,6 +240,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
                    .putObj("余额", NumberUtil.ifZeroReturnZero(DecimalUtil.longToDoubleForDivider(i.getBalance())))
                    .putObj("类型", EnumTool.getValue(UmsIncome.IncomeType.class, i.getIncomeType()))
                    .putObj("时间", i.getCreateTime())
+                   .putObj("秒杀商品ID", i.getFlashPromotionPdtId())
                    .putObj("描述", i.getDetailSource())
                    .putObj("备注", i.getRemark());
                 rows.add(map);
@@ -301,7 +303,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
                    .putObj("下单时间", o.getCreateTime())
                    .putObj("支付时间", o.getPaymentTime())
                    .putObj("交易流水号", o.getTransId())
-                   .putObj("客户端类型", NumberUtils.INTEGER_ZERO.equals(o.getCpyType()) ? "大尾狐" : "呼啦兔")
+                   .putObj("客户端类型", globalConfig.appName(o.getCpyType()))
                    .putObj("订单备注", o.getOrderNote())
                    .putObj("商品名称", o.getProductName());
                 rows.add(map);
@@ -409,7 +411,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
                 .putObj("创客消费", NumberUtil.ifZeroReturnZero(order.getMakerConsume()), condition)
                 .putObj("待收货", NumberUtil.ifZeroReturnZero(waitTake), condition)
                 .putObj("待秒杀", NumberUtil.ifZeroReturnZero(secKill.getWaitSecKill()), condition)
-                .putObj("已上架", NumberUtil.ifZeroReturnZero(secKill.getWaitPutAway()), condition)
+                .putObj("可上架(售卖)", NumberUtil.ifZeroReturnZero(secKill.getWaitPutAway()), condition)
                 .putObj("待卖出", NumberUtil.ifZeroReturnZero(secKill.getWaitSell()), condition)
                 .putObj("总未卖", NumberUtil.ifZeroReturnZero(sumSell + waitTake))
                 .putObj("预计卖出收益", NumberUtil.ifZeroReturnZero(saleSumIncome))

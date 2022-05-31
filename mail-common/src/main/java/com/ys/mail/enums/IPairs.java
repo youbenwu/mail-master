@@ -13,8 +13,6 @@ import com.ys.mail.constant.WarningsConstant;
  */
 public interface IPairs<K, V, C extends Enum<C>> {
 
-    public static final int i = 10;
-
     /**
      * 默认实现：返回枚举对象
      *

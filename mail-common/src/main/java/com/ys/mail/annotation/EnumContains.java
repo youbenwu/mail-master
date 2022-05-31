@@ -1,5 +1,6 @@
 package com.ys.mail.annotation;
 
+import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.EnumTool;
 import com.ys.mail.util.StringUtil;
 import org.slf4j.Logger;
@@ -63,6 +64,11 @@ public @interface EnumContains {
     String[] exclude() default {};
 
     /**
+     * 是否允许为空，true->必须传值（默认），false->允许为空
+     */
+    boolean required() default true;
+
+    /**
      * 内部校验器
      */
     class EnumContainsValidator implements ConstraintValidator<EnumContains, Object> {
@@ -72,16 +78,23 @@ public @interface EnumContains {
         private Class<? extends Enum<?>> enumClass;
         private String[] include;
         private String[] exclude;
+        private boolean required;
 
         @Override
         public void initialize(EnumContains enumContains) {
             this.enumClass = enumContains.enumClass();
             this.include = enumContains.include();
             this.exclude = enumContains.exclude();
+            this.required = enumContains.required();
         }
 
         @Override
         public boolean isValid(Object key, ConstraintValidatorContext constraintValidatorContext) {
+            // 非空检测
+            if (!required && BlankUtil.isEmpty(key)) {
+                return true;
+            }
+
             // 先判断是否被排除，当已经排除了则无法再进行匹配
             if (include.length == 0) {
                 for (String s : exclude) {
