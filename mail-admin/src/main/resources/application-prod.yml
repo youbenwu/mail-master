@@ -52,8 +52,8 @@ logging:
       springframework:
         boot:
           autoconfigure: ERROR
-  file:
-    path: /home/logs/qcy_mail/admin # 服务器上日志存储位置
+    file:
+      path: /home/project/qcy_mail/logs/admin # 服务器上日志存储位置
 
 
 logstash:

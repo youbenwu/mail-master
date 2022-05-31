@@ -47,7 +47,7 @@ logging:
     root: info
     com.ys.mail: info
   file:
-    path: /home/logs/qcy_mail/portal # 服务器上日志存储位置
+    path: /home/project/qcy_mail/logs/portal # 服务器上日志存储位置
 
 logstash:
   host: localhost
