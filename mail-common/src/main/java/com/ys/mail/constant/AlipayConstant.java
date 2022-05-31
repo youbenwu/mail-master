@@ -167,22 +167,22 @@ public class AlipayConstant implements Serializable {
     /**
      * ccc科技-APP_ID
      */
-    public static final String JH_YF_APP_ID = "";
+    public static final String JH_YF_APP_ID = "2021002196678429";
 
     /**
      * ccc科技-应用公钥证书路径
      */
-    public static final String JH_YF_APP_CERT_PATH = "";
+    public static final String JH_YF_APP_CERT_PATH = "crt/jihAppCertPublicKey_2021002196678429.crt";
 
     /**
      * ccc科技-支付宝公钥证书文件路径
      */
-    public static final String JH_YF_ALIPAY_CERT_PATH = "";
+    public static final String JH_YF_ALIPAY_CERT_PATH = "crt/jihAlipayCertPublicKey_RSA2.crt";
 
     /**
      * ccc科技-支付宝CA根证书文件路径
      */
-    public static final String JH_YF_ALIPAY_ROOT_CERT_PATH = "";
+    public static final String JH_YF_ALIPAY_ROOT_CERT_PATH = "crt/jihAlipayRootCert.crt";
 
     /**
      * 飞虎科技购买描述语
@@ -193,12 +193,12 @@ public class AlipayConstant implements Serializable {
     /**
      * ccc科技购买描述语
      */
-    public static final String JH_YF_SUBJECT = "ccc科技用户购买商品";
+    public static final String JH_YF_SUBJECT = "吉狐科技用户购买商品";
 
     /**
      * ccc科技应用私钥,呼啦兔
      */
-    public static final String JH_YF_APP_PRIVATE_KEY = "";
+    public static final String JH_YF_APP_PRIVATE_KEY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6yN+COOdmFtDPblnXKUzlO4XROzt8rVcRocZE5Cp5xx6Ql/aTHgL9ypZRod0p1rRJWPnWbze01ZNpkTJt7TnfLCW0uHUIDsl/5DkLORLCuJi8bs+IF9/+wic6THAfgFMMNp8gCBgQJHpQN4ySHQFjtveJRrjdSl55UAxwBs1nkSYdIYf2dZbLeSiw8X+fIh8Ec/bxyd4BTTJENCD4PiqXyqmFia1wmjl4w48waWMa1ZnfE0t5fG+/oSdRVri8icMi+PfxVoH4UElnsg4FHeFIoNZWgRMHiS2dqezPrxdk8/yC52DNsdXf4Smyzx6qxdFX26FhK/jd8tWLrGFbsDU/AgMBAAECggEAbXrBruVFlEv5Niv7EqcNgCsEQ2ARfQFo0FffC5Ak6V3xp1S63P4xSKpOsyhJpnVHFNrHDY4Au8iXb8AAK/ho/Es3Cpc3WXK5XnHZkZ9xRJrIQ2I72AwOaZdJQN1+tqgThUwatr6nxAZtfskgZqADqXub2WWPg31MpJRrxdnm2TV1HO1+e/VKQP5evLZWgoGECnvzdbSfB+5X2ReIt5w2VVyKh0pjrFjt/cOBf11BPFp+CyPSdBY8hJjcYSEg6K0zPCwlQMV4sAYja7V8JUIPtMuKOrA37GQOOPInh5/W3HH3iwznTOTp7ikHKLR0IbzrhgrdTCixznmgjQkn5FO5yQKBgQDej4ZXxR/sxKAAbR9HAYFZuOF7QFxMN3Pw+eErcIdyBkJlMzy/QSHSnmWjH7qWYWMKq8lHFR6FoeEgQrHUkCskmCPavZkf698c73P+ZiFV3jfzvD7ABRsUGwFieXKsAMjlJy5ppLtKT44vjPmbxFCgDmbCV9AgFKrPe4tFE3QUNQKBgQDW2UbLSKsRMlRS9OMshwx/StAAsm8M/WAY974oTHRMEyEW1oeViYXBRxtUYJxZPwEMaesPBbv6iCGua60HPiSSqD1vmELLdoOVopa2RC66U9DSufch3mVP1rGuR41GirdnYLRbp2ztH6LJudi0ZUEnsnVZS4Xpre1+gSV4MBXqIwKBgQDDn7pBCbbfAZF17nSwkAUnXRdso4y9PXy+kpU1/oo/UnsnwtqhbVmSbMH/mRMDvYQ1y/t2bHzQjxJ3rcfrg/E4EDZrvX2LjmMlZuA4+4JPnKzno04wsAw2JuqXqRJ/V409xqvIFhC956Gd8DcykGMh3Ka8Kj15BVGCYCBxTgEZBQKBgEcQNP9WOOcGO6f4wg9fV/3ek/A3FM46HIgFocsYhrsG9MHmEZCfnTMxvtNo5S4Lzd/6RLqCTgvu7R0RFnk3z8cGiNOZjDZaK+nZjnoZEU+mG4Mn6Zs1QVNoEvsvRYZYqZMzBFTwivHfreuFYi1A9I0Z1QDFHzUMx2o5c1hOp2D7AoGAJ4c3dauNQofCGlQQ/MjzLQBEKinkgCG25DSBK2E1v7PZAHiiC+kK4gfLeAYDMi7rDAQoruvM0HeAy1ZA87iuuO5cqIKX5mj8beYaKGH/KN6FJ+f7+a/JVN9ec5A+vHyqz4CXxeMFEwDzbqmi8+tq8ZhgStJ9Nx8eLlUIBTlNs4s=";
 
 
     /**
