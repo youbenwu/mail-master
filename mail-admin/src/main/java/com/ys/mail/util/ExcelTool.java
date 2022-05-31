@@ -90,8 +90,11 @@ public class ExcelTool {
             // 遍历写入
             workbookMap.forEach((sheetName, data) -> {
                 // 切换sheet
-                if (index.get() == 0) writer.renameSheet(0, sheetName);
-                else writer.setSheet(sheetName);
+                if (index.get() == 0) {
+                    writer.renameSheet(0, sheetName);
+                } else {
+                    writer.setSheet(sheetName);
+                }
                 // 冻结首行
                 writer.setFreezePane(1);
                 // 写入

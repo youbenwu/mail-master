@@ -1,5 +1,7 @@
 package com.ys.mail.util;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ys.mail.enums.AnsiColorEnum;
@@ -220,5 +222,26 @@ public class StringUtil {
      */
     public static String getColorContent(AnsiColorEnum colorEnum, String content) {
         return String.format("%s%s%s", colorEnum.getCode(), content, AnsiColorEnum.RESET.getCode());
+    }
+
+    /**
+     * 解析键值对数组
+     *
+     * @param data 数据
+     * @return 拼接后的结果
+     */
+    public static String parseJsonArray(String data) {
+        if (BlankUtil.isNotEmpty(data)) {
+            List<Object> objects = JSON.parseArray(data);
+
+            StringBuilder result = new StringBuilder();
+            for (Object obj : objects) {
+                String key = String.valueOf(((JSONObject) obj).get("key"));
+                String value = String.valueOf(((JSONObject) obj).get("value"));
+                result.append(key).append("：").append(value).append("\n");
+            }
+            return result.substring(0, result.length() - 1);
+        }
+        return null;
     }
 }

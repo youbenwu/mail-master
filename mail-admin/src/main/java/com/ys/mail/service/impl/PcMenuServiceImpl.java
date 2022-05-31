@@ -51,7 +51,6 @@ public class PcMenuServiceImpl extends ServiceImpl<PcMenuMapper, PcMenu> impleme
 
     @Override
     public List<PcMenuTree> getAllTreePcMenu() {
-        // return pcMenuMapper.selectAllTreePcMenu();
         return TreeUtil.toTree(listAllMenu(), "menuId", "parentId", "children", PcMenuTree.class);
     }
 
@@ -62,8 +61,10 @@ public class PcMenuServiceImpl extends ServiceImpl<PcMenuMapper, PcMenu> impleme
         Long menuId = param.getMenuId();
         menu.setMenuId(menuId.equals(NumberUtils.LONG_ZERO) ? IdWorker.generateId() : menuId);
         boolean flag = saveOrUpdate(menu);
-        if (flag)
-            DynamicSecurityMetadataSource.setConfigAttributeMap(dynamicSecurityService.loadDataSource()); // 动态更新菜单
+        if (flag) {
+            // 动态更新菜单
+            DynamicSecurityMetadataSource.setConfigAttributeMap(dynamicSecurityService.loadDataSource());
+        }
         return flag;
     }
 
@@ -75,8 +76,10 @@ public class PcMenuServiceImpl extends ServiceImpl<PcMenuMapper, PcMenu> impleme
         pcUserCacheService.delMenuListByResource(menuId);
         pcMenuMapper.delRoleMenuByMenuId(menuId);
         int result = pcMenuMapper.deleteById(menuId);
-        if (result > 0)
-            DynamicSecurityMetadataSource.setConfigAttributeMap(dynamicSecurityService.loadDataSource()); // 动态更新菜单
+        if (result > 0) {
+            // 动态更新菜单
+            DynamicSecurityMetadataSource.setConfigAttributeMap(dynamicSecurityService.loadDataSource());
+        }
         return result;
     }
 

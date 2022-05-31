@@ -1,68 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ys.mail.mapper.OmsOrderItemMapper">
-
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.ys.mail.entity.OmsOrderItem">
-        <id column="order_item_id" property="orderItemId" />
-        <result column="order_id" property="orderId" />
-        <result column="product_id" property="productId" />
-        <result column="pdt_cgy_id" property="pdtCgyId" />
-        <result column="order_sn" property="orderSn" />
-        <result column="product_pic" property="productPic" />
-        <result column="product_name" property="productName" />
-        <result column="product_brand" property="productBrand" />
-        <result column="product_sn" property="productSn" />
-        <result column="product_price" property="productPrice" />
-        <result column="product_quantity" property="productQuantity" />
-        <result column="product_sku_id" property="productSkuId" />
-        <result column="product_sku_code" property="productSkuCode" />
-        <result column="promotion_name" property="promotionName" />
-        <result column="promotion_amount" property="promotionAmount" />
-        <result column="coupon_amount" property="couponAmount" />
-        <result column="integration_amount" property="integrationAmount" />
-        <result column="real_amount" property="realAmount" />
-        <result column="product_attr" property="productAttr" />
-        <result column="create_time" property="createTime" />
+        <id column="order_item_id" property="orderItemId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="product_id" property="productId"/>
+        <result column="pdt_cgy_id" property="pdtCgyId"/>
+        <result column="order_sn" property="orderSn"/>
+        <result column="product_pic" property="productPic"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_brand" property="productBrand"/>
+        <result column="product_sn" property="productSn"/>
+        <result column="product_price" property="productPrice"/>
+        <result column="product_quantity" property="productQuantity"/>
+        <result column="product_sku_id" property="productSkuId"/>
+        <result column="product_sku_code" property="productSkuCode"/>
+        <result column="promotion_name" property="promotionName"/>
+        <result column="promotion_amount" property="promotionAmount"/>
+        <result column="coupon_amount" property="couponAmount"/>
+        <result column="integration_amount" property="integrationAmount"/>
+        <result column="real_amount" property="realAmount"/>
+        <result column="product_attr" property="productAttr"/>
+        <result column="create_time" property="createTime"/>
         <result column="partner_pdt_id" property="partnerPdtId"/>
     </resultMap>
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.OmsOrderItemVO">
-        <id column="order_item_id" property="orderItemId" />
-        <result column="order_id" property="orderId" />
-        <result column="product_id" property="productId" />
-        <result column="pdt_cgy_id" property="pdtCgyId" />
-        <result column="order_sn" property="orderSn" />
-        <result column="product_pic" property="productPic" />
-        <result column="product_name" property="productName" />
-        <result column="product_brand" property="productBrand" />
-        <result column="product_sn" property="productSn" />
-        <result column="product_price" property="productPrice" />
-        <result column="product_quantity" property="productQuantity" />
-        <result column="product_sku_id" property="productSkuId" />
-        <result column="product_sku_code" property="productSkuCode" />
-        <result column="promotion_name" property="promotionName" />
-        <result column="promotion_amount" property="promotionAmount" />
-        <result column="coupon_amount" property="couponAmount" />
-        <result column="integration_amount" property="integrationAmount" />
-        <result column="real_amount" property="realAmount" />
-        <result column="product_attr" property="productAttr" />
-        <result column="create_time" property="createTime" />
-
-        <result column="pdt_cgy_name" property="pdtCgyName" />
-        <result column="sp_data" property="spData" />
-
+        <id column="order_item_id" property="orderItemId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="product_id" property="productId"/>
+        <result column="pdt_cgy_name" property="pdtCgyName"/>
+        <result column="order_sn" property="orderSn"/>
+        <result column="product_pic" property="productPic"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_brand" property="productBrand"/>
+        <result column="product_sn" property="productSn"/>
+        <result column="product_price" property="productPrice"/>
+        <result column="product_quantity" property="productQuantity"/>
+        <result column="product_sku_id" property="productSkuId"/>
+        <result column="product_attr" property="spData"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_appraise" property="appraise"/>
     </resultMap>
 
     <resultMap id="BaseResultSearchVO" type="com.ys.mail.model.vo.OmsOrderItemSearchVO">
-        <id column="order_item_id" property="orderItemId" />
-        <result column="pdt_cgy_id" property="pdtCgyId" />
-        <result column="product_pic" property="productPic" />
-        <result column="product_name" property="productName" />
-        <result column="product_price" property="productPrice" />
-        <result column="product_quantity" property="productQuantity" />
-        <result column="product_attr" property="productAttr" />
+        <id column="order_item_id" property="orderItemId"/>
+        <result column="pdt_cgy_id" property="pdtCgyId"/>
+        <result column="product_pic" property="productPic"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_price" property="productPrice"/>
+        <result column="product_quantity" property="productQuantity"/>
+        <result column="product_attr" property="productAttr"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -73,13 +63,9 @@
     </sql>
 
     <select id="getItemList" resultMap="BaseResultMapVO">
-        select a.*,b.product_name,c.pdt_cgy_name,d.sp_data from oms_order_item a
-        inner join pms_product b on b.product_id=a.product_id
+        select a.*,c.pdt_cgy_name from oms_order_item a
         inner join pms_product_category c on c.pdt_cgy_id= a.pdt_cgy_id
-        inner join pms_sku_stock d on d.sku_stock_id=a.product_sku_id
-        <where>
-            a.order_id=#{orderId}
-        </where>
+        WHERE a.order_id=#{orderId}
     </select>
 
     <select id="getOrderIdsByProductName" resultType="long">
@@ -98,22 +84,21 @@
     </select>
 
     <select id="getOmsOrderItemSearchVO" resultMap="BaseResultSearchVO">
-        select order_item_id,pdt_cgy_id,product_pic,product_name,product_price,product_quantity,product_attr from oms_order_item
-        where order_id=#{orderId}
+        select order_item_id, pdt_cgy_id, product_pic, product_name, product_price, product_quantity, product_attr
+        from oms_order_item
+        where order_id = #{orderId}
     </select>
     <select id="selectByOrderSn" resultType="com.ys.mail.model.vo.OrderItemSkuVO">
-        SELECT
-            pss.stock,
-            oci.product_price,
-            oci.product_quantity
-        FROM
-            oms_order_item oci
-                LEFT JOIN pms_sku_stock pss ON oci.product_sku_id = pss.sku_stock_id
-        WHERE
-            oci.order_sn = #{orderSn};
+        SELECT pss.stock,
+               oci.product_price,
+               oci.product_quantity
+        FROM oms_order_item oci
+                     LEFT JOIN pms_sku_stock pss ON oci.product_sku_id = pss.sku_stock_id
+        WHERE oci.order_sn = #{orderSn};
     </select>
     <select id="getQuantity" resultType="java.lang.Integer">
-        SELECT SUM(product_quantity) FROM `oms_order_item` AS ooi WHERE ooi.`order_id` = #{orderId}
+        SELECT SUM(product_quantity)
+        FROM `oms_order_item` AS ooi
+        WHERE ooi.`order_id` = #{orderId}
     </select>
-
 </mapper>

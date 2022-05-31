@@ -21,6 +21,12 @@ import java.util.List;
 @Mapper
 public interface OmsOrderItemMapper extends BaseMapper<OmsOrderItem> {
 
+    /**
+     * 获取订单详情列表
+     *
+     * @param orderId 订单ID
+     * @return 结果
+     */
     List<OmsOrderItemVO> getItemList(@Param("orderId") Long orderId);
 
     List<Long> getOrderIdsByProductName(@Param("productName") String productName, @Param("orderId") Long orderId, @Param("pageSize") Integer pageSize);
@@ -35,14 +41,5 @@ public interface OmsOrderItemMapper extends BaseMapper<OmsOrderItem> {
      */
     OrderItemSkuVO selectByOrderSn(@Param("orderSn") String orderSn);
 
-    /**
-     * 查看订单对应的商品是否评论
-     *
-     * @param orderId   订单ID
-     * @param productId 商品ID
-     * @return 订单对象
-     */
-    OmsOrderItem getOrderProductIsAppraise(@Param("orderId") Long orderId, @Param("productId") Long productId);
-
-    Integer getQuantity(@Param("orderId")Long orderId);
+    Integer getQuantity(@Param("orderId") Long orderId);
 }

@@ -26,4 +26,27 @@ public class GlobalConfig {
      */
     private String projectName;
 
+    /**
+     * APP客户端名称
+     */
+    private String appZeroName;
+
+    private String appOneName;
+
+    /**
+     * 根据平台类型返回APP客户端名称
+     *
+     * @param type 平台类型
+     * @return 结果
+     */
+    public String appName(Integer type) {
+        switch (type) {
+            case 0:
+                return this.appZeroName;
+            case 1:
+            default:
+                return this.appOneName;
+        }
+    }
+
 }

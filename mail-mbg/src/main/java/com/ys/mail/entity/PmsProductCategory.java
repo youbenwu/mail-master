@@ -34,7 +34,7 @@ public class PmsProductCategory implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long parentId;
 
-    @ApiModelProperty(value = "产品名称")
+    @ApiModelProperty(value = "商品分类名称")
     private String pdtCgyName;
 
     @ApiModelProperty(value = "分类级别：0->1级；1->2级")

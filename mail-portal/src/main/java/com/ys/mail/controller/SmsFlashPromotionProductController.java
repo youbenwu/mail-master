@@ -218,11 +218,11 @@ public class SmsFlashPromotionProductController {
             @ApiImplicitParam(name = "partnerId", value = "店铺ID，默认为最近的店铺ID", dataType = "Long")
     })
     public CommonResult<NearbyStoreProductVO> getNearbyStore(@RequestParam("flashPromotionId")
-                                                             @NotNull @BlankOrPattern(regEnum = RegularEnum.ID) Long flashPromotionId,
+                                                             @NotNull @BlankOrPattern(regEnum = RegularEnum.KEY) Long flashPromotionId,
                                                              @RequestParam(value = "productType") Integer productType,
                                                              @RequestParam(value = "radius", required = false) Double radius,
                                                              @RequestParam(value = "partnerId", required = false)
-                                                             @BlankOrPattern(regEnum = RegularEnum.ID) Long partnerId,
+                                                             @BlankOrPattern(regEnum = RegularEnum.KEY) Long partnerId,
                                                              MapQuery mapQuery) {
         NearbyStoreProductVO vo = flashPromotionProductService.getNearbyStore(flashPromotionId, productType, radius, mapQuery, partnerId);
         return CommonResult.success(vo);

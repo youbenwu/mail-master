@@ -54,17 +54,6 @@ public interface AmsAppService extends IService<AmsApp> {
     boolean isExistsName(String name);
 
     /**
-     * 生成二维码并上传到默认目录
-     *
-     * @param content 二维码内容
-     * @param useLogo 是否使用Logo
-     * @param type    APP类型，0->APP1,1->APP2
-     * @return 返回二维码的key
-     * @throws Exception e
-     */
-    String genQrCode(String content, boolean useLogo, Integer type) throws Exception;
-
-    /**
      * 删除APP应用
      *
      * @param id 应用ID
@@ -81,7 +70,7 @@ public interface AmsAppService extends IService<AmsApp> {
     boolean check(Long id);
 
     /**
-     * 重新生成二维码
+     * 生成二维码
      *
      * @param id 应用ID
      * @return 生成结果

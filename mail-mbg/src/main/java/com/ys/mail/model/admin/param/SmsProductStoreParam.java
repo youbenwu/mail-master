@@ -24,7 +24,7 @@ public class SmsProductStoreParam {
 
     @NotNull
     @ApiModelProperty(value = "用户店铺ID", required = true)
-    @BlankOrPattern(regEnum = RegularEnum.ID)
+    @BlankOrPattern(regEnum = RegularEnum.KEY)
     private Long pdtStoreId;
 
     @ApiModelProperty(value = "审核状态", required = true)
