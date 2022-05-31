@@ -2,6 +2,8 @@
 global:
   dev-mode: true # 开发模式，false：表示执行关键步骤，true：表示不执行，方便开发
   project-name: 轻创营 # 项目名称
+  app-zero-name: 轻创营 # APP客户端名称
+  app-one-name: 卖乐吧
 
 # 自定义redis key timeout: 验证码
 redis:
