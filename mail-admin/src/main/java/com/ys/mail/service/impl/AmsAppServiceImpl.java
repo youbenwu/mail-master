@@ -79,7 +79,10 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         SqlLambdaQueryWrapper<AmsApp> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.like(AmsApp::getName, query.getName())
                .eq(AmsApp::getUploadStatus, query.getUploadStatus());
-        return amsAppMapper.getPage(page, wrapper);
+        IPage<AmsAppVO> result = amsAppMapper.getPage(page, wrapper);
+        // 添加额外项
+        result.getRecords().forEach(app -> app.setAppLogoUrl(StringConstant.SLASH + CosFolderEnum.IMAGES_FOLDER.value() + this.getAppLogoPath(app.getType())));
+        return result;
     }
 
     @Override
@@ -141,6 +144,9 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
 
     @Override
     public boolean isExistsName(String name) {
+        if (BlankUtil.isEmpty(name)) {
+            return false;
+        }
         SqlLambdaQueryWrapper<AmsApp> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.eq(AmsApp::getName, name)
                .last(StringConstant.LIMIT_ONE);
@@ -337,6 +343,11 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         return map;
     }
 
+    @Override
+    public String getAppLogoPath(Integer type) {
+        return String.format("%s%s%d.png", ImgPathEnum.SYS_LOGO_PATH.value(), "app", type);
+    }
+
     /**
      * 生成并上传二维码
      *
@@ -411,7 +422,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
     private File getAppLogo(Integer type) {
         String fullPath = StrUtil.format("{}temp-logo-app{}.png", SystemUtil.getTmpDir(), type);
         File logo = new File(fullPath);
-        cosService.download(CosFolderEnum.IMAGES_FOLDER, String.format("%s%s%d.png", ImgPathEnum.SYS_LOGO_PATH.value(), "app", type), logo);
+        cosService.download(CosFolderEnum.IMAGES_FOLDER, this.getAppLogoPath(type), logo);
         return logo;
     }
 

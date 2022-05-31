@@ -35,6 +35,9 @@ public class AmsAppVO implements Serializable {
     @ApiModelProperty(value = "APP路径")
     private String url;
 
+    @ApiModelProperty(value = "APP图标路径，用于展示")
+    private String appLogoUrl;
+
     @ApiModelProperty(value = "APP文件大小，单位字节")
     private Long size;
 

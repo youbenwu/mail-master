@@ -99,4 +99,12 @@ public interface AmsAppService extends IService<AmsApp> {
      * @return 结果
      */
     Map<String, String> qrcodeInfo();
+
+    /**
+     * 根据类型获取APP Logo图标路径
+     *
+     * @param type 类型
+     * @return 相对路径
+     */
+    String getAppLogoPath(Integer type);
 }

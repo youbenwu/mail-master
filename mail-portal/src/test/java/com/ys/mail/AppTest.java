@@ -4,7 +4,6 @@ import com.ys.mail.config.CfrConfig;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.constant.AlipayConstant;
 import com.ys.mail.entity.PmsProduct;
-import com.ys.mail.entity.SmsFlashPromotionProduct;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.entity.UmsUserInvite;
 import com.ys.mail.mapper.SmsFlashPromotionProductMapper;
@@ -18,11 +17,8 @@ import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.GeoUtil;
 import com.ys.mail.util.HttpUtil;
 import com.ys.mail.util.IdWorker;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +34,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author 070
@@ -48,7 +43,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SpringBootTest(classes = {MailPortalApplication.class})
 public class AppTest {
 
-    private final static Logger log = LoggerFactory.getLogger(AppTest.class);
     @Autowired
     private ResourceLoader resourceLoader;
 
@@ -220,13 +214,13 @@ public class AppTest {
     public void test14() {
         UmsIncome income = UmsIncome.builder()
                                     .incomeId(IdWorker.generateId())
-                                    .userId(1525006083540783104L)
+                                    .userId(1471786150199955456L)
                                     .income(100000000L)
                                     .expenditure(0L)
                                     .balance(100000000L)
                                     .todayIncome(100000000L)
                                     .allIncome(100000000L)
-                                    .incomeType(1)
+                                    .incomeType(UmsIncome.IncomeType.MINUS_TWO.key())
                                     .detailSource("系统管理员返还金额")
                                     .incomeNo("")
                                     .orderTradeNo("")
@@ -321,69 +315,4 @@ public class AppTest {
 //                TencentFaceIdClient.getRandomNumByLength(32));
     }
 
-    /**
-     * TODO 再大尾狐一次性处理好,直接迁移数据就可以了,后面大尾狐的服务关掉,使用到轻创营,卖乐吧,迁移所有数据进入到轻创营,卖乐吧,用户,秒杀商品,收益,邀请,订单,
-     *  第一步: 回购所有用户的秒杀产品,有多少产品,统一批量插入到ums_income表中去,所有秒杀商品表中的数量修改掉
-     *  第二步: 所有用户购买16800的快购商品,加上标识为创客用户,关掉返还3000的返佣设置
-     *  第三步: 迁移数据库到轻创营中,执行上诉流程,购买创客商品需要修改数据,是否为高级用户,是否为创客用户,
-     */
-
-    @Autowired
-    private SmsFlashPromotionProductService promotionProductService;
-
-    @Test
-    public void test18() {
-        // 系统全部回购 类型
-        List<SmsFlashPromotionProduct> promotionProducts = promotionProductService.getAllBuyBack(NumberUtils.INTEGER_ZERO);
-        AtomicInteger num = new AtomicInteger();
-        promotionProducts.stream().filter(Objects::nonNull).forEach(
-                x -> {
-                    if (BlankUtil.isNotEmpty(x)) {
-                        num.incrementAndGet();
-                        Long userId = x.getUserId();
-                        Long flashPromotionOriginPrice = x.getFlashPromotionOriginPrice();
-                        Long flashPromotionPdtId = x.getFlashPromotionPdtId();
-                        UmsIncome newest = incomeService.selectNewestByUserId(userId);
-
-                        // 收益表.(最新)总收益
-                        long allIncome = newest != null ? newest.getAllIncome() : 0L;
-                        // 收益表.(最新)结余
-                        long balance = newest != null ? newest.getBalance() : 0L;
-
-                        UmsIncome build = UmsIncome.builder()
-                                                   .incomeId(IdWorker.generateId())
-                                                   .userId(userId)
-                                                   .income(flashPromotionOriginPrice)
-                                                   .expenditure(0L)
-                                                   .balance(balance + flashPromotionOriginPrice)
-                                                   .allIncome(allIncome + flashPromotionOriginPrice)
-                                                   .incomeType(1)
-                                                   .detailSource("平台回购用户秒杀产品")
-                                                   .originType((byte) 0)
-                                                   .payType(3)
-                                                   .incomeNo("")
-                                                   .orderTradeNo("")
-                                                   .remark("平台回购-秒杀产品id:{" + flashPromotionPdtId + "},价格:{" + flashPromotionOriginPrice + "},持有人id:{" + userId + "},数量:{" + x.getFlashPromotionCount() + "}")
-                                                   .flashPromotionPdtId(flashPromotionPdtId)
-                                                   .build();
-                        incomeService.save(build);
-                    }
-                }
-        );
-        // 批量修改
-        promotionProducts.stream().filter(Objects::nonNull).forEach(x -> {
-            if (BlankUtil.isNotEmpty(x)) {
-                x.setFlashProductStatus(1);
-                x.setFlashPromotionCount(0);
-            }
-        });
-        promotionProductService.updateBatchById(promotionProducts);
-        log.info("应执行数量:{}", num);
-    }
-
-    @Test
-    public void test19() {
-        // 查询出有多少用户的余额大于16800的,并且扣除这些大于16800的用户,记录到用户表中为创客合伙人,批量修改一下
-        // 大于16800的用户修改完之后,批量修改16800用户为创客合伙人用户,其余的金额不足修改为普通用户
-    }
 }
