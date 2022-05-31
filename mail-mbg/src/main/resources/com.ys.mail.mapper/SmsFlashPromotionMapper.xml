@@ -158,7 +158,7 @@
         <where>
             sfp.is_publish_status = 1
             and fpp.flash_product_status = 2
-            and fpp.flash_promotion_count <![CDATA[ > ]]> 0
+<!--            and fpp.flash_promotion_count <![CDATA[ > ]]> 0-->
             AND NOW() <![CDATA[ <= ]]> sfp.`end_time`
             AND DATE(sfp.`end_time`) = CURRENT_DATE()
             AND DATE(sfp.`start_time`) = CURRENT_DATE()
@@ -222,7 +222,7 @@
                 and fpp.flash_promotion_pdt_id <![CDATA[ < ]]>  #{flashPromotionPdtId}
             </if>
             and fpp.flash_product_status = 2
-            and fpp.flash_promotion_count <![CDATA[ > ]]> 0
+<!--            and fpp.flash_promotion_count <![CDATA[ > ]]> 0-->
         </where>
         GROUP BY fpp.`product_id`,fpp.`flash_promotion_price`,fpp.`cpy_type`
         ORDER BY fpp.flash_promotion_pdt_id DESC
