@@ -927,24 +927,23 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
         UmsIncome umsIncome = umsIncomeMapper.selectNewestByUserId(userId);
         boolean empty = BlankUtil.isEmpty(umsIncome);
-        long income = empty ? NumberUtils.LONG_ZERO : umsIncome.getIncome();
         long balance = empty ? NumberUtils.LONG_ZERO : umsIncome.getBalance();
         long allIncome = empty ? NumberUtils.LONG_ZERO : umsIncome.getAllIncome();
         UmsIncome build = UmsIncome.builder()
-                                   .incomeId(IdWorker.generateId())
-                                   .userId(userId)
-                                   .income(income + partnerPrice)
-                                   .expenditure(NumberUtils.LONG_ZERO)
-                                   .balance(balance + partnerPrice)
-                                   .allIncome(allIncome + partnerPrice)
-                                   .incomeType(UmsIncome.IncomeType.FIFTEEN.key())
-                                   .detailSource("用户退款-秒杀产品")
-                                   .remark("平台回购-秒杀产品id:{" + flashPromotionPdtId + "},价格:{" + partnerPrice + "},持有人id:{" + userId + "},数量:{" + flashPromotionCount + "}")
-                                   .payType(UmsIncome.PayType.THREE.key())
-                                   .flashPromotionPdtId(flashPromotionPdtId)
-                                   .incomeNo(FigureConstant.STRING_EMPTY)
-                                   .orderTradeNo(FigureConstant.STRING_EMPTY)
-                                   .build();
+                .incomeId(IdWorker.generateId())
+                .userId(userId)
+                .income(partnerPrice)
+                .expenditure(NumberUtils.LONG_ZERO)
+                .balance(balance + partnerPrice)
+                .allIncome(allIncome + partnerPrice)
+                .incomeType(UmsIncome.IncomeType.FIFTEEN.key())
+                .detailSource("用户退款-秒杀产品")
+                .remark("平台回购-秒杀产品id:{" + flashPromotionPdtId + "},价格:{" + partnerPrice + "},持有人id:{" + userId + "},数量:{" + flashPromotionCount + "}")
+                .payType(UmsIncome.PayType.THREE.key())
+                .flashPromotionPdtId(flashPromotionPdtId)
+                .incomeNo(FigureConstant.STRING_EMPTY)
+                .orderTradeNo(FigureConstant.STRING_EMPTY)
+                .build();
         SmsFlashPromotionProduct build1 = SmsFlashPromotionProduct.builder()
                                                                   .flashPromotionPdtId(flashPromotionPdtId)
                                                                   .flashProductStatus(SmsFlashPromotionProduct.FlashProductStatus.FIVE.key())
