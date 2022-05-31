@@ -103,6 +103,9 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
 
     @Override
     public boolean isExistsProductName(String productName) {
+        if (BlankUtil.isEmpty(productName)) {
+            return false;
+        }
         SqlLambdaQueryWrapper<PmsProduct> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.eq(PmsProduct::getProductName, productName)
                .last(StringConstant.LIMIT_ONE);
