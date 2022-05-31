@@ -1,57 +1,58 @@
 package com.ys.mail.model.admin.query;
 
 import com.ys.mail.annotation.BlankOrPattern;
+import com.ys.mail.annotation.EnumContains;
+import com.ys.mail.entity.OmsOrder;
+import com.ys.mail.enums.RegularEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @Desc 订单查询对象
- * @Author CRH
- * @Create 2021-12-27 13:48
+ * 订单查询对象
+ *
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OmsOrderQuery extends Query {
 
-    @ApiModelProperty(value = "用户ID，支持任意模糊匹配")
-    @BlankOrPattern(regexp = "^\\d{19}$", message = "用户ID不合法，请检查！")
+    @ApiModelProperty(value = "用户ID，支持右模糊匹配")
+    @BlankOrPattern(regEnum = RegularEnum.KEY, message = "(用户编号)：不合法，请检查！")
     private String userId;
 
     @ApiModelProperty(value = "订单编号，支持任意模糊匹配")
-    @BlankOrPattern(regexp = "^\\d+$", message = "订单编号不合法，请检查！")
+    @BlankOrPattern(regEnum = RegularEnum.KEY, message = "(订单编号)：不合法，请检查！")
     private String orderSn;
 
     @ApiModelProperty(value = "物流公司，支持任意模糊匹配")
     private String deliveryCompany;
 
     @ApiModelProperty(value = "物流单号，支持任意模糊匹配")
-    @BlankOrPattern(regexp = "^\\d$", message = "物流单号不合法，请检查！")
+    @BlankOrPattern(regEnum = RegularEnum.KEY, message = "(物流单号)：不合法，请检查！")
     private String deliverySn;
 
     @ApiModelProperty(value = "第三方交易流水号,例如云闪付,支付宝等，支持任意模糊匹配")
-    @BlankOrPattern(regexp = "^\\d$", message = "第三方交易流水号不合法，请检查！")
+    @BlankOrPattern(regEnum = RegularEnum.KEY, message = "(交易流水号)：不合法，请检查！")
     private String transId;
 
-    @ApiModelProperty(value = "支付方式：0->未支付；1云闪付，2支付宝")
-    @BlankOrPattern(regexp = "[0-2]", message = "支付方式不合法，请检查！")
-    private String payType;
-
     @ApiModelProperty(value = "订单来源：0->PC订单；1->app订单")
-    @BlankOrPattern(regexp = "[01]", message = "订单来源不合法，请检查！")
+    @BlankOrPattern(regEnum = RegularEnum.ZERO_ONE, message = "(订单来源)：不合法，请检查！")
     private String sourceType;
 
-    @ApiModelProperty(value = "订单状态：0->待付款；1->待发货；2->已发货；3->已完成；4->已关闭；5->无效订单；6->已付款；7->待评价")
-    @BlankOrPattern(regexp = "[0-7]", message = "订单状态不合法，请检查！")
+    @ApiModelProperty(value = OmsOrder.PayType.DOCUMENT)
+    @EnumContains(enumClass = OmsOrder.PayType.class, message = "(支付方式)：不合法，请检查！", required = false)
+    private String payType;
+
+    @ApiModelProperty(value = OmsOrder.OrderStatus.DOCUMENT)
+    @EnumContains(enumClass = OmsOrder.OrderStatus.class, message = "(订单状态)：不合法，请检查！", required = false)
     private String orderStatus;
 
-    @ApiModelProperty(value = "订单类型：0->正常订单；3->礼品订单")
-    @BlankOrPattern(regexp = "[03]", message = "订单类型不合法，请检查！")
+    @ApiModelProperty(value = OmsOrder.OrderType.DOCUMENT)
+    @EnumContains(enumClass = OmsOrder.OrderType.class, message = "(订单类型)：不合法，请检查！", required = false)
     private String orderType;
-
-    @ApiModelProperty(value = "发票类型：0->不开发票；1->电子发票；2->纸质发票")
-    @BlankOrPattern(regexp = "[0-2]", message = "发票类型不合法，请检查！")
-    private String billType;
 
     @ApiModelProperty(value = "昵称")
     private String nickname;

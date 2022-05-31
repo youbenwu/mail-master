@@ -81,6 +81,7 @@ public class AmsAppController {
     }
 
     @ApiOperation(value = "发布应用", notes = "当变更应用信息之后，再执行该操作\n" +
+            "发布之前需要上传APP并且已经生成二维码\n" +
             "另外需谨慎操作，该操作将直接修改系统设置")
     @PostMapping(value = "/release/{id:^\\d{19}$}")
     @LocalLockAnn(key = "release:arg[0]", expire = 60)

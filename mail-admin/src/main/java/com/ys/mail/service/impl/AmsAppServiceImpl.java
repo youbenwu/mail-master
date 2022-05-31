@@ -149,26 +149,6 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
     }
 
     @Override
-    public String genQrCode(String content, boolean useLogo, Integer type) throws Exception {
-        // 二维码临时文件
-        File qrcode = File.createTempFile("temp-qrcode-", ".png");
-        // 生成二维码
-        if (useLogo) {
-            // 获取Logo文件
-            File logoFile = this.getAppLogo(type);
-            QrCodeUtil.encode(content, logoFile, qrcode);
-        } else {
-            QrCodeUtil.encode(content, qrcode);
-        }
-        // 构建二维码上传key
-        String key = ImgPathEnum.DOWNLOAD_QRCODE_PATH.value() + genQrcodeName(type);
-        // 上传到指定目录
-        cosService.upload(key, qrcode);
-        // 返回Key
-        return key;
-    }
-
-    @Override
     public boolean delete(Long id) {
         // 获取记录
         AmsApp amsApp = this.getById(id);
@@ -190,13 +170,16 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         if (BlankUtil.isNotEmpty(objectInfo)) {
             // 设置大小
             long contentLength = objectInfo.getContentLength();
-            if (contentLength == NumberUtils.LONG_ZERO && size.equals(NumberUtils.LONG_ZERO)) {
+            // 当文件内容长度为零时，并且上传状态为已上传 或者 内容长度不变时，表示已经更新过了，那么将会跳过更新
+            boolean condition = contentLength == NumberUtils.LONG_ZERO && uploadStatus.equals(NumberConstant.ONE) || contentLength == size;
+            if (condition) {
                 needUpdate = false;
             } else {
                 amsApp.setSize(contentLength);
                 amsApp.setUploadStatus(NumberConstant.ONE);
             }
         } else {
+            // 当数据已经更新过了，那么将会跳过更新
             if (size.equals(NumberUtils.LONG_ZERO) && uploadStatus.equals(NumberConstant.ZERO)) {
                 needUpdate = false;
             } else {
@@ -229,7 +212,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         content = this.paddingUrl(content);
         try {
             // 开始上传
-            String key = this.genQrCode(content, useLogo, type);
+            String key = this.uploadQrCode(content, useLogo, type);
             // 填充二维码地址
             amsApp.setQrcodeUrl(key);
             // 将当前类型APP的二维码置空
@@ -249,6 +232,10 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         // 检测APP上传状态，只有为已上传才可以进行发布
         Integer uploadStatus = amsApp.getUploadStatus();
         ApiAssert.isFalse(uploadStatus.equals(NumberConstant.ONE), BusinessErrorCode.UNFINISHED_APP_UPLOAD);
+        // 校验APP是否已生成二维码
+        String qrcodeUrl = amsApp.getQrcodeUrl();
+        ApiAssert.noValue(qrcodeUrl, BusinessErrorCode.APP_NOT_GENERATE_QRCODE);
+
         // 根据类型获取设置信息
         Integer type = amsApp.getType();
         Integer appType;
@@ -267,7 +254,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
                                                    .appName(amsApp.getName())
                                                    .versionCode(Integer.valueOf(amsApp.getVersionCode()))
                                                    .versionName(amsApp.getVersionName())
-                                                   .fullQrcodeUrl(cosService.getOssPath() + amsApp.getQrcodeUrl())
+                                                   .fullQrcodeUrl(cosService.getOssPath() + qrcodeUrl)
                                                    .updateTitle(amsApp.getUpdateTitle())
                                                    .updateContent(amsApp.getUpdateContent())
                                                    .forcedUpdate(amsApp.getForcedUpdate())
@@ -298,6 +285,9 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
 
         // 检测APP状态（当状态为已上传才允许发布）
         ApiAssert.isFalse(amsApp.getUploadStatus().equals(NumberConstant.ONE), BusinessErrorCode.UNFINISHED_APP_UPLOAD);
+        // 校验APP是否已生成二维码
+        String qrcodeUrl = amsApp.getQrcodeUrl();
+        ApiAssert.noValue(qrcodeUrl, BusinessErrorCode.APP_NOT_GENERATE_QRCODE);
 
         // 校验每日刷新用量配额(中国境内)
         DescribePurgeQuotaResponse dpqResponse = cdnService.describePurgeQuota();
@@ -306,7 +296,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
         ApiAssert.isTrue(availableUrlPurgeNumber == 0, BusinessErrorCode.CDN_URL_PURGE_QUOTA_EXCEED);
 
         // 刷新二维码
-        String fullQrcodeUrl = cosService.getOssPath() + amsApp.getQrcodeUrl();
+        String fullQrcodeUrl = cosService.getOssPath() + qrcodeUrl;
         cdnService.purgeUrlsCache(fullQrcodeUrl);
 
         // 校验每日预热用量配额
@@ -345,6 +335,34 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
 
         // 返回数据
         return map;
+    }
+
+    /**
+     * 生成并上传二维码
+     *
+     * @param content 二维码内容
+     * @param useLogo 是否使用Logo
+     * @param type    APP类型
+     * @return 二维码的存储key
+     * @throws Exception e
+     */
+    private String uploadQrCode(String content, boolean useLogo, Integer type) throws Exception {
+        // 二维码临时文件
+        File qrcode = File.createTempFile("temp-qrcode-", ".png");
+        // 生成二维码
+        if (useLogo) {
+            // 获取Logo文件
+            File logoFile = this.getAppLogo(type);
+            QrCodeUtil.encode(content, logoFile, qrcode);
+        } else {
+            QrCodeUtil.encode(content, qrcode);
+        }
+        // 构建二维码上传key
+        String key = ImgPathEnum.DOWNLOAD_QRCODE_PATH.value() + genQrcodeName(type);
+        // 上传到指定目录
+        cosService.upload(key, qrcode);
+        // 返回Key
+        return key;
     }
 
     /**

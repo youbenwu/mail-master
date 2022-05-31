@@ -3,7 +3,6 @@ package com.ys.mail.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.OmsOrderItem;
 import com.ys.mail.model.vo.OmsOrderItemSearchVO;
-import com.ys.mail.model.vo.OmsOrderItemVO;
 import com.ys.mail.model.vo.OrderItemSkuVO;
 
 import java.util.List;
@@ -17,8 +16,6 @@ import java.util.List;
  * @since 2021-11-24
  */
 public interface OmsOrderItemService extends IService<OmsOrderItem> {
-
-    List<OmsOrderItemVO> getItemList(Long order);
 
     /**
      * 根据商品名称查询订单id
@@ -50,6 +47,7 @@ public interface OmsOrderItemService extends IService<OmsOrderItem> {
 
     /**
      * 根据订单id 查询购买数量
+     *
      * @param orderId
      * @return
      */

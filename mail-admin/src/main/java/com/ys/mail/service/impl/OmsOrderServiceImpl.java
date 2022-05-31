@@ -1,28 +1,29 @@
 package com.ys.mail.service.impl;
 
-import cn.hutool.core.date.DateUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ys.mail.config.GlobalConfig;
 import com.ys.mail.entity.OmsOrder;
+import com.ys.mail.mapper.OmsOrderItemMapper;
 import com.ys.mail.mapper.OmsOrderMapper;
 import com.ys.mail.model.CommonResult;
-import com.ys.mail.model.admin.dto.ExportOrderDTO;
-import com.ys.mail.model.admin.param.ExportOrderParam;
 import com.ys.mail.model.admin.query.OmsOrderQuery;
-import com.ys.mail.model.admin.vo.OrdinaryReMoneyVO;
-import com.ys.mail.model.admin.vo.PcUserOrderVO;
-import com.ys.mail.model.admin.vo.PidPrPdtOrderVO;
-import com.ys.mail.model.admin.vo.PrPdtOrderVO;
+import com.ys.mail.model.admin.vo.*;
+import com.ys.mail.model.vo.OmsOrderItemVO;
+import com.ys.mail.override.ChainLinkedHashMap;
 import com.ys.mail.service.OmsOrderService;
-import com.ys.mail.util.BlankUtil;
-import com.ys.mail.util.JavaForDateUtil;
-import org.ehcache.impl.internal.concurrent.ConcurrentHashMap;
+import com.ys.mail.util.*;
+import com.ys.mail.wrapper.SqlQueryWrapper;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -38,78 +39,36 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
 
     @Autowired
     private OmsOrderMapper omsOrderMapper;
+    @Autowired
+    private OmsOrderItemMapper omsOrderItemMapper;
+    @Autowired
+    private GlobalConfig globalConfig;
 
     @Override
-    public CommonResult<Page<PcUserOrderVO>> getGeneralOrder(OmsOrderQuery query) {
-        String beginTime = query.getBeginTime();
-        String endTime = query.getEndTime();
+    public CommonResult<Page<PcUserOrderVO>> getPage(OmsOrderQuery query) {
         Page<PcUserOrderVO> page = new Page<>(query.getPageNum(), query.getPageSize());
-        QueryWrapper<PcUserOrderVO> wrapper = new QueryWrapper<>();
-
-        if (!BlankUtil.isEmpty(beginTime) && !BlankUtil.isEmpty(endTime)) {
-            if (beginTime.compareTo(endTime) > 0) return CommonResult.failed("开始时间不能大于结束时间", null);
-            wrapper.between("date_format( oo.create_time,'%Y-%m-%d %T')", beginTime, endTime);
-        }
-
         // 构建多条件查询
-        if (!BlankUtil.isEmpty(query.getUserId())) wrapper.like("oo.user_id", query.getUserId());
-        if (!BlankUtil.isEmpty(query.getOrderSn())) wrapper.like("oo.order_sn", query.getOrderSn());
-        if (!BlankUtil.isEmpty(query.getDeliveryCompany()))
-            wrapper.like("oo.delivery_company", query.getDeliveryCompany());
-        if (!BlankUtil.isEmpty(query.getDeliverySn())) wrapper.like("oo.delivery_sn", query.getDeliverySn());
-        if (!BlankUtil.isEmpty(query.getTransId())) wrapper.like("oo.trans_id", query.getTransId());
-
-        if (!BlankUtil.isEmpty(query.getPayType())) wrapper.eq("oo.pay_type", query.getPayType());
-        if (!BlankUtil.isEmpty(query.getSourceType())) wrapper.eq("oo.source_type", query.getSourceType());
-        if (!BlankUtil.isEmpty(query.getOrderStatus())) wrapper.eq("oo.order_status", query.getOrderStatus());
-        if (!BlankUtil.isEmpty(query.getOrderType())) wrapper.eq("oo.order_type", query.getOrderType());
-        if (!BlankUtil.isEmpty(query.getBillType())) wrapper.eq("oo.bill_type", query.getBillType());
-
-        if (!BlankUtil.isEmpty(query.getNickname())) wrapper.like("uu.nickname", query.getNickname());
-        if (!BlankUtil.isEmpty(query.getPhone())) wrapper.like("uu.phone", query.getPhone());
-
-        wrapper.orderByDesc("oo.order_id");
+        SqlQueryWrapper<PcUserOrderVO> wrapper = this.getWrapper(query);
         return CommonResult.success(omsOrderMapper.getPage(page, wrapper));
     }
 
-    @Override
-    public List<ExportOrderDTO> getExportOrderList(ExportOrderParam params) {
-        // 条件判断
-        assert BlankUtil.isEmpty(params);
-
-        // 时间处理
-        String timeType = params.getTimeType();
-        if ("0".equals(timeType)) {
-            assert BlankUtil.isEmpty(params.getBeginTime());
-            assert BlankUtil.isEmpty(params.getEndTime());
-        } else {
-            // 1-当月，2-近三个月，3-近半年
-            int type = 5; // 默认当月第一天
-            switch (timeType) {
-                case "2":
-                    type = 2;
-                    break;
-                case "3":
-                    type = 3;
-                    break;
-            }
-            String date = String.valueOf(DateUtil.parse(JavaForDateUtil.JavaForDate(type)));
-            params.setBeginTime(date);
-        }
-        // 查询
-        return omsOrderMapper.getExportOrderList(params);
-    }
-
-    @Override
-    public CommonResult<String> export(ExportOrderParam params) {
-        // 根据参数过滤出数据
-        List<ExportOrderDTO> exportOrderList = this.getExportOrderList(params);
-        System.out.println(exportOrderList.size());
-        // 构建excel对象
-        // 生成文件
-        // 上传到oss中
-        // 返回下载链接给前端
-        return CommonResult.success("导出成功，等待下载！");
+    private SqlQueryWrapper<PcUserOrderVO> getWrapper(OmsOrderQuery query) {
+        // 构建多条件查询
+        SqlQueryWrapper<PcUserOrderVO> wrapper = new SqlQueryWrapper<>();
+        wrapper.likeRight("oo.user_id", query.getUserId())
+               .like("oo.order_sn", query.getOrderSn())
+               .like("oo.delivery_company", query.getDeliveryCompany())
+               .like("oo.delivery_sn", query.getDeliverySn())
+               .like("oo.trans_id", query.getTransId())
+               .eq("oo.source_type", query.getSourceType())
+               .eq("oo.pay_type", query.getPayType())
+               .eq("oo.order_status", query.getOrderStatus())
+               .eq("oo.order_type", query.getOrderType())
+               .like("uu.nickname", query.getNickname())
+               .like("uu.phone", query.getPhone())
+               .compareDate("oo.create_time", query.getBeginTime(), query.getEndTime())
+               .orderByDesc("oo.order_id");
+        return wrapper;
     }
 
     @Override
@@ -125,6 +84,69 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     @Override
     public List<OrdinaryReMoneyVO> getByOrdinaryReMoney(Integer ite) {
         return omsOrderMapper.selectByOrdinaryReMoney(ite);
+    }
+
+    @Override
+    public List<OmsOrderItemVO> getItemList(Long orderId) {
+        return omsOrderItemMapper.getItemList(orderId);
+    }
+
+    @Override
+    public void exportExcel(OmsOrderQuery query, String fileName, HttpServletResponse response) {
+        // 取消分页
+        query.setPageSize(NumberUtils.INTEGER_MINUS_ONE);
+        // 构建条件
+        SqlQueryWrapper<PcUserOrderVO> wrapper = this.getWrapper(query);
+        // 查询订单和订单详情
+        List<OrderDetailsVO> list = omsOrderMapper.getOrderDetails(wrapper);
+        // 工作表集合
+        Map<String, List<Map<String, Object>>> workbookMap = new HashMap<>(1);
+        // 封装数据
+        List<Map<String, Object>> rows = new ArrayList<>();
+        list.forEach(e -> {
+            ChainLinkedHashMap<String, Object> map = new ChainLinkedHashMap<>();
+            List<OmsOrderItemVO> omsOrderItem = e.getOmsOrderItem();
+            if (BlankUtil.isNotEmpty(omsOrderItem)) {
+                omsOrderItem.forEach(item -> {
+                    map.putObj("用户ID", e.getUserId().toString())
+                       .putObj("订单编号", item.getOrderSn())
+                       .putObj("订单号", e.getOrderId().toString())
+                       .putObj("昵称", e.getNickname())
+                       .putObj("手机号", e.getPhone())
+                       .putObj("客户端类型", globalConfig.appName(Integer.valueOf(e.getCpyType())))
+                       .putObj("下单时间", e.getCreateTime())
+                       .putObj("订单类型", EnumTool.getValue(OmsOrder.OrderType.class, e.getOrderType()))
+                       .putObj("商品名称", item.getProductName())
+                       .putObj("商品分类名称", item.getPdtCgyName())
+                       .putObj("商品品牌", item.getProductBrand())
+                       .putObj("商品货号", item.getProductSn())
+                       .putObj("商品SKU属性", StringUtil.parseJsonArray(item.getSpData()))
+                       .putObj("商品价格", DecimalUtil.longToStrForDivider(item.getProductPrice()))
+                       .putObj("购买数量", item.getProductQuantity())
+                       .putObj("支付金额", DecimalUtil.longToStrForDivider(e.getPayAmount()))
+                       .putObj("支付方式", EnumTool.getValue(OmsOrder.PayType.class, e.getPayType()))
+                       .putObj("支付时间", e.getPaymentTime())
+                       .putObj("订单状态", EnumTool.getValue(OmsOrder.OrderStatus.class, e.getOrderStatus()))
+                       .putObj("收货人姓名", e.getReceiverName())
+                       .putObj("收货人电话", e.getReceiverPhone())
+                       .putObj("收货人省份", e.getReceiverProvince())
+                       .putObj("收货人城市", e.getReceiverCity())
+                       .putObj("收货人地区", e.getReceiverRegion())
+                       .putObj("收货人详细地址", e.getReceiverAddress())
+                       .putObj("订单备注", e.getOrderNote())
+                       .putObj("确认收货", NumberUtils.INTEGER_ZERO.equals(e.getIsConfirmStatus()) ? "未确认" : "已确认")
+                       .putObj("交易流水号", e.getTransId())
+                       .putObj("商品详情ID", item.getOrderItemId().toString())
+                       .putObj("商品ID", item.getProductId().toString());
+                    rows.add(map);
+                });
+            } else {
+                rows.add(map);
+            }
+        });
+        workbookMap.put(fileName, rows);
+        // 导出Excel（相同订单数据暂不能合并）
+        ExcelTool.writeExcel(workbookMap, fileName, response);
     }
 
 }

@@ -33,14 +33,29 @@ public class StringConstant {
     public static final String PAY_PASSWORD = "123456";
 
     /**
-     * 符号
+     * 其他符号
      */
-    public static final String SLASH = "/";
-    public static final String BACKSLASH = "\\";
-    public static final String DOT = ".";
     public static final String BLANK = "";
+    public static final String EQUAL_SIGN = " = ";
+    public static final String PLACEHOLDER_S = "%s";
+
+    /**
+     * 中文符号
+     */
+    public static final String ZH_COMMA = "，";
+    public static final String ZH_COLON = "：";
     public static final String LEFT_ARROWS = "========》";
     public static final String RIGHT_ARROWS = "《========";
+
+    /**
+     * 英文符号
+     */
+    public static final String EN_SEMICOLON = ";";
+    public static final String SLASH = "/";
+    public static final String DOUBLE_QUOTE = "\"";
+    public static final String BACKSLASH = "\\";
+    public static final String DOT = ".";
+    public static final String SIMPLE_ARROWS = "->";
 
     /**
      * 标识
@@ -53,6 +68,5 @@ public class StringConstant {
      * 文件后缀
      */
     public static final String PNG = ".png";
-
 
 }
