@@ -118,5 +118,6 @@ public class NumberConstant {
     public static final Integer ONE_HUNDRED = 100;
     public static final Integer HUNDRED_ONE = 101;
     public static final Integer HUNDRED_TWENTY = 120;
+    public static final Integer TWO_THOUSAND = 2000;
 
 }
