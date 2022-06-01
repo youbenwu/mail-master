@@ -28,7 +28,7 @@ public class MyStoreDTO implements Serializable {
     @TableField("is_publish_status")
     private Boolean publishStatus;
 
-    @ApiModelProperty(value = "秒杀商品状态：-1->已过期；1->已卖出；2->秒杀中；3->上架; 4->待卖出")
+    @ApiModelProperty(value = "秒杀商品状态：-1->已过期(待退款)；1->已卖出；2->秒杀中；3->上架; 4->待卖出; 5->已退款")
     private Integer flashProductStatus;
 
     @ApiModelProperty(value = "翻页id")

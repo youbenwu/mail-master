@@ -160,27 +160,41 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         SqlLambdaQueryWrapper<SmsFlashPromotionProduct> wrapper = new SqlLambdaQueryWrapper<>();
         wrapper.eq(SmsFlashPromotionProduct::getFlashPromotionPdtId, flashPromotionPdtId)
                .eq(SmsFlashPromotionProduct::getUserId, userId);
-        SmsFlashPromotionProduct smsFlashPromotionProduct = flashPromotionProductMapper.selectOne(wrapper);
-        ApiAssert.noValue(smsFlashPromotionProduct, BusinessErrorCode.FLASH_PRODUCT_NO_EXIST);
+        SmsFlashPromotionProduct sfpp = flashPromotionProductMapper.selectOne(wrapper);
+        ApiAssert.noValue(sfpp, BusinessErrorCode.FLASH_PRODUCT_NO_EXIST);
 
         // 状态校验：只有当秒杀状态为3、4才能上架
-        Integer flashProductStatus = smsFlashPromotionProduct.getFlashProductStatus();
+        Integer flashProductStatus = sfpp.getFlashProductStatus();
         boolean condition = SmsFlashPromotionProduct.FlashProductStatus.THREE.key().equals(flashProductStatus) ||
                 SmsFlashPromotionProduct.FlashProductStatus.FOUR.key().equals(flashProductStatus);
         ApiAssert.isFalse(condition, CommonResultCode.ILLEGAL_REQUEST);
 
-        // 过期时间校验
-        boolean expireTime = DateTool.isExpireTime(smsFlashPromotionProduct.getExpireTime());
-        ApiAssert.isTrue(expireTime, BusinessErrorCode.ERR_DATE_EXPIRE);
+        // 过期时间校验(过期之后改为不能重新上架，但可以退货)
+        Date sfppExpireTime = sfpp.getExpireTime();
+        // 首次加入退货生效时间(必须过期才允许退货、退款)，如果已经存在则跳过
+        // 获取设置中定义的秒杀上架截止时间的最低天数（自动延长时间），如：7天（移动到上架时）
+        if (BlankUtil.isEmpty(sfppExpireTime)) {
+            Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_four);
+            Optional.ofNullable(days).map(map -> {
+                // 加入截止日期
+                DateTime offsetDay = DateUtil.offsetDay(DateTool.getNow(), days);
+                sfpp.setExpireTime(offsetDay);
+                return days;
+            });
+        } else {
+            boolean expireTime = DateTool.isExpireTime(sfppExpireTime);
+            // ApiAssert.isTrue(expireTime, BusinessErrorCode.ERR_DATE_EXPIRE);
+            ApiAssert.isTrue(expireTime, BusinessErrorCode.ALLOW_PRODUCT_REFUND);
+        }
 
         // 填充信息
-        smsFlashPromotionProduct.setIsPublishStatus(true);
+        sfpp.setIsPublishStatus(true);
         // 秒杀商品状态为 3上架
-        smsFlashPromotionProduct.setFlashProductStatus(2);
+        sfpp.setFlashProductStatus(2);
         //上架操作
-        smsFlashPromotionProduct.setPublisherId(smsFlashPromotionProduct.getUserId());
+        sfpp.setPublisherId(sfpp.getUserId());
         // 平台
-        Byte cpyType = smsFlashPromotionProduct.getCpyType();
+        Byte cpyType = sfpp.getCpyType();
 
         // 查询最近场次信息
         SecondProductDTO secondProductDTO = flashPromotionMapper.selectCpyTypeOne(cpyType);
@@ -192,13 +206,13 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             ProductStoreObjDTO storeObjDTO = new ProductStoreObjDTO();
             BeanUtils.copyProperties(reviewed, storeObjDTO);
             storeObjDTO.setStoreLogo(currentUser.getHeadPortrait());
-            smsFlashPromotionProduct.setPdtStoreObj(JSON.toJSONString(storeObjDTO));
+            sfpp.setPdtStoreObj(JSON.toJSONString(storeObjDTO));
 
             // 关联场次ID
-            smsFlashPromotionProduct.setFlashPromotionId(secondProductDTO.getFlashPromotionId());
+            sfpp.setFlashPromotionId(secondProductDTO.getFlashPromotionId());
 
             // 更新到数据库
-            result = updateById(smsFlashPromotionProduct);
+            result = updateById(sfpp);
 
             // 清理缓存
             redisService.keys(redisDatabase + ":home:*");
@@ -542,14 +556,14 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
             // 合伙人原价格      如果置换-则拿  置换后产品价格  否则 拿订单的合伙人原价格
             sfpp.setPartnerPrice(br ? skuStock.getPrice() : orderInfo.getPartnerPrice());
 
-            // 获取设置中定义的秒杀上架截止时间的最低天数（自动延长时间），如：7天
-            Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_four);
-            Optional.ofNullable(days).map(map -> {
-                // 加入截止日期
-                DateTime offsetDay = DateUtil.offsetDay(DateTool.getNow(), days);
-                sfpp.setExpireTime(offsetDay);
-                return days;
-            });
+            // 获取设置中定义的秒杀上架截止时间的最低天数（自动延长时间），如：7天（移动到上架时）
+            // Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_four);
+            // Optional.ofNullable(days).map(map -> {
+            //     // 加入截止日期
+            //     DateTime offsetDay = DateUtil.offsetDay(DateTool.getNow(), days);
+            //     sfpp.setExpireTime(offsetDay);
+            //     return days;
+            // });
 
             // true 置换成功
             boolean b = saveOrUpdate(sfpp);
@@ -788,12 +802,19 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
 
     private List<MyStoreDTO> getMyStore(List<MyStoreDTO> dTos) {
         dTos.stream().filter(Objects::nonNull).forEach(
-                x -> {
-                    long time = System.currentTimeMillis();
-                    if (BlankUtil.isNotEmpty(x) && BlankUtil.isNotEmpty(x.getExpireTime()) && time > x.getExpireTime()
-                                                                                                      .getTime() && !x
-                            .getFlashProductStatus().equals(SettingTypeEnum.five.key())) {
-                        x.setFlashProductStatus(NumberUtils.INTEGER_MINUS_ONE);
+                sfpp -> {
+                    if (BlankUtil.isNotEmpty(sfpp.getExpireTime())) {
+                        Integer flashProductStatus = sfpp.getFlashProductStatus();
+                        switch (EnumTool.getEnum(SmsFlashPromotionProduct.FlashProductStatus.class, flashProductStatus)) {
+                            case TWO:
+                            case THREE:
+                            case FOUR:
+                                if (DateTool.isExpireTime(sfpp.getExpireTime())) {
+                                    sfpp.setFlashProductStatus(NumberUtils.INTEGER_MINUS_ONE);
+                                }
+                                break;
+                            default:
+                        }
                     }
                 }
         );
@@ -914,7 +935,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         }
         Integer status = promotionProduct.getFlashProductStatus();
         if (!ObjectUtil.equal(status, NumberUtils.INTEGER_MINUS_ONE)) {
-            return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_PDT_SALE);
+            // return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_PDT_SALE);
+            return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_NOT_DATE);
         }
         ApiAssert.noValue(partnerPrice, BusinessErrorCode.PDT_SUPPLY_NOT);
         if (BlankUtil.isNotEmpty(flashPromotionPrice) && flashPromotionPrice.compareTo(partnerPrice) < NumberUtils.INTEGER_ZERO) {
