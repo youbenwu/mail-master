@@ -666,14 +666,21 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
 
     @Override
     public CommonResult<Boolean> verifyFace(String userImageString) {
-        QueryWrapper<UmsUser> wrapper = new QueryWrapper<>();
-        if (BlankUtil.isEmpty(userImageString)) return CommonResult.failed("数据异常");
+        SqlLambdaQueryWrapper<UmsUser> wrapper = new SqlLambdaQueryWrapper<>();
+        if (BlankUtil.isEmpty(userImageString)) {
+            return CommonResult.failed("数据异常");
+        }
         userImageString = DigestUtils.sha512Hex(userImageString);
-        wrapper.eq("payment_type", NumberUtils.INTEGER_ONE).eq("user_image_string", userImageString);
+        wrapper.eq(UmsUser::getPaymentType, NumberUtils.INTEGER_ONE)
+               .eq(UmsUser::getUserImageString, userImageString);
         int count = this.count(wrapper);
-        if (count > 0) return CommonResult.failed(BusinessErrorCode.USER_IMAGE_STRING_EXIST);
-        else
-            return CommonResult.success(BusinessErrorCode.USER_IMAGE_STRING_UNREGISTERED.getMessage(), Boolean.TRUE); // 允许重新注册
+        if (count > 0) {
+            // 已经存在不允许注册
+            return CommonResult.failed(BusinessErrorCode.USER_IMAGE_STRING_EXIST);
+        } else {
+            // 允许重新注册
+            return CommonResult.success(BusinessErrorCode.USER_IMAGE_STRING_UNREGISTERED.getMessage(), Boolean.TRUE);
+        }
     }
 
     /**

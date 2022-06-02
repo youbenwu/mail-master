@@ -65,14 +65,18 @@
     </select>
 
     <select id="selectCategoryTree" resultMap="treeResultMap">
-        select pdt_cgy_id,
-               parent_id,
-               pdt_cgy_name,
-               `level`,
-               sort,
-               icon,
-               description
-        from pms_product_category  where deleted = 0;
+        SELECT
+                pdt_cgy_id,
+                parent_id,
+                pdt_cgy_name,
+                `level`,
+                sort,
+                icon,
+                description
+        FROM
+                pms_product_category
+        WHERE
+                is_show_status = 1 AND deleted = 0;
     </select>
 
     <select id="selectSearch" resultMap="SearchResultMap">
