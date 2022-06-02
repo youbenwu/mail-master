@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -64,7 +66,9 @@ public class PmsVerificationCode implements Serializable {
     @ApiModelProperty(value = "截止时间")
     private Date expireTime;
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum IsStatus implements IPairs<Integer, String, IsStatus> {
         /**
          * 状态
@@ -73,19 +77,8 @@ public class PmsVerificationCode implements Serializable {
         ONE(1, "已使用"),
         TWO(2, "已失效"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
     }
-
 
 }

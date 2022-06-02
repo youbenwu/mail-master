@@ -1,9 +1,11 @@
 package com.ys.mail.exception.code;
 
 /**
- * @version V1.0
- * @Description: 业务异常状态码(400开头)
- * @author: hezhidong
+ * 业务异常状态码(400开头)
+ *
+ * @author 007
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 public enum BusinessErrorCode implements IErrorCode {
     // 后三位1开头与商品有关
