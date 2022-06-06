@@ -33,9 +33,9 @@ public interface OmsOrderService extends IService<OmsOrder> {
     /**
      * 根据目标用户id查询相关的订单记录
      *
-     * @param userId 目标用户id
-     * @param orderId      翻页的订单id
-     * @param pageSize     查询条数
+     * @param userId   目标用户id
+     * @param orderId  翻页的订单id
+     * @param pageSize 查询条数
      * @return 返回值
      */
     List<UserOrderVO> getUserOrderList(String userId, String orderId, Integer pageSize);

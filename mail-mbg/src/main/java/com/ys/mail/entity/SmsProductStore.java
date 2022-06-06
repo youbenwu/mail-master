@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -72,7 +74,9 @@ public class SmsProductStore implements Serializable {
     @ApiModelProperty(value = "审核描述")
     private String reviewDesc;
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum ReviewState implements IPairs<Integer, String, ReviewState> {
         /**
          * 审核状态
@@ -81,18 +85,8 @@ public class SmsProductStore implements Serializable {
         ONE(1, "已通过"),
         TWO(2, "不通过"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
     }
 
 }

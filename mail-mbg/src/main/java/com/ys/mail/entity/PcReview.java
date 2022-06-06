@@ -6,6 +6,7 @@ import com.ys.mail.enums.IPairs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -82,7 +83,9 @@ public class PcReview implements Serializable {
     @TableLogic
     private Integer deleted;
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum ReviewState implements IPairs<Integer, String, ReviewState> {
         /**
          * 系统调度触发
@@ -103,18 +106,8 @@ public class PcReview implements Serializable {
          */
         FOUR(4, "已取消"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
     }
 
 }

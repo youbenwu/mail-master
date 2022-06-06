@@ -132,8 +132,11 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     @Override
     public CommonResult<GenerateOrderBO> generateGiftOrder(String userImageString, String cpyType) {
         // 判断该人脸数据是否已被有效注册，如果有则不能再次生成订单
-        CommonResult<Boolean> commonResult = umsUserService.verifyFace(userImageString);
-        ApiAssert.noValue(commonResult.getData(), BusinessErrorCode.USER_IMAGE_STRING_EXIST);
+        Boolean openFaceIdentify = sysSettingService.getSettingValue(SettingTypeEnum.twenty_nine);
+        if (BlankUtil.isNotEmpty(openFaceIdentify) && openFaceIdentify && BlankUtil.isNotEmpty(userImageString)) {
+            CommonResult<Boolean> commonResult = umsUserService.verifyFace(userImageString);
+            ApiAssert.noValue(commonResult.getData(), BusinessErrorCode.USER_IMAGE_STRING_EXIST);
+        }
 
         // 验证当前用户是否支付99元，如果是则无需再支付，否则进入下一步
         UmsUser currentUser = UserUtil.getCurrentUser();
@@ -192,25 +195,37 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
         // 验证是否已付款、是否高级用户、是否已领取
         UmsUser currentUser = UserUtil.getCurrentUser();
 
-        if (!Objects.equals(currentUser.getPaymentType(), NumberUtils.INTEGER_ONE))
+        if (!Objects.equals(currentUser.getPaymentType(), NumberUtils.INTEGER_ONE)) {
             return CommonResult.failed(CommonResultCode.ERR_USER_NON_PAYMENT);
-        if (!Objects.equals(currentUser.getRoleId(), NumberUtils.INTEGER_ONE))
+        }
+        if (!Objects.equals(currentUser.getRoleId(), NumberUtils.INTEGER_ONE)) {
             return CommonResult.failed(CommonResultCode.ERR_USER_NOT_SENIOR_ROLE);
+        }
         // TODO：新需求要移除实名验证，改为人脸数据验证（判断是否已注册）
-        if (BlankUtil.isEmpty(currentUser.getUserImageString()))
-            return CommonResult.failed(BusinessErrorCode.USER_IMAGE_STRING_UNREGISTERED);
+        Boolean openFaceIdentify = sysSettingService.getSettingValue(SettingTypeEnum.twenty_nine);
+        if (BlankUtil.isNotEmpty(openFaceIdentify) && openFaceIdentify) {
+            ApiAssert.noValue(currentUser.getUserImageString(), BusinessErrorCode.USER_IMAGE_STRING_UNREGISTERED);
+        }
+
         // 验证是否已经兑换礼品
-        if (currentUser.getExchangeGift()) return CommonResult.failed(BusinessErrorCode.ERR_PRODUCT_RE_EXCHANGE);
+        if (currentUser.getExchangeGift()) {
+            return CommonResult.failed(BusinessErrorCode.ERR_PRODUCT_RE_EXCHANGE);
+        }
 
         // 验证是否存在订单，并获取之前生成的空订单ID
         OmsOrder giftOrder = this.getGiftOrder(currentUser.getUserId());
-        if (BeanUtil.isEmpty(giftOrder)) return CommonResult.failed(BusinessErrorCode.ORDER_NOT_EXIST);
+        if (BeanUtil.isEmpty(giftOrder)) {
+            return CommonResult.failed(BusinessErrorCode.ORDER_NOT_EXIST);
+        }
 
         // 验证该商品ID是否是礼品列表中有的，（不能兑换没有的礼品）
         List<PmsProduct> giftList = productService.getGift();
-        String productId = param.getProductId(); // 用户领取的礼品ID
-        boolean isExist = false; // 是否在礼品列表
-        PmsProduct pmsProduct = new PmsProduct();// 当前操作的礼品
+        // 用户领取的礼品ID
+        String productId = param.getProductId();
+        // 是否在礼品列表
+        boolean isExist = false;
+        // 当前操作的礼品
+        PmsProduct pmsProduct = new PmsProduct();
         for (PmsProduct product : giftList) {
             if (String.valueOf(product.getProductId()).equals(productId)) {
                 isExist = true;
@@ -218,7 +233,9 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
                 break;
             }
         }
-        if (!isExist) return CommonResult.failed(BusinessErrorCode.GIFT_NOT_EXIST);
+        if (!isExist) {
+            return CommonResult.failed(BusinessErrorCode.GIFT_NOT_EXIST);
+        }
 
         // 开始生成订单详情，并关联到之前的订单中
         OmsOrderItem omsOrderItem = OmsOrderItem.builder().orderItemId(IdWorker.generateId())

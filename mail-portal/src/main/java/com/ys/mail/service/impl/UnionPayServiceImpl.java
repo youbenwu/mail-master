@@ -394,7 +394,8 @@ public class UnionPayServiceImpl implements UnionPayService {
         certAlipayRequest.setServerUrl(AlipayConstant.SERVER_URL);
         // 因为吉虎收款被限制,所以换成都是吉狐收款
         String subject = "";
-        Byte cpyType = BlankUtil.isEmpty(param.getCpyType()) ? NumberUtils.BYTE_ZERO : param.getCpyType();
+        // Byte cpyType = BlankUtil.isEmpty(param.getCpyType()) ? NumberUtils.BYTE_ZERO : param.getCpyType();
+        Byte cpyType = NumberUtils.BYTE_ONE;
         switch (cpyType) {
             default:
             case FigureConstant.BYTE_ZERO:

@@ -1,7 +1,6 @@
 package com.ys.mail.controller;
 
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -176,7 +175,7 @@ public class UmsUserController {
         QueryWrapper<UmsUser> qwp = new QueryWrapper<>();
         // 获取最近支付过的一位会员
         qwp.eq("role_id", NumberUtils.INTEGER_ONE).eq("deleted", NumberUtils.INTEGER_ZERO)
-                .orderByDesc("create_time,update_time").last("limit 1");
+           .orderByDesc("create_time,update_time").last("limit 1");
         UmsUser user = userService.getOne(qwp);
 
         // 封装结果
@@ -198,8 +197,8 @@ public class UmsUserController {
 
     @ApiOperation("人脸识别调用sdk")
     @PostMapping(value = "/callVerifyFace")
-    @OftenReqAnn(key="userCallVerifyFace:arg[0]")
-    public CommonResult<JSONObject> callVerifyFace(@Validated @RequestBody VerifyFaceParam param){
+    @OftenReqAnn(key = "userCallVerifyFace:arg[0]")
+    public CommonResult<JSONObject> callVerifyFace(@Validated @RequestBody VerifyFaceParam param) {
         // 用注解判断,一天只能5次,不能一直刷,
         return userService.callVerifyFace(param);
     }

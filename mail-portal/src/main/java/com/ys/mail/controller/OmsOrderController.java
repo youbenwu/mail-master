@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -89,9 +88,9 @@ public class OmsOrderController {
     @ApiOperation("生成高级会员支付订单(礼品订单)")
     @PostMapping(value = "/generateGiftOrder")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "人脸肖像数据", name = "userImageString", required = true)
+            @ApiImplicitParam(value = "人脸肖像数据", name = "userImageString")
     })
-    public CommonResult<GenerateOrderBO> generateGiftOrder(@RequestParam(name = "userImageString") @NotBlank String userImageString) {
+    public CommonResult<GenerateOrderBO> generateGiftOrder(@RequestParam(name = "userImageString", required = false) String userImageString) {
 
         return omsOrderService.generateGiftOrder(userImageString, "0");
     }

@@ -9,6 +9,7 @@ import com.ys.mail.enums.IPairs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -112,7 +113,9 @@ public class SmsFlashPromotionProduct implements Serializable {
     @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
     private Date expireTime;
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum FlashProductStatus implements IPairs<Integer, String, FlashProductStatus> {
         /**
          * 状态
@@ -122,20 +125,10 @@ public class SmsFlashPromotionProduct implements Serializable {
         TWO(2, "秒杀中"),
         THREE(3, "上架"),
         FOUR(4, "待卖出"),
-        FIVE(5,"已退款"),
+        FIVE(5, "已退款"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
     }
 
 }

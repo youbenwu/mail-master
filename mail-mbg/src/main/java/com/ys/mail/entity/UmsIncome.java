@@ -6,6 +6,7 @@ import com.ys.mail.enums.IPairs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -102,7 +103,9 @@ public class UmsIncome implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long flashPromotionPdtId;
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum IncomeType implements IPairs<Integer, String, IncomeType> {
         /**
          * 状态
@@ -126,21 +129,13 @@ public class UmsIncome implements Serializable {
         FOURTEEN(14,"会员订单收益"),
         FIFTEEN(15,"用户退款秒杀产品")
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
     }
 
+    @Getter
     @AllArgsConstructor
+    @Accessors(fluent = true)
     public enum PayType implements IPairs<Integer, String, PayType> {
         /**
          * 状态
@@ -150,17 +145,7 @@ public class UmsIncome implements Serializable {
         TWO(2, "支付宝"),
         THREE(3, "余额"),
         ;
-        final Integer type;
-        final String name;
-
-        @Override
-        public Integer key() {
-            return this.type;
-        }
-
-        @Override
-        public String value() {
-            return this.name;
-        }
+        final Integer key;
+        final String value;
     }
 }

@@ -1,10 +1,16 @@
 package com.ys.mail.exception.code;
 
 /**
- * @Description:
- * @author: hezhidong
+ * 通用状态码
+ *
+ * @author 007
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 public enum CommonResultCode implements IErrorCode {
+    /**
+     * 状态码
+     */
     SUCCESS(200, "操作成功"),
     FAILED(400, "操作失败"),
 
