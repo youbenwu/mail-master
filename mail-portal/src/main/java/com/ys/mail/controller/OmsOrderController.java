@@ -90,7 +90,7 @@ public class OmsOrderController {
     @ApiImplicitParams({
             @ApiImplicitParam(value = "人脸肖像数据", name = "userImageString")
     })
-    public CommonResult<GenerateOrderBO> generateGiftOrder(@RequestParam(name = "userImageString") String userImageString) {
+    public CommonResult<GenerateOrderBO> generateGiftOrder(@RequestParam(name = "userImageString", required = false) String userImageString) {
 
         return omsOrderService.generateGiftOrder(userImageString, "0");
     }
