@@ -22,6 +22,7 @@
         <result column="total_amount" property="totalAmount"/>
         <result column="pdt_store_obj" property="pdtStoreObj"/>
         <result column="expire_time" property="expireTime"/>
+        <result column="num" property="num"/>
     </resultMap>
 
     <resultMap id="DtoBaseResultMap" type="com.ys.mail.model.admin.dto.PcFlashPromotionProductDTO">
@@ -146,7 +147,7 @@
     <sql id="Base_Column_List">
         flash_promotion_pdt_id, flash_promotion_id, flash_promotion_sn_id, product_id, flash_promotion_price,
         flash_promotion_count, flash_promotion_limit, sort, create_time, update_time,flash_promotion_round,
-        user_id,publisher_id,sku_stock_id,is_publish_status,flash_product_status,order_id,flash_promotion_origin_price,partner_price
+        user_id,publisher_id,sku_stock_id,is_publish_status,flash_product_status,order_id,flash_promotion_origin_price,partner_price,num
     </sql>
 
     <select id="selectInfoById" resultMap="DtoBaseResultMap">
@@ -599,6 +600,7 @@
             <result column="user_id" property="userId"/>
             <result column="order_id" property="orderId"/>
             <result column="expire_time" property="expireTime"/>
+            <result column="num" property="num"/>
 
             <association property="storeProduct" javaType="com.ys.mail.model.dto.MyStoreDTO$StoreProduct"
             column="product_id" select="com.ys.mail.mapper.SmsFlashPromotionProductMapper.selectStorePdt"
@@ -614,7 +616,8 @@
                 product_id,
                 user_id,
                 order_id,
-                expire_time
+                expire_time,
+                num
         FROM
                 sms_flash_promotion_product
         WHERE
@@ -646,7 +649,8 @@
                 product_id,
                 user_id,
                 order_id,
-                expire_time
+                expire_time,
+                num
         FROM
                 sms_flash_promotion_product
             <where>

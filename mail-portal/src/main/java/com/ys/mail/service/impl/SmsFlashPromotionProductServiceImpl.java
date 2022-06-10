@@ -1,8 +1,6 @@
 package com.ys.mail.service.impl;
 
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -16,6 +14,7 @@ import com.ys.mail.entity.*;
 import com.ys.mail.enums.SettingTypeEnum;
 import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
+import com.ys.mail.exception.BusinessException;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.*;
@@ -169,23 +168,31 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
                 SmsFlashPromotionProduct.FlashProductStatus.FOUR.key().equals(flashProductStatus);
         ApiAssert.isFalse(condition, CommonResultCode.ILLEGAL_REQUEST);
 
-        // 过期时间校验(过期之后改为不能重新上架，但可以退货)
-        Date sfppExpireTime = sfpp.getExpireTime();
-        // 首次加入退货生效时间(必须过期才允许退货、退款)，如果已经存在则跳过
-        // 获取设置中定义的秒杀上架截止时间的最低天数（自动延长时间），如：7天（移动到上架时）
-        if (BlankUtil.isEmpty(sfppExpireTime)) {
-            Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_four);
-            Optional.ofNullable(days).map(map -> {
-                // 加入截止日期
-                DateTime offsetDay = DateUtil.offsetDay(DateTool.getNow(), days);
-                sfpp.setExpireTime(offsetDay);
-                return days;
-            });
-        } else {
-            boolean expireTime = DateTool.isExpireTime(sfppExpireTime);
-            // ApiAssert.isTrue(expireTime, BusinessErrorCode.ERR_DATE_EXPIRE);
-            ApiAssert.isTrue(expireTime, BusinessErrorCode.ALLOW_PRODUCT_REFUND);
+        // 不用判断过期时间,只需要效验次数和状态就可以了,为0的时候就是不能上架
+        Integer num = sfpp.getNum();
+        num = BlankUtil.isEmpty(num) ? NumberUtils.INTEGER_ZERO : num;
+        Integer setNum = sysSettingService.getSettingValue(SettingTypeEnum.thirty);
+        if (BlankUtil.isNotEmpty(setNum) && num.compareTo(setNum) >= NumberUtils.INTEGER_ZERO) {
+            throw new BusinessException(BusinessErrorCode.ALLOW_PRODUCT_REFUND);
         }
+
+        // 过期时间校验(过期之后改为不能重新上架，但可以退货)
+        // Date sfppExpireTime = sfpp.getExpireTime();
+        // // 首次加入退货生效时间(必须过期才允许退货、退款)，如果已经存在则跳过
+        // // 获取设置中定义的秒杀上架截止时间的最低天数（自动延长时间），如：7天（移动到上架时）
+        // if (BlankUtil.isEmpty(sfppExpireTime)) {
+        //     Integer days = sysSettingService.getSettingValue(SettingTypeEnum.twenty_four);
+        //     Optional.ofNullable(days).map(map -> {
+        //         // 加入截止日期
+        //         DateTime offsetDay = DateUtil.offsetDay(DateTool.getNow(), days);
+        //         sfpp.setExpireTime(offsetDay);
+        //         return days;
+        //     });
+        // } else {
+        //     boolean expireTime = DateTool.isExpireTime(sfppExpireTime);
+        //     // ApiAssert.isTrue(expireTime, BusinessErrorCode.ERR_DATE_EXPIRE);
+        //     ApiAssert.isTrue(expireTime, BusinessErrorCode.ALLOW_PRODUCT_REFUND);
+        // }
 
         // 填充信息
         sfpp.setIsPublishStatus(true);
@@ -195,6 +202,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         sfpp.setPublisherId(sfpp.getUserId());
         // 平台
         Byte cpyType = sfpp.getCpyType();
+        // 增加一次数量,数据库设置了不能为null,默认值就是为0
+        sfpp.setNum(num + NumberUtils.INTEGER_ONE);
 
         // 查询最近场次信息
         SecondProductDTO secondProductDTO = flashPromotionMapper.selectCpyTypeOne(cpyType);
@@ -801,19 +810,27 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
     }
 
     private List<MyStoreDTO> getMyStore(List<MyStoreDTO> dTos) {
+        Integer setNum = sysSettingService.getSettingValue(SettingTypeEnum.thirty);
         dTos.stream().filter(Objects::nonNull).forEach(
                 sfpp -> {
-                    if (BlankUtil.isNotEmpty(sfpp.getExpireTime())) {
-                        Integer flashProductStatus = sfpp.getFlashProductStatus();
-                        switch (EnumTool.getEnum(SmsFlashPromotionProduct.FlashProductStatus.class, flashProductStatus)) {
-                            case TWO:
-                            case THREE:
-                            case FOUR:
-                                if (DateTool.isExpireTime(sfpp.getExpireTime())) {
-                                    sfpp.setFlashProductStatus(NumberUtils.INTEGER_MINUS_ONE);
-                                }
-                                break;
-                            default:
+                    // 不用判断过期时间,判断过期次数就可以了,只能是两次未卖出才能退款
+                    // if (BlankUtil.isNotEmpty(sfpp.getExpireTime())) {
+                    //     Integer flashProductStatus = sfpp.getFlashProductStatus();
+                    //     switch (EnumTool.getEnum(SmsFlashPromotionProduct.FlashProductStatus.class, flashProductStatus)) {
+                    //         case TWO:
+                    //         case THREE:
+                    //         case FOUR:
+                    //             if (DateTool.isExpireTime(sfpp.getExpireTime())) {
+                    //                 sfpp.setFlashProductStatus(NumberUtils.INTEGER_MINUS_ONE);
+                    //             }
+                    //             break;
+                    //         default:
+                    //     }
+                    // }
+                    if (ObjectUtil.equal(sfpp.getFlashProductStatus(), SmsFlashPromotionProduct.FlashProductStatus.FOUR.key())) {
+                        if (BlankUtil.isNotEmpty(setNum) && sfpp.getNum()
+                                                                .compareTo(setNum) >= NumberUtils.INTEGER_ZERO) {
+                            sfpp.setFlashProductStatus(NumberUtils.INTEGER_MINUS_ONE);
                         }
                     }
                 }
@@ -924,16 +941,21 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         ApiAssert.noValue(promotionProduct.getFlashProductStatus(), BusinessErrorCode.NPE_PARAM);
         Long partnerPrice = promotionProduct.getPartnerPrice();
         Long flashPromotionPrice = promotionProduct.getFlashPromotionPrice();
-        Long publisherId = promotionProduct.getPublisherId();
+        // Long publisherId = promotionProduct.getPublisherId();
         Long productId = promotionProduct.getProductId();
         Long userId = promotionProduct.getUserId();
         Integer flashPromotionCount = promotionProduct.getFlashPromotionCount();
-        Date expireTime = promotionProduct.getExpireTime();
+        // Date expireTime = promotionProduct.getExpireTime();
         ApiAssert.noEq(UserUtil.getCurrentUser().getUserId(), userId, BusinessErrorCode.GOODS_NOT_EXIST);
-        if (BlankUtil.isNotEmpty(expireTime) && DateTool.isExpireTime(expireTime)) {
-            promotionProduct.setFlashProductStatus(NumberConstant.MINUS_ONE);
-        }
+        // if (BlankUtil.isNotEmpty(expireTime) && DateTool.isExpireTime(expireTime)) {
+        //     promotionProduct.setFlashProductStatus(NumberConstant.MINUS_ONE);
+        // }
+        Integer setNum = sysSettingService.getSettingValue(SettingTypeEnum.thirty);
+        Integer num = promotionProduct.getNum();
         Integer status = promotionProduct.getFlashProductStatus();
+        if (BlankUtil.isNotEmpty(setNum) && ObjectUtil.equal(status, 4) && num.compareTo(setNum) >= NumberUtils.INTEGER_ZERO) {
+            status = NumberConstant.MINUS_ONE;
+        }
         if (!ObjectUtil.equal(status, NumberUtils.INTEGER_MINUS_ONE)) {
             // return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_PDT_SALE);
             return CommonResult.failed(BusinessErrorCode.ERR_PROMOTION_NOT_DATE);
@@ -952,20 +974,20 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         long balance = empty ? NumberUtils.LONG_ZERO : umsIncome.getBalance();
         long allIncome = empty ? NumberUtils.LONG_ZERO : umsIncome.getAllIncome();
         UmsIncome build = UmsIncome.builder()
-                .incomeId(IdWorker.generateId())
-                .userId(userId)
-                .income(flashPromotionPrice)
-                .expenditure(NumberUtils.LONG_ZERO)
-                .balance(balance + flashPromotionPrice)
-                .allIncome(allIncome + flashPromotionPrice)
-                .incomeType(UmsIncome.IncomeType.FIFTEEN.key())
-                .detailSource("用户退款-秒杀产品")
-                .remark("平台回购-秒杀产品id:{" + flashPromotionPdtId + "},价格:{" + flashPromotionPrice + "},持有人id:{" + userId + "},数量:{" + flashPromotionCount + "}")
-                .payType(UmsIncome.PayType.THREE.key())
-                .flashPromotionPdtId(flashPromotionPdtId)
-                .incomeNo(FigureConstant.STRING_EMPTY)
-                .orderTradeNo(FigureConstant.STRING_EMPTY)
-                .build();
+                                   .incomeId(IdWorker.generateId())
+                                   .userId(userId)
+                                   .income(flashPromotionPrice)
+                                   .expenditure(NumberUtils.LONG_ZERO)
+                                   .balance(balance + flashPromotionPrice)
+                                   .allIncome(allIncome + flashPromotionPrice)
+                                   .incomeType(UmsIncome.IncomeType.FIFTEEN.key())
+                                   .detailSource("用户退款-秒杀产品")
+                                   .remark("平台回购-秒杀产品id:{" + flashPromotionPdtId + "},价格:{" + flashPromotionPrice + "},持有人id:{" + userId + "},数量:{" + flashPromotionCount + "}")
+                                   .payType(UmsIncome.PayType.THREE.key())
+                                   .flashPromotionPdtId(flashPromotionPdtId)
+                                   .incomeNo(FigureConstant.STRING_EMPTY)
+                                   .orderTradeNo(FigureConstant.STRING_EMPTY)
+                                   .build();
         SmsFlashPromotionProduct build1 = SmsFlashPromotionProduct.builder()
                                                                   .flashPromotionPdtId(flashPromotionPdtId)
                                                                   .flashProductStatus(SmsFlashPromotionProduct.FlashProductStatus.FIVE.key())

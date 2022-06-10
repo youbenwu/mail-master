@@ -131,4 +131,7 @@ public class SmsFlashPromotionProduct implements Serializable {
         final String value;
     }
 
+    @ApiModelProperty(value = "未卖出的次数,默认值为0")
+    private Integer num;
+
 }
