@@ -240,7 +240,7 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
                    .putObj("余额", NumberUtil.ifZeroReturnZero(DecimalUtil.longToDoubleForDivider(i.getBalance())))
                    .putObj("类型", EnumTool.getValue(UmsIncome.IncomeType.class, i.getIncomeType()))
                    .putObj("时间", i.getCreateTime())
-                   .putObj("秒杀商品ID", i.getFlashPromotionPdtId())
+                   .putObj("秒杀商品ID", i.getFlashPromotionPdtId().toString())
                    .putObj("描述", i.getDetailSource())
                    .putObj("备注", i.getRemark());
                 rows.add(map);

@@ -3,6 +3,7 @@ spring:
     name: mail-admin
   profiles:
     active: common,prod #默认为开发环境,每次上传代码的时候改成prod为生产环境,开发环境dev,测试环境test
+    active: common,dev # 默认为开发环境,生产环境prod,开发环境dev,测试环境test
   servlet:
     multipart:
       enabled: true # 开启文件上传
@@ -40,6 +41,11 @@ jwt:
   secret: electric-admin-secret #JWT加解密使用的密钥
   expiration: 604800 #JWT的超期限时间(60*60*24*7) 604800 60就是一分钟
   tokenHead: 'Bearer'  #JWT负载中拿到开头
+
+# swagger enum 文档生成器
+swagger:
+  plugin:
+    enum-support: true
 
 secure:
   ignored:

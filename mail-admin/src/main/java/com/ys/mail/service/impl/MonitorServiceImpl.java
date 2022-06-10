@@ -3,6 +3,7 @@ package com.ys.mail.service.impl;
 import cn.hutool.core.date.BetweenFormater;
 import cn.hutool.core.date.DateUtil;
 import com.ys.mail.config.RedisConfig;
+import com.ys.mail.constant.WarningsConstant;
 import com.ys.mail.service.MonitorService;
 import com.ys.mail.service.RedisService;
 import com.ys.mail.util.FileTool;
@@ -41,6 +42,7 @@ public class MonitorServiceImpl implements MonitorService {
     private RedisConfig redisConfig;
 
     @Override
+    @SuppressWarnings(WarningsConstant.UNCHECKED)
     public Map<String, Object> getServers(boolean refresh) {
         // 获取key
         String fullKey = redisConfig.fullKey(redisConfig.getKey().getMonitorServers());

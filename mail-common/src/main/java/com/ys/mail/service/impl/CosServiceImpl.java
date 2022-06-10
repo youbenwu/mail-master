@@ -125,7 +125,7 @@ public class CosServiceImpl implements CosService {
      */
     @Override
     public COSClient getOssClient(Credentials credentials) {
-        LOGGER.info("初始化COS客户端");
+        LOGGER.info("init cosClient ...");
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSCredentials cred;
         if (BlankUtil.isNotEmpty(credentials))

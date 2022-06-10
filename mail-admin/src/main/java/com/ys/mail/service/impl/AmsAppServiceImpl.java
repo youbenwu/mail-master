@@ -345,7 +345,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
 
     @Override
     public String getAppLogoPath(Integer type) {
-        return String.format("%s%s%d.png", ImgPathEnum.SYS_LOGO_PATH.value(), "app", type);
+        return String.format("%s%s%d.png", ImgPathEnum.SYS_LOGO_PATH.path(), "app", type);
     }
 
     /**
@@ -369,7 +369,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
             QrCodeUtil.encode(content, qrcode);
         }
         // 构建二维码上传key
-        String key = ImgPathEnum.DOWNLOAD_QRCODE_PATH.value() + genQrcodeName(type);
+        String key = ImgPathEnum.DOWNLOAD_QRCODE_PATH.path() + genQrcodeName(type);
         // 上传到指定目录
         cosService.upload(key, qrcode);
         // 返回Key

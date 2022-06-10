@@ -109,7 +109,7 @@ public class UmsUserInviteServiceImpl extends ServiceImpl<UmsUserInviteMapper, U
         // 校验高级用户
         ApiAssert.isTrue(NumberUtils.INTEGER_ZERO.equals(currentUser.getRoleId()), CommonResultCode.NOT_SENIOR_USER);
         // 用户二维码key，对应COS存储路径
-        String key = String.format("%s%d-%s.jpg", ImgPathEnum.QR_CODE_PATH.value(), userId, type);
+        String key = String.format("%s%d-%s.jpg", ImgPathEnum.QR_CODE_PATH.path(), userId, type);
         String fullKey = cosService.getFullKey(null, key);
         Boolean existKey = cosService.isExistKey(fullKey);
         // 存在直接返回

@@ -20,25 +20,17 @@ import java.util.List;
 @Accessors(fluent = true)
 public enum FilePathEnum implements IPairs<Integer, String, FilePathEnum> {
     /**
-     * 开发测试，默认类型
+     * 文件目录
      */
-    TEST_PATH(-1, "/test/", null),
-    /**
-     * APK存储目录
-     */
-    APK_PATH(0, "/apk/", Collections.singletonList("apk")),
-    /**
-     * 视频存储目录
-     */
-    VIDEO_PATH(1, "/video/", Arrays.asList("avi", "wmv", "mpeg", "mp4", "mov", "flv", "rmvb", "3gp", "ts")),
-    /**
-     * 音频存储目录
-     */
-    AUDIO_PATH(1, "/audio/", Arrays.asList("mp3", "wav", "flac", "aac", "alac")),
+    TEST_PATH(-1, "开发测试", "/test/", null),
+    APK_PATH(0, "APK存储", "/apk/", Collections.singletonList("apk")),
+    VIDEO_PATH(1, "视频存储", "/video/", Arrays.asList("avi", "wmv", "mpeg", "mp4", "mov", "flv", "rmvb", "3gp", "ts")),
+    AUDIO_PATH(1, "音频存储", "/audio/", Arrays.asList("mp3", "wav", "flac", "aac", "alac")),
     ;
 
     final Integer key;
     final String value;
+    final String path;
     /**
      * 文件后缀，不同存储目录要求不同，为空则不进行检测
      */

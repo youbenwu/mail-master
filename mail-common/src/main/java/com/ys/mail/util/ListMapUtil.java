@@ -1,12 +1,16 @@
 package com.ys.mail.util;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * @Desc List/Map工具类
- * @Author CRH
- * @Create 2022-04-01 17:38
+ * List/Map工具类
+ *
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 public class ListMapUtil {
 
@@ -20,7 +24,19 @@ public class ListMapUtil {
     public static <V> V getListMapValue(List<Map<Long, V>> listMap, Long id) {
         Map<Long, V> vMap = listMap.stream().filter(map -> BlankUtil.isNotEmpty(map.get(id))).findFirst()
                                    .orElse(null);
-        if (BlankUtil.isNotEmpty(vMap)) return vMap.get(id);
-        else return null;
+        if (BlankUtil.isNotEmpty(vMap)) {
+            return vMap.get(id);
+        }
+        return null;
+    }
+
+    /**
+     * 将int数组转为List<Integer>
+     *
+     * @param array 数组
+     * @return 结果
+     */
+    public static List<Integer> valueOf(int[] array) {
+        return Arrays.stream(array).boxed().collect(Collectors.toList());
     }
 }

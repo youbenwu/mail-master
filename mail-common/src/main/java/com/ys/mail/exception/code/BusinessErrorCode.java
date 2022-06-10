@@ -97,7 +97,6 @@ public enum BusinessErrorCode implements IErrorCode {
     ERR_DATE_EXPIRE(400301, "该商品已过期，不能上架"),
     ALLOW_PRODUCT_REFUND(400302, "该商品已经满足退款条件"),
 
-
     ERR_KEY_NOT_EXIST(400400, "Path：%s 不存在"),
     ERR_FILE_NAME_FORMAT(400500, "文件名称格式不正确"),
     ERR_FILE_SUFFIX(400501, "文件后缀不正确，格式应为：%s"),

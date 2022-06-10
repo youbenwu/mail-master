@@ -53,6 +53,9 @@ public class MyStoreDTO implements Serializable {
     @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
     private Date expireTime;
 
+    @ApiModelProperty(value = "未卖出记录数量")
+    private Integer num;
+
     @Data
     static class StoreProduct {
 

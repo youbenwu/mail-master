@@ -1,7 +1,7 @@
 package com.ys.mail.controller;
 
 
-import com.ys.mail.annotation.EnumContains;
+import com.ys.mail.annotation.EnumDocumentValid;
 import com.ys.mail.enums.FilePathEnum;
 import com.ys.mail.enums.ImgPathEnum;
 import com.ys.mail.exception.code.CommonResultCode;
@@ -14,8 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +34,6 @@ import java.util.List;
 @RequestMapping("/pc/file")
 public class FileController {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(FileController.class);
-
     @Autowired
     private FileService fileService;
     @Autowired
@@ -50,21 +46,20 @@ public class FileController {
         return CommonResult.success(cosPath);
     }
 
-    @ApiOperation(value = "图片上传-COS", notes = "上传到腾讯云COS，图片大小不能超过500kb")
     @PostMapping(value = "/cos/upload")
-    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码," +
-            "4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌,10->创客商品图片案例", required = true, dataType = "int")
+    @ApiOperation(value = "图片上传-COS", notes = "上传到腾讯云COS，不同类型图片大小不一致")
+    @ApiImplicitParam(name = "imgType", value = "图片类型", required = true, dataType = "int")
     public CommonResult<String> cosUpload(@RequestParam(name = "file") MultipartFile file,
-                                          @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class, exclude = {"9"}) Integer imgType,
+                                          @RequestParam(name = "imgType") @EnumDocumentValid(enumClass = ImgPathEnum.class, exclude = {-3, -2}) Integer imgType,
                                           HttpServletRequest req) {
         return fileService.imageUpload(file, EnumTool.getEnum(ImgPathEnum.class, imgType));
     }
 
-    @ApiOperation(value = "图片批量上传-COS", notes = "批量上传图片到腾讯云COS")
     @PostMapping(value = "/cos/uploadBatch")
-    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,0->系统设置,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,6->轮播图,7->融云聊天,8->企业品牌,10->创客商品图片案例", required = true, dataType = "int")
+    @ApiOperation(value = "图片批量上传-COS", notes = "批量上传图片到腾讯云COS")
+    @ApiImplicitParam(name = "imgType", value = "图片类型", required = true, dataType = "int")
     public CommonResult<String> cosUploadBatch(@RequestParam(value = "file", required = false) MultipartFile[] multipartFile,
-                                               @RequestParam(name = "imgType") @EnumContains(enumClass = ImgPathEnum.class, exclude = {"9"}) Integer imgType,
+                                               @RequestParam(name = "imgType") @EnumDocumentValid(enumClass = ImgPathEnum.class, exclude = {-3, -2}) Integer imgType,
                                                HttpServletRequest req) {
         if (BlankUtil.isEmpty(multipartFile)) {
             return CommonResult.failed("请选择要上传的图片");
@@ -87,12 +82,10 @@ public class FileController {
     @PostMapping(value = "/cos/async/fileUpload")
     @ApiOperation(value = "异步文件上传-COS", notes = "最大不超过200MB")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "fileType", value = "文件类型：-1->开发测试,0->APK目录,1->视频存储,2->音频存储", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "fileType", value = "文件类型", required = true, dataType = "int"),
             @ApiImplicitParam(name = "retainName", value = "是否保留原文件名(注意，文件名不能带中文)，默认为false->随机生成，true->保留", dataType = "boolean")
     })
-    public CommonResult<String> asyncFileUpload(@RequestParam(name = "file") MultipartFile multipartFile,
-                                                @RequestParam(name = "fileType") @EnumContains(enumClass = FilePathEnum.class) Integer fileType,
-                                                @RequestParam(name = "retainName", defaultValue = "0") boolean retainName) {
+    public CommonResult<String> asyncFileUpload(@RequestParam(name = "file") MultipartFile multipartFile, @RequestParam(name = "fileType") @EnumDocumentValid(enumClass = FilePathEnum.class) Integer fileType, @RequestParam(name = "retainName", defaultValue = "0") boolean retainName) {
         return fileService.asyncFileUpload(multipartFile, EnumTool.getEnum(FilePathEnum.class, fileType), retainName);
     }
 }
