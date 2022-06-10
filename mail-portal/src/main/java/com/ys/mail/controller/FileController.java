@@ -1,7 +1,7 @@
 package com.ys.mail.controller;
 
 
-import com.ys.mail.annotation.EnumContains;
+import com.ys.mail.annotation.EnumDocumentValid;
 import com.ys.mail.enums.ImgPathEnum;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.service.CosService;
@@ -10,8 +10,6 @@ import com.ys.mail.util.EnumTool;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(tags = "文件管理")
 @RequestMapping("/file")
 public class FileController {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
     private FileService fileService;
@@ -48,11 +44,10 @@ public class FileController {
             "2、图片等比例缩放：?imageMogr2/thumbnail/100x<br/>" +
             "3、图片为原图50%：?imageMogr2/thumbnail/!50p 等<br/>")
     @PostMapping(value = "/cos/upload")
-    @ApiImplicitParam(name = "imgType", value = "图片类型：-1->开发测试,1->商品图片,2->用户头像,3->二维码,4->商品评价,5->身份证,7->融云聊天,9->用户店铺",
-            required = true, dataType = "int")
+    @ApiImplicitParam(name = "imgType", value = "图片类型", required = true, dataType = "int")
     public CommonResult<String> cosUpload(@RequestParam(name = "file") MultipartFile file,
                                           @RequestParam(name = "imgType")
-                                          @EnumContains(enumClass = ImgPathEnum.class, exclude = {"0", "6", "8"}) Integer imgType) {
+                                          @EnumDocumentValid(enumClass = ImgPathEnum.class, exclude = {-3, -2, 0, 3, 6, 8, 10}) Integer imgType) {
         return fileService.imageUpload(file, EnumTool.getEnum(ImgPathEnum.class, imgType));
     }
 

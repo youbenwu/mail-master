@@ -23,8 +23,8 @@ import java.util.Objects;
  * @since 1.0
  */
 @Documented
-@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER,ElementType.TYPE})
 @Constraint(validatedBy = EnumContains.EnumContainsValidator.class)
 public @interface EnumContains {
 

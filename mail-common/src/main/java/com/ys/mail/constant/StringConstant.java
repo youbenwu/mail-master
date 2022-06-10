@@ -50,6 +50,7 @@ public class StringConstant {
     /**
      * 英文符号
      */
+    public static final String EN_COMMA = ",";
     public static final String EN_SEMICOLON = ";";
     public static final String SLASH = "/";
     public static final String DOUBLE_QUOTE = "\"";

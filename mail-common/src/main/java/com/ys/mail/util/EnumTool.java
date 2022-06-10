@@ -22,6 +22,42 @@ import java.util.stream.Collectors;
 public class EnumTool {
 
     /**
+     * 获取枚举项拼接列表
+     *
+     * @param iPairsClass 枚举类型
+     * @param include     包含列表
+     * @param exclude     排除列表
+     * @param jointMark   连接符
+     * @param delimiter   分割符
+     * @return 拼接列表
+     */
+    public static <E extends Enum<E>> String values(Class<? extends IPairs<?, ?, ?>> iPairsClass,
+                                                    List<Integer> include, List<Integer> exclude,
+                                                    CharSequence jointMark, CharSequence delimiter) {
+        // 获取枚举数组
+        IPairs<?, ?, ?>[] enumConstants = iPairsClass.getEnumConstants();
+
+        // 遍历拼接结果，支持包含排除模式：优先包含列表
+        return Arrays.stream(enumConstants).map(e -> {
+            Integer key = (Integer) e.key();
+            String value = String.valueOf(e.value());
+
+            if (BlankUtil.isNotEmpty(include)) {
+                if (include.contains(key)) {
+                    return String.format("%s%s%s", key, jointMark, value);
+                }
+            } else if (BlankUtil.isNotEmpty(exclude)) {
+                if (!exclude.contains(key)) {
+                    return String.format("%s%s%s", key, jointMark, value);
+                }
+            } else {
+                return String.format("%s%s%s", key, jointMark, value);
+            }
+            return StringConstant.BLANK;
+        }).filter(BlankUtil::isNotEmpty).collect(Collectors.joining(delimiter));
+    }
+
+    /**
      * 通用：判断枚举中是否包含该值
      * - 主要为了兼容普通的枚举类
      *

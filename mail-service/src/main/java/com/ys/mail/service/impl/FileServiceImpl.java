@@ -16,8 +16,7 @@ import com.ys.mail.service.FileService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.FileTool;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,10 +30,9 @@ import java.util.List;
  * @date 2022-04-19 15:19
  * @since 1.0
  */
+@Slf4j
 @Service
 public class FileServiceImpl implements FileService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(FileServiceImpl.class);
 
     @Autowired
     private CosService cosService;
@@ -48,7 +46,6 @@ public class FileServiceImpl implements FileService {
      * 默认，图片限制500kb
      */
     private final static Long LONG_FILE_MAX_SIZE = 1024 * 500L;
-    private final static String FILE_SIZE_OVERSTEP = "文件大小不能大于500KB";
 
     @Override
     public CommonResult<String> imageUpload(MultipartFile file, ImgPathEnum imgType) {
@@ -73,7 +70,7 @@ public class FileServiceImpl implements FileService {
         }
 
         // 上传
-        String key = imgType.value() + this.getRandomName(file);
+        String key = imgType.path() + this.getRandomName(file);
         cosService.upload(key, FileTool.multipartToFile(file));
         return CommonResult.success(key);
     }
@@ -102,7 +99,7 @@ public class FileServiceImpl implements FileService {
             newFileName = this.getRandomName(file);
         }
         // 完整的key
-        String fullKey = filePath.value() + newFileName;
+        String fullKey = filePath.path() + newFileName;
 
         // 使用异步上传
         cosService.asyncUpload(FileTool.multipartToFile(file), CosFolderEnum.FILE_FOLDER, fullKey);

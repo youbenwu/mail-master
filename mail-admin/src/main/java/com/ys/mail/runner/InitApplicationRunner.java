@@ -23,12 +23,12 @@ public class InitApplicationRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        LOGGER.info("InitApplicationRunner 开始加载 ···");
+        LOGGER.info("InitApplicationRunner start ···");
 
         // 重新加载系统设置
         sysSettingService.loadAll();
         // 其他操作等
 
-        LOGGER.info("InitApplicationRunner 加载完成 ···");
+        LOGGER.info("InitApplicationRunner end ···");
     }
 }

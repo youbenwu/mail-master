@@ -1,0 +1,20 @@
+{
+  "properties": [
+    {
+      "name": "swagger.plugin.enum-support",
+      "type": "java.lang.String",
+      "description": "Description for swagger.plugin.enum-support."
+    }, {
+      "name": "jwt.tokenHeader",
+      "type": "java.lang.String",
+      "description": "Description for jwt.tokenHeader."
+    }, {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Description for jwt.secret."
+    }, {
+      "name": "jwt.expiration",
+      "type": "java.lang.String",
+      "description": "Description for jwt.expiration."
+    }
+  ] }
