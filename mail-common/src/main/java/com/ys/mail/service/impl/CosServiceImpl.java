@@ -181,8 +181,6 @@ public class CosServiceImpl implements CosService {
         try {
             // 获取key
             key = getFullKey(cosFolder, key);
-            // 尝试检测网络
-            this.isExistKey(key);
             // 获取桶
             if (BlankUtil.isEmpty(bucketName)) {
                 bucketName = cosConfig.getBucket();
@@ -191,7 +189,7 @@ public class CosServiceImpl implements CosService {
             // 开始上传
             Upload upload = transferManager.upload(putObjectRequest);
             // 同步阻塞
-            upload.waitForCompletion();
+            upload.waitForUploadResult();
             // 记录结果
             LOGGER.info(upload.getDescription().replace("//", "/"));
             // 等待返回结果
