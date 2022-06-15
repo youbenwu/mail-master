@@ -209,7 +209,8 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
             List<Map<String, Object>> rows = new ArrayList<>();
             flashDetailsData.forEach(f -> {
                 ChainLinkedHashMap<String, Object> map = new ChainLinkedHashMap<>();
-                map.putObj("秒杀商品ID", f.getFlashPromotionPdtId().toString())
+                String id = BlankUtil.isNotEmpty(f.getFlashPromotionPdtId()) ? String.valueOf(f.getFlashPromotionPdtId()) : null;
+                map.putObj("秒杀商品ID", id)
                    .putObj("秒杀场次名称", f.getFlashPromotionTitle())
                    .putObj("发布价格", f.getReleasePrice())
                    .putObj("商品原价", f.getOriginalPrice())
@@ -234,13 +235,14 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
             List<Map<String, Object>> rows = new ArrayList<>();
             incomeList.forEach(i -> {
                 ChainLinkedHashMap<String, Object> map = new ChainLinkedHashMap<>();
+                Long flashPromotionPdtId = i.getFlashPromotionPdtId();
                 map.putObj("流水号", i.getIncomeId().toString())
                    .putObj("收益/返还", NumberUtil.ifZeroReturnZero(DecimalUtil.longToDoubleForDivider(i.getIncome())))
                    .putObj("支出/扣除", NumberUtil.ifZeroReturnZero(DecimalUtil.longToDoubleForDivider(i.getExpenditure())))
                    .putObj("余额", NumberUtil.ifZeroReturnZero(DecimalUtil.longToDoubleForDivider(i.getBalance())))
                    .putObj("类型", EnumTool.getValue(UmsIncome.IncomeType.class, i.getIncomeType()))
                    .putObj("时间", i.getCreateTime())
-                   .putObj("秒杀商品ID", i.getFlashPromotionPdtId().toString())
+                   .putObj("秒杀商品ID", BlankUtil.isNotEmpty(flashPromotionPdtId) ? String.valueOf(flashPromotionPdtId) : null)
                    .putObj("描述", i.getDetailSource())
                    .putObj("备注", i.getRemark());
                 rows.add(map);
@@ -260,15 +262,16 @@ public class UserManageServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> i
         List<PcReviewVO> reviewList = result.getData().getRecords();
         if (BlankUtil.isNotEmpty(reviewList)) {
             // 单个工作表
-            List<Map<String, Object>> rows = new ArrayList<>();// 单个工作表
+            List<Map<String, Object>> rows = new ArrayList<>();
             reviewList.forEach(r -> {
                 ChainLinkedHashMap<String, Object> map = new ChainLinkedHashMap<>();
-                map.putObj("审核ID", r.getReviewId().toString())
+                String id = BlankUtil.isNotEmpty(r.getReviewId()) ? String.valueOf(r.getReviewId()) : null;
+                map.putObj("审核ID", id)
                    .putObj("支付宝名字", r.getAlipayName())
                    .putObj("支付宝账号", r.getAlipayAccount())
                    .putObj("申请提现金额", DecimalUtil.longToStrForDivider(r.getReviewMoney()))
                    .putObj("审核状态", EnumTool.getValue(PcReview.ReviewState.class, r.getReviewState()))
-                   .putObj("审核人ID", BlankUtil.isNotEmpty(r.getReviewId()) ? r.getReviewId().toString() : null)
+                   .putObj("审核人ID", BlankUtil.isNotEmpty(r.getPcUserId()) ? r.getPcUserId().toString() : null)
                    .putObj("审核人名称", r.getUsername())
                    .putObj("提现流水号", BlankUtil.isNotEmpty(r.getIncomeId()) ? r.getIncomeId() : null)
                    .putObj("申请时间", r.getCreateTime())
