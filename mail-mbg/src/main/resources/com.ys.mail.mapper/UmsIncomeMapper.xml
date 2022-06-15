@@ -26,12 +26,12 @@
 
     <resultMap id="UmsIncomeVOMap" type="com.ys.mail.model.vo.UmsIncomeSumVO">
         <result column="all_income" property="allIncome"/>
-<!--        <result column="balance" property="balance"/>-->
-<!--        <result column="today_income" property="todayIncome"/>-->
-<!--        <result column="invite_income_sum" property="inviteIncomeSum"/>-->
-<!--        <result column="sale_income_sum" property="saleIncomeSum"/>-->
-<!--        <result column="expenditure_sum" property="expenditureSum"/>-->
-<!--        <result column="general_income_sum" property="generalIncomeSum"/>-->
+        <result column="balance" property="balance"/>
+        <result column="today_income" property="todayIncome"/>
+        <result column="invite_income_sum" property="inviteIncomeSum"/>
+        <result column="sale_income_sum" property="saleIncomeSum"/>
+        <result column="expenditure_sum" property="expenditureSum"/>
+        <result column="general_income_sum" property="generalIncomeSum"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -166,9 +166,9 @@
             CASE WHEN SUM(a) + SUM(c) > 0 THEN 1 ELSE 0 END cover,
             SUM(a) - SUM(c) original, SUM(b) - SUM(d) integral
         FROM (
-                SELECT SUM(original) a,SUM(integral) b,0 c,0 d FROM ums_income WHERE user_id = 1471786150199955456 AND income_type IN (-2,0,1,3,5,6,7,8,11,14,15)
+                SELECT SUM(original) a,SUM(integral) b,0 c,0 d FROM ums_income WHERE user_id = #{userId} AND income_type IN (-2,0,1,3,5,6,7,8,11,14,15)
                 UNION
-                SELECT 0 a,0 b,SUM(original) c,SUM(integral) d FROM ums_income WHERE user_id = 1471786150199955456 AND income_type IN (-1,2,4,9,10,13)
+                SELECT 0 a,0 b,SUM(original) c,SUM(integral) d FROM ums_income WHERE user_id = #{userId} AND income_type IN (-1,2,4,9,10,13)
         ) t
     </select>
 

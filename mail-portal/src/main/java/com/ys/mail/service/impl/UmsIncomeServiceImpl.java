@@ -68,8 +68,9 @@ public class UmsIncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome
         }
         // 查询用户最新记录
         UmsIncome umsIncome = incomeMapper.selectNewestByUserId(userId);
-        UmsIncomeSumVO vo = new UmsIncomeSumVO();
-        if (BlankUtil.isEmpty(umsIncome)) {
+        // 查询出统计数据
+        UmsIncomeSumVO vo = incomeMapper.selectUmsIncomeSumById(userId);
+        if (BlankUtil.isEmpty(umsIncome) || BlankUtil.isEmpty(vo)) {
             return vo;
         }
         OriginalIntegralPO po = incomeMapper.getOriginalIntegralByUserId(userId);
@@ -81,6 +82,13 @@ public class UmsIncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome
         vo.setRate(BlankUtil.isEmpty(userRate) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(userRate));
         vo.setAllIncome(BlankUtil.isEmpty(umsIncome.getAllIncome()) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(umsIncome.getAllIncome()));
         vo.setBalance(BlankUtil.isEmpty(umsIncome.getBalance()) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(umsIncome.getBalance()));
+
+        // 下个版本移除
+        vo.setTodayIncome(BlankUtil.isEmpty(umsIncome.getTodayIncome()) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(umsIncome.getTodayIncome()));
+        vo.setInviteIncomeSum(DecimalUtil.strToStrForDivider(vo.getInviteIncomeSum()));
+        vo.setSaleIncomeSum(DecimalUtil.strToStrForDivider(vo.getSaleIncomeSum()));
+        vo.setExpenditureSum(DecimalUtil.strToStrForDivider(vo.getExpenditureSum()));
+        vo.setGeneralIncomeSum(DecimalUtil.strToStrForDivider(vo.getGeneralIncomeSum()));
 
         return vo;
     }
