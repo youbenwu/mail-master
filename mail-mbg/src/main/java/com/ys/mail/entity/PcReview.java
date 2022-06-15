@@ -2,6 +2,7 @@ package com.ys.mail.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ys.mail.annotation.EnumDocumentValid;
 import com.ys.mail.enums.IPairs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,7 +36,8 @@ public class PcReview implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long reviewId;
 
-    @ApiModelProperty(value = "审核状态：-1->已失效,0->待审核，1->已通过，2->不通过，3->已关闭，4->已取消", notes = "使用枚举")
+    @ApiModelProperty(value = "审核状态")
+    @EnumDocumentValid(enumClass = ReviewState.class, isValid = false)
     private Integer reviewState;
 
     @ApiModelProperty(value = "审核人")
@@ -47,6 +49,10 @@ public class PcReview implements Serializable {
 
     @ApiModelProperty(value = "提现流水号")
     private String incomeId;
+
+    @ApiModelProperty(value = "提现流水id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long exIncomeId;
 
     @ApiModelProperty(value = "手续费流水id")
     @JsonFormat(shape = JsonFormat.Shape.STRING)

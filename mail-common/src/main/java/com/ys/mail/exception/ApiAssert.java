@@ -116,6 +116,12 @@ public class ApiAssert {
         }
     }
 
+    public static void isTrue(boolean condition, IErrorCode errorCode, String message) {
+        if (condition) {
+            throw new BusinessException(errorCode, message);
+        }
+    }
+
     /**
      * 如果为false则抛出异常
      *

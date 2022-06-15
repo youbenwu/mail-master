@@ -1,6 +1,7 @@
 package com.ys.mail.util;
 
 import com.ys.mail.constant.StringConstant;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -311,7 +312,9 @@ public class DecimalUtil {
     }
 
     public static Double longToDoubleForDivider(Long longNumber) {
-        if (BlankUtil.isEmpty(longNumber)) return null;
+        if (BlankUtil.isEmpty(longNumber)) {
+            return NumberUtils.DOUBLE_ZERO;
+        }
         BigDecimal divide = new BigDecimal(longNumber).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         return divide.doubleValue();
     }

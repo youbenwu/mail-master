@@ -72,6 +72,10 @@ public class CommonResult<T> {
         return new CommonResult<T>(CommonResultCode.FAILED.getCode(), CommonResultCode.FAILED.getMessage(), data);
     }
 
+    public static <T> CommonResult<T> failed() {
+        return new CommonResult<T>(CommonResultCode.FAILED.getCode(), CommonResultCode.FAILED.getMessage(), null);
+    }
+
     public static <T> CommonResult<T> errRequestMethod(String message) {
         return new CommonResult<T>(CommonResultCode.ERR_REQUEST_METHOD.getCode(), message, null);
     }

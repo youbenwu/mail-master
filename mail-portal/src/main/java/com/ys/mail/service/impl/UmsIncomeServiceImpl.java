@@ -8,12 +8,15 @@ import com.ys.mail.constant.StringConstant;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.mapper.UmsIncomeMapper;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.po.OriginalIntegralPO;
+import com.ys.mail.model.query.IncomeDimensionQuery;
 import com.ys.mail.model.vo.UmsIncomeDimensionVO;
 import com.ys.mail.model.vo.UmsIncomeSumVO;
 import com.ys.mail.service.UmsIncomeService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.DecimalUtil;
 import com.ys.mail.util.UserUtil;
+import com.ys.mail.wrapper.SqlLambdaQueryWrapper;
 import com.ys.mail.wrapper.SqlQueryWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,12 +47,11 @@ public class UmsIncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome
 
     @Override
     public UmsIncome getUmsIncomeByIdType(Long userId, Integer type) {
-        QueryWrapper<UmsIncome> wrapper = new QueryWrapper<>();
-        if (BeanUtil.isEmpty(userId)) userId = UserUtil.getCurrentUser().getUserId();
-        if (BeanUtil.isNotEmpty(type)) wrapper.eq("income_type", type);
-
-        wrapper.eq("user_id", userId)
-               .orderByDesc("income").last("limit 1");
+        SqlLambdaQueryWrapper<UmsIncome> wrapper = new SqlLambdaQueryWrapper<>();
+        wrapper.eq(UmsIncome::getUserId, userId)
+               .eq(UmsIncome::getIncomeType, type)
+               .orderByDesc(UmsIncome::getIncome)
+               .last(StringConstant.LIMIT_ONE);
         return getOne(wrapper);
     }
 
@@ -61,32 +63,41 @@ public class UmsIncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome
      */
     @Override
     public UmsIncomeSumVO getUmsIncomeSumById(Long userId) {
-
         if (BeanUtil.isEmpty(userId)) {
             userId = UserUtil.getCurrentUser().getUserId();
         }
         // 查询用户最新记录
         UmsIncome umsIncome = incomeMapper.selectNewestByUserId(userId);
         // 查询出统计数据
-        UmsIncomeSumVO umsIncomeSumVO = incomeMapper.selectUmsIncomeSumById(userId);
-        if (BlankUtil.isEmpty(umsIncome) || BlankUtil.isEmpty(umsIncomeSumVO)) {
-            return umsIncomeSumVO;
+        UmsIncomeSumVO vo = incomeMapper.selectUmsIncomeSumById(userId);
+        if (BlankUtil.isEmpty(umsIncome) || BlankUtil.isEmpty(vo)) {
+            return vo;
         }
+        OriginalIntegralPO po = incomeMapper.getOriginalIntegralByUserId(userId);
+        Long userRate = incomeMapper.selectUserRate(userId);
+
         // 组装结果返回
-        umsIncomeSumVO.setBalance(BlankUtil.isEmpty(umsIncome.getBalance()) ? "0" : DecimalUtil.longToStrForDivider(umsIncome.getBalance()));
-        umsIncomeSumVO.setTodayIncome(BlankUtil.isEmpty(umsIncome.getTodayIncome()) ? "0" : DecimalUtil.longToStrForDivider(umsIncome.getTodayIncome()));
-        umsIncomeSumVO.setAllIncome(BlankUtil.isEmpty(umsIncome.getAllIncome()) ? "0" : DecimalUtil.longToStrForDivider(umsIncome.getAllIncome()));
+        vo.setOriginal(DecimalUtil.longToStrForDivider(po.getOriginal()));
+        vo.setIntegral(DecimalUtil.longToStrForDivider(po.getIntegral()));
+        vo.setRate(BlankUtil.isEmpty(userRate) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(userRate));
+        vo.setAllIncome(BlankUtil.isEmpty(umsIncome.getAllIncome()) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(umsIncome.getAllIncome()));
+        vo.setBalance(BlankUtil.isEmpty(umsIncome.getBalance()) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(umsIncome.getBalance()));
 
-        umsIncomeSumVO.setInviteIncomeSum(DecimalUtil.strToStrForDivider(umsIncomeSumVO.getInviteIncomeSum()));
-        umsIncomeSumVO.setSaleIncomeSum(DecimalUtil.strToStrForDivider(umsIncomeSumVO.getSaleIncomeSum()));
-        umsIncomeSumVO.setExpenditureSum(DecimalUtil.strToStrForDivider(umsIncomeSumVO.getExpenditureSum()));
-        umsIncomeSumVO.setGeneralIncomeSum(DecimalUtil.strToStrForDivider(umsIncomeSumVO.getGeneralIncomeSum()));
+        // 下个版本移除
+        vo.setTodayIncome(BlankUtil.isEmpty(umsIncome.getTodayIncome()) ? StringConstant.ZERO : DecimalUtil.longToStrForDivider(umsIncome.getTodayIncome()));
+        vo.setInviteIncomeSum(DecimalUtil.strToStrForDivider(vo.getInviteIncomeSum()));
+        vo.setSaleIncomeSum(DecimalUtil.strToStrForDivider(vo.getSaleIncomeSum()));
+        vo.setExpenditureSum(DecimalUtil.strToStrForDivider(vo.getExpenditureSum()));
+        vo.setGeneralIncomeSum(DecimalUtil.strToStrForDivider(vo.getGeneralIncomeSum()));
 
-        return umsIncomeSumVO;
+        return vo;
     }
 
     @Override
-    public CommonResult<List<UmsIncomeDimensionVO>> getUmsIncomeByDimension(String beginTime, String endTime, Long lastIncomeId, String lately, String pageSize) {
+    public CommonResult<List<UmsIncomeDimensionVO>> getUmsIncomeByDimension(IncomeDimensionQuery query) {
+        String beginTime = query.getBeginTime();
+        String endTime = query.getEndTime();
+        Long lastIncomeId = query.getLastIncomeId();
         // 默认日期
         if (BlankUtil.isEmpty(beginTime)) {
             beginTime = DateUtil.format(new Date(), "yyyyMMdd");
@@ -97,11 +108,11 @@ public class UmsIncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome
         wrapper.select("income_id,detail_source,income_type,create_time,balance," +
                        "Case when income_type in(-1,2,4,9,10) THEN expenditure ELSE income END income")
                .eq("user_id", UserUtil.getCurrentUser().getUserId())
-               .orderByDesc("income_id").last("limit " + pageSize);
+               .orderByDesc("income_id").last("limit " + query.getPageSize());
         if (BlankUtil.isNotEmpty(lastIncomeId) && lastIncomeId != 0) wrapper.lt("income_id", lastIncomeId);
 
         // 0 表示开启时间查询
-        if (StringConstant.ZERO.equals(lately)) {
+        if (StringConstant.ZERO.equals(query.getLately())) {
             int length = beginTime.length();
             String dateFormat;
             switch (length) {

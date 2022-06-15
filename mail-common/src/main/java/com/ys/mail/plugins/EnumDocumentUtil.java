@@ -7,6 +7,7 @@ import com.ys.mail.enums.IPairs;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.EnumTool;
 import com.ys.mail.util.ListMapUtil;
+import springfox.documentation.builders.ModelPropertyBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 
 /**
@@ -21,12 +22,12 @@ public class EnumDocumentUtil {
     /**
      * 统一处理文档
      *
-     * @param enumDocument     枚举文档注解（该注解中的枚举类必须实现IPairs接口）
-     * @param parameterBuilder 参数构建器
-     * @param originalValue    原有值
+     * @param enumDocument  枚举文档注解（该注解中的枚举类必须实现IPairs接口）
+     * @param builder       参数构建器
+     * @param originalValue 原有值
      */
     @SuppressWarnings(WarningsConstant.UNCHECKED)
-    public static void handlerDocument(EnumDocumentValid enumDocument, ParameterBuilder parameterBuilder, String paramName, String originalValue) {
+    public static void handlerDocument(EnumDocumentValid enumDocument, Object builder, String paramName, String originalValue) {
         // 将枚举文档注解中的枚举类型尝试转换
         Class<? extends IPairs<?, ?, ?>> iPairsClass = (Class<? extends IPairs<?, ?, ?>>) enumDocument.enumClass()
                                                                                                       .asSubclass(IPairs.class);
@@ -53,7 +54,15 @@ public class EnumDocumentUtil {
                     coverValue = originalValue;
                 }
             }
-            parameterBuilder.description(coverValue);
+            // 处理不同构建器
+            if (builder instanceof ParameterBuilder) {
+                ParameterBuilder parameterBuilder = (ParameterBuilder) builder;
+                parameterBuilder.description(coverValue);
+            } else if (builder instanceof ModelPropertyBuilder) {
+                ModelPropertyBuilder modelPropertyBuilder = (ModelPropertyBuilder) builder;
+                modelPropertyBuilder.description(coverValue);
+            }
+
         }
     }
 }

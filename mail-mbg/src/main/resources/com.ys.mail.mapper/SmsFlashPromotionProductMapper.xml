@@ -336,9 +336,7 @@
                sfpp.publisher_id,
                sfpp.sku_stock_id,
                sfpp.is_publish_status,
-                CASE WHEN
-                    DATE( sfpp.expire_time ) <![CDATA[ < ]]> DATE( CURRENT_DATE ()) THEN '-1' ELSE sfpp.flash_product_status
-                END AS flash_product_status,
+               sfpp.flash_product_status,
                sfpp.flash_promotion_limit,
                sfpp.order_id,
                sfpp.pdt_store_obj,

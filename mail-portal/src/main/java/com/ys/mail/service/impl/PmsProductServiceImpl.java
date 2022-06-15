@@ -133,7 +133,9 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
             pdtCollectId = productMapper.selectByUserIdOrPdtId(productId, currentUser.getUserId());
         }
 
-        productInfoDTO.setPdtCollectId(BlankUtil.isEmpty(pdtCollectId) ? NumberUtils.LONG_ZERO : pdtCollectId);
+        if (BlankUtil.isNotEmpty(productInfoDTO)) {
+            productInfoDTO.setPdtCollectId(BlankUtil.isEmpty(pdtCollectId) ? NumberUtils.LONG_ZERO : pdtCollectId);
+        }
         // 返回结果
         return productInfoDTO;
     }

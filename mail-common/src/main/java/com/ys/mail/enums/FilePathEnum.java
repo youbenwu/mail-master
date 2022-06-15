@@ -24,7 +24,7 @@ public enum FilePathEnum implements IPairs<Integer, String, FilePathEnum> {
      */
     TEST_PATH(-1, "开发测试", "/test/", null),
     APK_PATH(0, "APK存储", "/apk/", Collections.singletonList("apk")),
-    VIDEO_PATH(1, "视频存储", "/video/", Arrays.asList("avi", "wmv", "mpeg", "mp4", "mov", "flv", "rmvb", "3gp", "ts")),
+    VIDEO_PATH(1, "视频存储", "/video/", Arrays.asList("avi", "wmv", "mpeg", "mp4", "mov", "flv", "m4v", "aac", "rmvb", "3gp", "ts")),
     AUDIO_PATH(1, "音频存储", "/audio/", Arrays.asList("mp3", "wav", "flac", "aac", "alac")),
     ;
 

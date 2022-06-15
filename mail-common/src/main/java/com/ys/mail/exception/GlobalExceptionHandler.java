@@ -3,6 +3,7 @@ package com.ys.mail.exception;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.ys.mail.constant.StringConstant;
 import com.ys.mail.enums.AnsiColorEnum;
+import com.ys.mail.exception.code.IErrorCode;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.StringUtil;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.crypto.BadPaddingException;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,7 +58,7 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(value = BusinessException.class)
-    public CommonResult<String> handler(BusinessException e) {
+    public CommonResult<String> handler(BusinessException e, HttpServletResponse res) {
         String message = e.getMessage();
         // 打印简洁的业务异常
         String title = String.format("%s业务异常::%s", StringConstant.LEFT_ARROWS, message);
@@ -69,9 +72,11 @@ public class GlobalExceptionHandler {
             content = title + link;
             logger.warn(content);
         }
+
         // 返回结果
-        if (e.getErrorCode() != null) {
-            return CommonResult.failed(e.getErrorCode(), message);
+        IErrorCode errorCode = e.getErrorCode();
+        if (errorCode != null) {
+            return CommonResult.failed(errorCode, message);
         }
         return CommonResult.failed(e.getMessage());
     }

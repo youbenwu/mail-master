@@ -194,5 +194,4 @@ public class PmsProduct implements Serializable {
     @TableField("is_home_status")
     private Boolean homeStatus;
 
-
 }

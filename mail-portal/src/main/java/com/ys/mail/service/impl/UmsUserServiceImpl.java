@@ -36,6 +36,7 @@ import com.ys.mail.model.oauth.Base64Utils;
 import com.ys.mail.model.oauth.DES;
 import com.ys.mail.model.oauth.SignUtil;
 import com.ys.mail.model.param.*;
+import com.ys.mail.model.po.OriginalIntegralPO;
 import com.ys.mail.model.tencent.TencentFaceIdClient;
 import com.ys.mail.model.vo.ProductStoreVO;
 import com.ys.mail.model.vo.UmsUserVo;
@@ -515,9 +516,14 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         if (response.isSuccess()) {
             // 添加提现流水：微服务架构这里可以直接返回给前端,异步操作这段插入
             LOGGER.info("提现{}", result);
+            // 计算本金和积分
+            OriginalIntegralPO po = incomeService.calculateOriginalIntegral(userId, income, money);
             UmsIncome umsIncome = UmsIncome.builder().incomeId(IdWorker.generateId()).userId(userId)
                                            .income(NumberUtils.LONG_ZERO)
-                                           .expenditure(money).balance(finalBalance)
+                                           .expenditure(money)
+                                           .original(po.getOriginal())
+                                           .integral(po.getIntegral())
+                                           .balance(finalBalance)
                                            .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
                                            // 2->余额提现
                                            .incomeType(UmsIncome.IncomeType.TWO.key())
@@ -601,16 +607,22 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         Map<String, Long> resultMap = incomeService.deductCharges(income, money, userId);
         Long rateIncomeId = resultMap.get("rateIncomeId");
         Long newBalance = resultMap.get("balance");
-        Long newMoney = resultMap.get("money");
         long finalBalance = balance - money;
+        Long newMoney = resultMap.get("money");
         if (BlankUtil.isNotEmpty(newBalance) && BlankUtil.isNotEmpty(newMoney)) {
             money = newMoney;
             finalBalance = newBalance - money;
         }
         String transAmount = DecimalUtil.longToStrForDivider(money);
+
+        // 计算本金和积分
+        OriginalIntegralPO po = incomeService.calculateOriginalIntegral(userId, income, money);
         // 从余额中冻结该笔提现金额，插入一条冻结流水记录
-        UmsIncome umsIncome = UmsIncome.builder().incomeId(IdWorker.generateId()).userId(userId)
-                                       .income(NumberUtils.LONG_ZERO).expenditure(money).balance(finalBalance)
+        Long incomeId = IdWorker.generateId();
+        UmsIncome umsIncome = UmsIncome.builder().incomeId(incomeId).userId(userId)
+                                       .income(NumberUtils.LONG_ZERO).expenditure(money)
+                                       .original(po.getOriginal()).integral(po.getIntegral())
+                                       .balance(finalBalance)
                                        .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
                                        .incomeType(UmsIncome.IncomeType.FOUR.key())
                                        .incomeNo("").orderTradeNo("").detailSource("系统审核中:" + transAmount + "元")
@@ -620,6 +632,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
 
         // 添加审核
         PcReview pcReview = PcReview.builder().reviewId(IdWorker.generateId()).userId(userId).reviewMoney(money)
+                                    .exIncomeId(incomeId)
                                     .rateIncomeId(rateIncomeId).alipayAccount(currentUser.getAlipayAccount())
                                     .alipayName(currentUser.getAlipayName()).build();
         updateResult = reviewService.save(pcReview);

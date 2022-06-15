@@ -24,11 +24,13 @@ import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
 import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.exception.code.CommonResultCode;
+import com.ys.mail.mapper.UmsIncomeMapper;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.dto.ChangeActiveDto;
 import com.ys.mail.model.param.AliBuyProductParam;
 import com.ys.mail.model.param.BalanceProductParam;
 import com.ys.mail.model.param.BuyProductParam;
+import com.ys.mail.model.po.OriginalIntegralPO;
 import com.ys.mail.model.unionPay.DateUtil;
 import com.ys.mail.model.unionPay.HttpClientUtil;
 import com.ys.mail.model.unionPay.SignUtils;
@@ -81,7 +83,11 @@ public class UnionPayServiceImpl implements UnionPayService {
     @Autowired
     private UmsUserInviteService inviteService;
     @Autowired
-    private UmsIncomeService incomeService;
+    private UmsIncomeService umsIncomeService;
+    @Autowired
+    private UmsIncomeMapper umsIncomeMapper;
+    @Autowired
+    private IncomeService incomeService;
     @Autowired
     private OmsOrderItemService orderItemService;
     @Autowired
@@ -128,7 +134,7 @@ public class UnionPayServiceImpl implements UnionPayService {
             return CommonResult.failed(BusinessErrorCode.ERR_NAME_ALIPAY);
         }
         //查询用户余额
-        UmsIncome income = incomeService.selectNewestByUserId(userId);
+        UmsIncome income = umsIncomeService.selectNewestByUserId(userId);
         if (BlankUtil.isEmpty(income)) {
             return CommonResult.failed(CommonResultCode.ERROR_20002);
         }
@@ -170,7 +176,7 @@ public class UnionPayServiceImpl implements UnionPayService {
                                            .detailSource("余额支付购买:" + money + "元")
                                            .payType(3)
                                            .build();
-            rep = incomeService.save(umsIncome);
+            rep = umsIncomeService.save(umsIncome);
         }
         LOGGER.info("余额支付结束,result:{}", rep);
         return rep ? CommonResult.success(rep) : CommonResult.failed(false);
@@ -649,9 +655,11 @@ public class UnionPayServiceImpl implements UnionPayService {
                 LOGGER.info("余额支付:用户id:{},输入支付密码错误", userId);
                 return CommonResult.failed(CommonResultCode.ERR_NOT_PAY_CODE);
             }
-            UmsIncome umsIncome = incomeService.selectNewestByUserId(Long.valueOf(userId.toString()));
+            UmsIncome umsIncome = umsIncomeService.selectNewestByUserId(Long.valueOf(userId.toString()));
             BigDecimal multiply = DecimalUtil.toBigDecimal(amount);
-            if (BlankUtil.isEmpty(umsIncome) || BlankUtil.isEmpty(multiply) || multiply.compareTo(DecimalUtil.toBigDecimal(umsIncome.getBalance())) != NumberUtils.INTEGER_MINUS_ONE) {
+            // 最新余额
+            Long balance = umsIncome.getBalance();
+            if (BlankUtil.isEmpty(umsIncome) || BlankUtil.isEmpty(multiply) || multiply.compareTo(DecimalUtil.toBigDecimal(balance)) != NumberUtils.INTEGER_MINUS_ONE) {
                 //余额不足
                 LOGGER.info("余额支付:用户id:{},余额不足", userId);
                 return CommonResult.failed(CommonResultCode.ERR_USER_DEPOSIT);
@@ -705,6 +713,9 @@ public class UnionPayServiceImpl implements UnionPayService {
                         throw new ApiException(CommonResultCode.FAILED);
                     }
 
+                    // 计算本金和积分
+                    OriginalIntegralPO po = incomeService.calculateOriginalIntegral(userId, umsIncome, amount);
+
                     //构建对象
                     Long longZero = NumberUtils.LONG_ZERO;
                     UmsIncome build = UmsIncome.builder()
@@ -712,7 +723,9 @@ public class UnionPayServiceImpl implements UnionPayService {
                                                .userId(userId)
                                                .income(longZero)
                                                .expenditure(amount)
-                                               .balance(umsIncome.getBalance() - amount)
+                                               .original(po.getOriginal())
+                                               .integral(po.getIntegral())
+                                               .balance(balance - amount)
                                                .todayIncome(BlankUtil.isEmpty(umsIncome.getTodayIncome()) ? longZero : umsIncome.getTodayIncome())
                                                .allIncome(BlankUtil.isEmpty(umsIncome.getAllIncome()) ? longZero : umsIncome.getAllIncome())
                                                .incomeType(UmsIncome.IncomeType.NINE.key())
@@ -727,7 +740,7 @@ public class UnionPayServiceImpl implements UnionPayService {
                     // 这里还会有异常需要再
                     if (response) {
                         try {
-                            signVerified = incomeService.save(build) && orderService.updateById(order);
+                            signVerified = umsIncomeService.save(build) && orderService.updateById(order);
                         } catch (Exception e) {
                             LOGGER.debug("数据库操作异常:{}", e.getMessage());
                             throw new ApiException(CommonResultCode.ERR_DATABASE);
