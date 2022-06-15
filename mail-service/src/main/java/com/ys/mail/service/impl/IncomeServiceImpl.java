@@ -208,9 +208,21 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
         Long integral = po.getIntegral();
         // 这里只要为false，则首次使用余额进行计算（余额不在此处校验）
         if (!po.getCover()) {
-            // 并且更新所有余额作为本金
-            umsIncome.setOriginal(balance);
-            this.updateById(umsIncome);
+            // 插入记录，余额转货款
+            String money = DecimalUtil.longToStrForDivider(balance);
+            UmsIncome temp = UmsIncome.builder().incomeId(IdWorker.generateId())
+                                      .userId(umsIncome.getUserId())
+                                      .income(NumberUtils.LONG_ZERO)
+                                      .expenditure(NumberUtils.LONG_ZERO)
+                                      .original(balance)
+                                      .balance(balance)
+                                      .todayIncome(umsIncome.getTodayIncome())
+                                      .allIncome(umsIncome.getAllIncome())
+                                      .incomeType(UmsIncome.IncomeType.MINUS_TWO.key())
+                                      .detailSource("余额转货款:" + money + "元")
+                                      .payType(UmsIncome.PayType.THREE.key())
+                                      .build();
+            this.save(temp);
             original = balance;
         }
         // 优先扣除本金，再扣除积分
