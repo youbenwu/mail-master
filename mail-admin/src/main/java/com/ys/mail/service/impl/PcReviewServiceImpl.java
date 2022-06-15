@@ -118,16 +118,16 @@ public class PcReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> i
                 CommonResult<Boolean> commonResult = this.transferAccounts(pcReview.getAlipayName(), pcReview.getAlipayAccount(), actualMoney);
                 Boolean result = commonResult.getData();
                 if (BlankUtil.isNotEmpty(result)) {
-                    incomeId = this.addPaidOutIncome(reviewUserId, reviewMoney, commonResult.getMessage(), umsIncome, true, "系统转账");
+                    incomeId = this.addPaidOutIncome(reviewUserId, null, reviewMoney, commonResult.getMessage(), umsIncome, true, "系统转账");
                 } else {
                     return commonResult;
                 }
             } else {
-                incomeId = this.addPaidOutIncome(reviewUserId, reviewMoney, "", umsIncome, true, "线下转账");
+                incomeId = this.addPaidOutIncome(reviewUserId, null, reviewMoney, "", umsIncome, true, "线下转账");
             }
         } else if (ifCondition) {
             // 将冻结金额原路返回到余额中
-            incomeId = this.addPaidOutIncome(reviewUserId, reviewMoney, "", umsIncome, false, param.getReviewDescribe());
+            incomeId = this.addPaidOutIncome(reviewUserId, pcReview.getExIncomeId(), reviewMoney, "", umsIncome, false, param.getReviewDescribe());
             // 重新查询
             umsIncome = incomeService.getLatestEntry(reviewUserId);
             // 退还提现服务费
@@ -194,11 +194,18 @@ public class PcReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> i
      * @param opsType       流水类型：true->提现，false->审核退还
      * @return 系统流水号
      */
-    private Long addPaidOutIncome(Long userId, Long reviewMoney, String aliPayOrderId, UmsIncome latestIncome, Boolean opsType, String remark) {
+    private Long addPaidOutIncome(Long userId, Long exIncomeId, Long reviewMoney, String aliPayOrderId,
+                                  UmsIncome latestIncome, Boolean opsType, String remark) {
         Long incomeId = IdWorker.generateId();
         String orderSn = IdGenerator.INSTANCE.generateId();
         // 实际金额
         String actualMoney = DecimalUtil.longToStrForDivider(reviewMoney);
+
+        // 查询之前冻结记录
+        UmsIncome exIncome = null;
+        if (BlankUtil.isNotEmpty(exIncomeId)) {
+            exIncome = umsIncomeService.getById(exIncomeId);
+        }
 
         UmsIncome umsIncome;
         UmsIncome.UmsIncomeBuilder builder = UmsIncome.builder().incomeId(incomeId)
@@ -208,6 +215,9 @@ public class PcReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> i
                                                       .allIncome(latestIncome.getAllIncome())
                                                       // 今日流水不变
                                                       .todayIncome(latestIncome.getTodayIncome()).remark(remark);
+        if (BlankUtil.isNotEmpty(exIncome)) {
+            builder.original(exIncome.getOriginal()).integral(exIncome.getIntegral());
+        }
 
         if (opsType) {
             umsIncome = builder.income(NumberUtils.LONG_ZERO)

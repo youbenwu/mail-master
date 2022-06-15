@@ -9,6 +9,7 @@
         <result column="pc_user_id" property="pcUserId" />
         <result column="review_describe" property="reviewDescribe" />
         <result column="income_id" property="incomeId" />
+        <result column="ex_income_id" property="exIncomeId" />
         <result column="rate_income_id" property="rateIncomeId" />
         <result column="user_id" property="userId" />
         <result column="review_money" property="reviewMoney" />
@@ -21,7 +22,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        review_id, review_state, pc_user_id, review_describe, income_id, rate_income_id, user_id, review_money, alipay_account, alipay_name, create_time, update_time, deleted
+        review_id, review_state, pc_user_id, review_describe, income_id, ex_income_id, rate_income_id, user_id, review_money, alipay_account, alipay_name, create_time, update_time, deleted
     </sql>
 
     <select id="getList" resultMap="BaseResultMap">

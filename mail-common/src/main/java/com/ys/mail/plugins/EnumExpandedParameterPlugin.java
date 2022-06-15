@@ -107,7 +107,7 @@ public class EnumExpandedParameterPlugin implements ExpandedParameterBuilderPlug
     }
 
     /**
-     * 自定义枚举文档处理器
+     * 自定义枚举文档处理器 - 处理部分接口属性（不需要@RequestBody）
      *
      * @param context          参数上下文
      * @param parameterBuilder 参数构建器

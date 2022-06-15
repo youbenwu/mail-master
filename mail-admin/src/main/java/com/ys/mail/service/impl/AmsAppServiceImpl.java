@@ -81,7 +81,8 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
                .eq(AmsApp::getUploadStatus, query.getUploadStatus());
         IPage<AmsAppVO> result = amsAppMapper.getPage(page, wrapper);
         // 添加额外项
-        result.getRecords().forEach(app -> app.setAppLogoUrl(StringConstant.SLASH + CosFolderEnum.IMAGES_FOLDER.value() + this.getAppLogoPath(app.getType())));
+        result.getRecords()
+              .forEach(app -> app.setAppLogoUrl(StringConstant.SLASH + CosFolderEnum.IMAGES_FOLDER.value() + this.getAppLogoPath(app.getType())));
         return result;
     }
 
@@ -177,7 +178,8 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
             // 设置大小
             long contentLength = objectInfo.getContentLength();
             // 当文件内容长度为零时，并且上传状态为已上传 或者 内容长度不变时，表示已经更新过了，那么将会跳过更新
-            boolean condition = contentLength == NumberUtils.LONG_ZERO && uploadStatus.equals(NumberConstant.ONE) || contentLength == size;
+            boolean condition = contentLength == NumberUtils.LONG_ZERO && uploadStatus.equals(NumberConstant.ONE)
+                    || BlankUtil.isNotEmpty(size) && contentLength == size;
             if (condition) {
                 needUpdate = false;
             } else {

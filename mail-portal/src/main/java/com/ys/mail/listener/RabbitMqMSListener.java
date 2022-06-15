@@ -174,23 +174,38 @@ public class RabbitMqMSListener {
                     BigDecimal allIncomeBgAddIncome = allIncomeBg.add(income);
                     // 此次结余
                     BigDecimal balanceBgBgAddIncome = balanceBg.add(income);
+                    // 收益计算
+                    BigDecimal integral = income.subtract(flashPromotionPriceBg);
 
-                    umsIncome.setIncomeId(IdWorker.generateId());                               // 收益ID
-                    umsIncome.setUserId(publisherId);                                           // 收益人
-                    umsIncome.setIncome(income.longValue());                                    // 收益数
-                    umsIncome.setTodayIncome(todayIncomeBgAddIncome.longValue());               // 今日收益
-                    umsIncome.setAllIncome(allIncomeBgAddIncome.longValue());                   // 总收益
-                    umsIncome.setBalance(balanceBgBgAddIncome.longValue());                     // 结余
-                    umsIncome.setIncomeType(1);                                                 // 收益类型  1-秒杀收益
-                    umsIncome.setOriginType((byte) 1);                                           // 1->用户秒杀购买
+                    // 收益ID
+                    umsIncome.setIncomeId(IdWorker.generateId());
+                    // 收益人
+                    umsIncome.setUserId(publisherId);
+                    // 收益数
+                    umsIncome.setIncome(income.longValue());
+                    // 本金 2022-06-10
+                    umsIncome.setOriginal(flashPromotionPriceBg.longValue());
+                    // 本次纯收益，积分
+                    umsIncome.setIntegral(integral.longValue());
+                    // 今日收益
+                    umsIncome.setTodayIncome(todayIncomeBgAddIncome.longValue());
+                    // 总收益
+                    umsIncome.setAllIncome(allIncomeBgAddIncome.longValue());
+                    // 结余
+                    umsIncome.setBalance(balanceBgBgAddIncome.longValue());
+                    // 收益类型  1-秒杀收益
+                    umsIncome.setIncomeType(1);
+                    // 1->用户秒杀购买
+                    umsIncome.setOriginType((byte) 1);
+
                     // 默认为2支付宝先写死
                     umsIncome.setPayType(3);
                     // 加入唯一商品主键id
                     umsIncome.setFlashPromotionPdtId(promotionPdtId);
                     // 来源
                     umsIncome.setDetailSource("用户秒杀收益-产品:(" + productName + ")");
-                    // 备注
-                    umsIncome.setRemark("用户实时收益-用户:{" + order.getUserId() + "}秒杀-产品持有人:{" + publisherId + "}秒杀产品:{" + promotionPdtId + "},数量为:{" + flashPromotionCount + "}");                  // 来源
+                    // 备注 来源
+                    umsIncome.setRemark("用户实时收益-用户:{" + order.getUserId() + "}秒杀-产品持有人:{" + publisherId + "}秒杀产品:{" + promotionPdtId + "},数量为:{" + flashPromotionCount + "}");
 
                     umsIncomeMapper.insert(umsIncome);
                 }

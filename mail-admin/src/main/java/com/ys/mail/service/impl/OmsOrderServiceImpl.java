@@ -137,8 +137,10 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
                        .putObj("订单备注", e.getOrderNote())
                        .putObj("确认收货", NumberUtils.INTEGER_ZERO.equals(e.getIsConfirmStatus()) ? "未确认" : "已确认")
                        .putObj("交易流水号", e.getTransId())
-                       .putObj("商品详情ID", item.getOrderItemId().toString())
-                       .putObj("商品ID", item.getProductId().toString());
+                       .putObj("商品详情ID", BlankUtil.isNotEmpty(item.getOrderItemId()) ? item.getOrderItemId()
+                                                                                           .toString() : null)
+                       .putObj("商品ID", BlankUtil.isNotEmpty(item.getProductId()) ? item.getProductId()
+                                                                                       .toString() : null);
                     rows.add(map);
                 });
             } else {

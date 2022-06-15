@@ -1,9 +1,12 @@
 package com.ys.mail.util;
 
+import com.ys.mail.model.CommonResult;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Desc 请求上下文工具类
@@ -68,5 +71,17 @@ public class RequestUtil {
      */
     public static String getHeader(String s) {
         return getRequest().getHeader(s);
+    }
+
+    /***
+     * 设置HTTP响应状态码
+     *
+     * @param res 响应对象
+     * @param result 结果
+     */
+    public static void setStatus(HttpServletResponse res, CommonResult<?> result) {
+        if (result.getCode() != HttpStatus.OK.value()) {
+            res.setStatus((int) result.getCode());
+        }
     }
 }

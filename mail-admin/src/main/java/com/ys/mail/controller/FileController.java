@@ -10,16 +10,19 @@ import com.ys.mail.service.CosService;
 import com.ys.mail.service.FileService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.EnumTool;
+import com.ys.mail.util.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,8 +54,10 @@ public class FileController {
     @ApiImplicitParam(name = "imgType", value = "图片类型", required = true, dataType = "int")
     public CommonResult<String> cosUpload(@RequestParam(name = "file") MultipartFile file,
                                           @RequestParam(name = "imgType") @EnumDocumentValid(enumClass = ImgPathEnum.class, exclude = {-3, -2}) Integer imgType,
-                                          HttpServletRequest req) {
-        return fileService.imageUpload(file, EnumTool.getEnum(ImgPathEnum.class, imgType));
+                                          HttpServletRequest req, HttpServletResponse res) {
+        CommonResult<String> result = fileService.imageUpload(file, EnumTool.getEnum(ImgPathEnum.class, imgType));
+        RequestUtil.setStatus(res, result);
+        return result;
     }
 
     @PostMapping(value = "/cos/uploadBatch")
@@ -60,7 +65,7 @@ public class FileController {
     @ApiImplicitParam(name = "imgType", value = "图片类型", required = true, dataType = "int")
     public CommonResult<String> cosUploadBatch(@RequestParam(value = "file", required = false) MultipartFile[] multipartFile,
                                                @RequestParam(name = "imgType") @EnumDocumentValid(enumClass = ImgPathEnum.class, exclude = {-3, -2}) Integer imgType,
-                                               HttpServletRequest req) {
+                                               HttpServletRequest req, HttpServletResponse res) {
         if (BlankUtil.isEmpty(multipartFile)) {
             return CommonResult.failed("请选择要上传的图片");
         }

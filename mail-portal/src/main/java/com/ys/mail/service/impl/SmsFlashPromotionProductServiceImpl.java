@@ -654,14 +654,14 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         // 秒杀表.剩余数量
         Integer flashPromotionCount = product.getFlashPromotionCount();
         // 秒杀表.秒杀金额
-        Long flashPromotionPrice = product.getFlashPromotionOriginPrice();
+        Long flashPromotionOriginPrice = product.getFlashPromotionOriginPrice();
         if (ObjectUtil.isEmpty(product.getFlashProductStatus()) || !product.getFlashProductStatus().equals(4)) {
             return CommonResult.failed("该商品已卖出");
         }
         // 若有为Null  直接跳过
-        LOGGER.info("持有人:{},产品id:{},剩余数量:{},秒杀产品原价:{}", publisherId, productId, flashPromotionCount, flashPromotionPrice);
+        LOGGER.info("持有人:{},产品id:{},剩余数量:{},秒杀产品原价:{}", publisherId, productId, flashPromotionCount, flashPromotionOriginPrice);
         if (ObjectUtil.isNull(publisherId) || ObjectUtil.isNull(productId) ||
-                ObjectUtil.isNull(flashPromotionCount) || flashPromotionCount.equals(0) || ObjectUtil.isNull(flashPromotionPrice)) {
+                ObjectUtil.isNull(flashPromotionCount) || flashPromotionCount.equals(0) || ObjectUtil.isNull(flashPromotionOriginPrice)) {
             LOGGER.info("-----结束");
             return CommonResult.success("退回成功");
         }
@@ -688,7 +688,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         // Bg.剩余数量
         BigDecimal flashPromotionCountBg = new BigDecimal(flashPromotionCount);
         // Bg.秒杀金额
-        BigDecimal flashPromotionPriceBg = new BigDecimal(flashPromotionPrice);
+        BigDecimal flashPromotionPriceBg = new BigDecimal(flashPromotionOriginPrice);
 
         // es 用户佣金比
         GetRequest getRequest = new GetRequest("game_record").id(publisherId.toString());
@@ -727,6 +727,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         umsIncome.setUserId(publisherId);
         // 收益数
         umsIncome.setIncome(income.longValue());
+        umsIncome.setOriginal(flashPromotionOriginPrice);
+        umsIncome.setIntegral(income.longValue() - flashPromotionOriginPrice);
         // 今日收益
         umsIncome.setTodayIncome(todayIncomeBgAddIncome.longValue());
         // 总收益
@@ -740,7 +742,7 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         // 来源
         umsIncome.setDetailSource("平台回购-秒杀产品:(" + productName + ")");
         // 备注
-        umsIncome.setRemark("平台回购-秒杀产品id:{" + product.getFlashPromotionPdtId() + "},价格:{" + flashPromotionPrice + "},持有人id:{" + publisherId + "},结算比例:{" + ratioBg.doubleValue() + "},数量:{" + flashPromotionCount + "}");
+        umsIncome.setRemark("平台回购-秒杀产品id:{" + product.getFlashPromotionPdtId() + "},价格:{" + flashPromotionOriginPrice + "},持有人id:{" + publisherId + "},结算比例:{" + ratioBg.doubleValue() + "},数量:{" + flashPromotionCount + "}");
         // 该笔收益添加余额的意思
         umsIncome.setPayType(3);
         // 保存唯一商品主键id
@@ -945,7 +947,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         Long productId = promotionProduct.getProductId();
         Long userId = promotionProduct.getUserId();
         Integer flashPromotionCount = promotionProduct.getFlashPromotionCount();
-        // Date expireTime = promotionProduct.getExpireTime();
+        Date expireTime = promotionProduct.getExpireTime();
+        Long flashPromotionOriginPrice = promotionProduct.getFlashPromotionOriginPrice();
         ApiAssert.noEq(UserUtil.getCurrentUser().getUserId(), userId, BusinessErrorCode.GOODS_NOT_EXIST);
         // if (BlankUtil.isNotEmpty(expireTime) && DateTool.isExpireTime(expireTime)) {
         //     promotionProduct.setFlashProductStatus(NumberConstant.MINUS_ONE);
@@ -978,6 +981,8 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
                                    .userId(userId)
                                    .income(flashPromotionPrice)
                                    .expenditure(NumberUtils.LONG_ZERO)
+                                   .original(flashPromotionOriginPrice)
+                                   .integral(flashPromotionPrice - flashPromotionOriginPrice)
                                    .balance(balance + flashPromotionPrice)
                                    .allIncome(allIncome + flashPromotionPrice)
                                    .incomeType(UmsIncome.IncomeType.FIFTEEN.key())

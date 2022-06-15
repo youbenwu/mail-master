@@ -347,6 +347,7 @@ public class ScheduleTask {
                                              .userId(vo.getUserId())
                                              .income(vo.getIncome())
                                              .expenditure(NumberUtils.LONG_ZERO)
+                                             .integral(vo.getIncome())
                                              .balance(vo.getUmsIncome().getBalance() + vo.getIncome())
                                              .allIncome(vo.getUmsIncome().getAllIncome() + vo.getIncome())
                                              .incomeType(UmsIncome.IncomeType.THIRTEEN.key())

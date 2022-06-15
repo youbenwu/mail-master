@@ -167,6 +167,8 @@ public class IncomeCalcu {
             umsIncome.setUserId(pid);
             // 收益数
             umsIncome.setIncome(divide.longValue());
+            // 收益积分
+            umsIncome.setIntegral(divide.longValue());
             // 今日收益
             umsIncome.setTodayIncome(todayIncomeBgAddIncome.longValue());
             // 总收益

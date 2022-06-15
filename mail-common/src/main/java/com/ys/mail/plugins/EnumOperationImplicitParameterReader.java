@@ -78,7 +78,7 @@ public class EnumOperationImplicitParameterReader implements OperationBuilderPlu
     }
 
     /**
-     * 枚举文档处理器
+     * 枚举文档处理器 - 直接作用于controller层接口中的参数，对于参数对象里面的属性无效
      *
      * @param context          参数上下文
      * @param parameterBuilder 参数构建器

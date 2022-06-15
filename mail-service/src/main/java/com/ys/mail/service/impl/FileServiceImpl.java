@@ -58,7 +58,8 @@ public class FileServiceImpl implements FileService {
         String sizeName;
         if (BlankUtil.isNotEmpty(size)) {
             sizeName = FileTool.getSize(size);
-            ApiAssert.isTrue(file.getSize() > size, BusinessErrorCode.ERR_FILE_SIZE_EXCEED.getMessage(sizeName));
+            BusinessErrorCode errorCode = BusinessErrorCode.ERR_FILE_SIZE_EXCEED;
+            ApiAssert.isTrue(file.getSize() > size, errorCode, errorCode.getMessage(sizeName));
         } else {
             sizeName = FileTool.getSize(LONG_FILE_MAX_SIZE);
             ApiAssert.isTrue(file.getSize() > LONG_FILE_MAX_SIZE, BusinessErrorCode.ERR_FILE_SIZE_EXCEED.getMessage(sizeName));
@@ -112,8 +113,9 @@ public class FileServiceImpl implements FileService {
             return StringConstant.BLANK;
         }
         int lastIndexOf = suffix.lastIndexOf(".");
-        String message = BusinessErrorCode.ERR_FILE_NOT_SUFFIX.getMessage(file.getName());
-        ApiAssert.isTrue(lastIndexOf < 0, message);
+        BusinessErrorCode errorCode = BusinessErrorCode.ERR_FILE_NOT_SUFFIX;
+        String message = errorCode.getMessage(file.getName());
+        ApiAssert.isTrue(lastIndexOf < 0, errorCode, message);
         return suffix.substring(lastIndexOf + 1).toLowerCase();
     }
 

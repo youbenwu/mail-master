@@ -9,6 +9,7 @@ import com.ys.mail.model.admin.dto.excel.IncomeCollectDTO;
 import com.ys.mail.model.admin.dto.excel.UserBalanceDTO;
 import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
 import com.ys.mail.model.admin.vo.UmsIncomeVO;
+import com.ys.mail.model.po.OriginalIntegralPO;
 import com.ys.mail.model.vo.UmsIncomeSumVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -82,8 +83,27 @@ public interface UmsIncomeMapper extends BaseMapper<UmsIncome> {
 
     /**
      * 查询待返还的数量
+     *
      * @param format 天数
      * @return 返回值
      */
     List<FreezeReMoneyVO> selectByFreezeReMoney(@Param("format") String format);
+
+    /**
+     * 获取个人本金、积分的收入支出列表
+     * - 根据类型进行区别，type：0表示收入 1表示支出
+     *
+     * @param userId 用户ID
+     * @return 本金、积分列表
+     */
+    OriginalIntegralPO getOriginalIntegralByUserId(@Param("userId") Long userId);
+
+    /**
+     * 获取手续费
+     *
+     * @param userId 用户ID
+     * @return 手续费
+     */
+    Long selectUserRate(@Param("userId") Long userId);
+
 }

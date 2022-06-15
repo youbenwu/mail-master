@@ -6,9 +6,12 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.enums.SettingTypeEnum;
+import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.ApiException;
+import com.ys.mail.exception.code.CommonResultCode;
 import com.ys.mail.mapper.UmsIncomeMapper;
 import com.ys.mail.model.admin.vo.FreezeReMoneyVO;
+import com.ys.mail.model.po.OriginalIntegralPO;
 import com.ys.mail.service.IncomeService;
 import com.ys.mail.service.SysSettingService;
 import com.ys.mail.util.BlankUtil;
@@ -47,7 +50,7 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
     @Override
     public Map<String, Long> deductCharges(UmsIncome income, Long money, Long userId) {
         // 计算服务费
-        BigDecimal rate = this.calcuCharges(money);
+        BigDecimal rate = this.calculateCharges(money);
         Map<String, Long> resultMap = new HashMap<>(3);
         if (BlankUtil.isNotEmpty(rate)) {
             BigDecimal zeroOne = new BigDecimal("10");
@@ -61,25 +64,32 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
                 if (newBalance.compareTo(newMoney) < 0) {
                     newMoney = newBalance;
                 }
+                // 计算本金和积分
+                long rateMoney = rate.longValue();
+                OriginalIntegralPO po = this.calculateOriginalIntegral(userId, income, rateMoney);
                 Long incomeId = IdWorker.generateId();
                 // 添加手续费流水
                 UmsIncome umsIncome = UmsIncome.builder()
                                                .incomeId(incomeId)
                                                .userId(userId)
                                                .income(NumberUtils.LONG_ZERO)
-                                               .expenditure(rate.longValue())
+                                               .expenditure(rateMoney)
+                                               .original(po.getOriginal())
+                                               .integral(po.getIntegral())
                                                .balance(newBalance.longValue())
                                                .todayIncome(income.getTodayIncome())
                                                .allIncome(income.getAllIncome())
                                                // 10->提现费用
                                                .incomeType(UmsIncome.IncomeType.TEN.key())
                                                .incomeNo("").orderTradeNo("")
-                                               .detailSource("扣除提现服务费:" + DecimalUtil.longToStrForDivider(rate.longValue()) + "元")
+                                               .detailSource("扣除提现服务费:" + DecimalUtil.longToStrForDivider(rateMoney) + "元")
                                                // 从余额中扣除
                                                .payType(UmsIncome.PayType.THREE.key())
                                                .build();
                 boolean updateResult = this.save(umsIncome);
-                if (!updateResult) throw new ApiException("添加手续费失败");
+                if (!updateResult) {
+                    throw new ApiException("添加手续费失败");
+                }
                 resultMap.put("rateIncomeId", incomeId);
             } else {
                 newBalance = balance;
@@ -94,31 +104,38 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
     @Override
     public boolean refundCharges(UmsIncome income, Long rateIncomeId) {
         // 判断是否存在手续费，不存在不需要退还
-        if (BlankUtil.isEmpty(rateIncomeId)) return false;
+        if (BlankUtil.isEmpty(rateIncomeId)) {
+            return false;
+        }
         return this.refundChargesBatch(Collections.singletonList(income), Collections.singletonList(rateIncomeId));
     }
 
     @Override
     public boolean refundChargesBatch(List<UmsIncome> incomes, List<Long> rateIncomeIds) {
-        if (BlankUtil.isEmpty(rateIncomeIds) || BlankUtil.isEmpty(incomes)) return false;
+        if (BlankUtil.isEmpty(rateIncomeIds) || BlankUtil.isEmpty(incomes)) {
+            return false;
+        }
         // 获取一批服务费记录
         List<UmsIncome> rateIncomeList = this.listByIds(rateIncomeIds);
-        // 构造新的记录
-        List<Long> incomeIds = IdWorker.generateIds(rateIncomeIds.size()); // 生成一批流水ID
+        // 构造新的记录，生成一批流水ID
+        List<Long> incomeIds = IdWorker.generateIds(rateIncomeIds.size());
         AtomicInteger index = new AtomicInteger();
         List<UmsIncome> addList = new ArrayList<>();
-        List<Boolean> collect = rateIncomeList.stream().map(map -> incomes.stream().anyMatch(income -> {
-            if (map.getUserId().equals(income.getUserId())) {
-                Long rate = map.getExpenditure();
+        List<Boolean> ignored = rateIncomeList.stream().map(rateIncome -> incomes.stream().anyMatch(income -> {
+            if (rateIncome.getUserId().equals(income.getUserId())) {
+                Long rate = rateIncome.getExpenditure();
                 UmsIncome build = UmsIncome.builder().
                                            incomeId(incomeIds.get(index.get())).userId(income.getUserId())
                                            .income(rate).expenditure(NumberUtils.LONG_ZERO)
+                                           .original(rateIncome.getOriginal()).integral(rateIncome.getIntegral())
                                            .todayIncome(income.getTodayIncome()).allIncome(income.getAllIncome())
                                            .balance(income.getBalance() + rate)
-                                           .incomeType(UmsIncome.IncomeType.ELEVEN.key()) // 11->退还服务费
+                                           // 11->退还服务费
+                                           .incomeType(UmsIncome.IncomeType.ELEVEN.key())
                                            .incomeNo("").orderTradeNo("")
                                            .detailSource("退还提现服务费:" + DecimalUtil.longToStrForDivider(rate) + "元")
-                                           .payType(UmsIncome.PayType.THREE.key())// 退还到余额中
+                                           // 退还到余额中
+                                           .payType(UmsIncome.PayType.THREE.key())
                                            .build();
                 addList.add(build);
                 index.getAndIncrement();
@@ -136,7 +153,7 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
     }
 
     @Override
-    public BigDecimal calcuCharges(Long money) {
+    public BigDecimal calculateCharges(Long money) {
         // 读取设置
         BigDecimal penny = new BigDecimal("10");
         JSON rules = sysSettingService.getSettingValue(SettingTypeEnum.eighteen);
@@ -152,7 +169,9 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
             BigDecimal rate = newMoney.multiply(new BigDecimal(scale))
                                       .setScale(0, RoundingMode.UP);
             // 保证最小服务费为0.1
-            if (rate.compareTo(penny) < 0) rate = penny;
+            if (rate.compareTo(penny) < 0) {
+                rate = penny;
+            }
             return rate;
         }
         return null;
@@ -161,5 +180,50 @@ public class IncomeServiceImpl extends ServiceImpl<UmsIncomeMapper, UmsIncome> i
     @Override
     public List<FreezeReMoneyVO> getByFreezeReMoney(String format) {
         return umsIncomeMapper.selectByFreezeReMoney(format);
+    }
+
+    /**
+     * balance original integral amount
+     * 1.1000 = (800)-1000  (500)-200
+     * 800 - 1000 = -200 < 0 (表示不够扣除，并且只扣除了 800，还需要使用积分继续扣除)
+     * 500 - abs(-200) = 300 (使用积分减去上一步的绝对值，则表示扣除完毕，且扣了200)
+     * 2.500 = (800)-500 = 300 > 0 (表示足够扣除，并且已经扣除了500)
+     *
+     * @param umsIncome 最新收益
+     * @param amount    需要扣除的总金额
+     * @return 计算结果
+     */
+    @Override
+    public OriginalIntegralPO calculateOriginalIntegral(Long userId, UmsIncome umsIncome, Long amount) {
+        ApiAssert.isTrue(BlankUtil.isEmpty(umsIncome) || BlankUtil.isEmpty(amount), CommonResultCode.ERR_INTERFACE_PARAM);
+
+        Long balance = umsIncome.getBalance();
+        // 校验余额是否足够
+        ApiAssert.isTrue(balance < amount, CommonResultCode.ERR_USER_DEPOSIT);
+        // 获取剩余本金、积分
+        OriginalIntegralPO po = umsIncomeMapper.getOriginalIntegralByUserId(userId);
+        ApiAssert.noValue(po, CommonResultCode.ID_NO_EXIST);
+
+        Long original = po.getOriginal();
+        Long integral = po.getIntegral();
+        // 这里只要为false，则首次使用余额进行计算（余额不在此处校验）
+        if (!po.getCover()) {
+            // 并且更新所有余额作为本金
+            umsIncome.setOriginal(balance);
+            this.updateById(umsIncome);
+            original = balance;
+        }
+        // 优先扣除本金，再扣除积分
+        long r1 = original - amount;
+        if (r1 < 0) {
+            r1 = Math.abs(r1);
+            original = amount - r1;
+            ApiAssert.isTrue(integral < r1, CommonResultCode.ERR_USER_DEPOSIT);
+            integral = r1;
+        } else {
+            original = amount;
+            integral = NumberUtils.LONG_ZERO;
+        }
+        return new OriginalIntegralPO(original, integral, true);
     }
 }

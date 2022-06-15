@@ -3,6 +3,7 @@ package com.ys.mail.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.UmsIncome;
 import com.ys.mail.model.CommonResult;
+import com.ys.mail.model.query.IncomeDimensionQuery;
 import com.ys.mail.model.vo.UmsIncomeDimensionVO;
 import com.ys.mail.model.vo.UmsIncomeSumVO;
 
@@ -38,14 +39,10 @@ public interface UmsIncomeService extends IService<UmsIncome> {
     /**
      * 根据时间查询当前用户的历史收益记录，支持分页
      *
-     * @param beginTime    开始时间
-     * @param endTime      结束时间
-     * @param lastIncomeId 最后一条记录ID，用于分页
-     * @param lately       是否开启按最近时间查询，0->不开启；1->开启，默认开启
-     * @param pageSize     分页大小
+     * @param query 查询条件
      * @return List
      */
-    CommonResult<List<UmsIncomeDimensionVO>> getUmsIncomeByDimension(String beginTime, String endTime, Long lastIncomeId, String lately, String pageSize);
+    CommonResult<List<UmsIncomeDimensionVO>> getUmsIncomeByDimension(IncomeDimensionQuery query);
 
     /**
      * 查询用户的最新一条收益

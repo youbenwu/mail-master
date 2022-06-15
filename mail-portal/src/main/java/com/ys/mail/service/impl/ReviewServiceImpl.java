@@ -60,7 +60,8 @@ public class ReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> imp
     @Override
     public CommonResult<Boolean> cancel(Long reviewId) {
         // 读取设置（是否允许取消、取消截止时间）
-        String time = sysSettingService.getSettingValue(SettingTypeEnum.seventeen);// APP取消提现审核截止时间点,如 23:30
+        // APP取消提现审核截止时间点,如 23:30
+        String time = sysSettingService.getSettingValue(SettingTypeEnum.seventeen);
         if (DateTool.localTimeIsAfter(time)) return CommonResult.failed("已超过取消时间点，需要等系统自动退还", false);
         // 获取当前用户
         UmsUser currentUser = UserUtil.getCurrentUser();
@@ -69,7 +70,8 @@ public class ReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> imp
         LOGGER.info("用户【ID：{}，支付宝名称：{}】发起了取消审核", userId, alipayName);
         // 获取指定的审核记录
         PcReview pcReview = this.getById(reviewId);
-        if (BlankUtil.isEmpty(pcReview)) return CommonResult.failed("审核ID异常！", false); // 校验审核id是否存在
+        // 校验审核id是否存在
+        if (BlankUtil.isEmpty(pcReview)) return CommonResult.failed("审核ID异常！", false);
         // 校验申请用户与当前操作用户身份是否匹配
         if (!pcReview.getUserId().equals(userId)) return CommonResult.failed("身份不匹配，禁止操作！", false);
         // 校验状态是否为0
@@ -89,13 +91,20 @@ public class ReviewServiceImpl extends ServiceImpl<PcReviewMapper, PcReview> imp
         if (update > NumberUtils.INTEGER_ZERO) {
             Long reviewMoney = pcReview.getReviewMoney();
             String actualMoney = DecimalUtil.longToStrForDivider(reviewMoney);
+            // 查询之前冻结记录
+            UmsIncome exIncome = umsIncomeService.getById(pcReview.getExIncomeId());
+
             // 退还资金
-            UmsIncome umsIncome = UmsIncome.builder().incomeId(incomeId).userId(userId).income(reviewMoney)
-                                           .expenditure(NumberUtils.LONG_ZERO).todayIncome(income.getTodayIncome())
+            UmsIncome umsIncome = UmsIncome.builder().incomeId(incomeId).userId(userId)
+                                           .income(reviewMoney).expenditure(NumberUtils.LONG_ZERO)
+                                           .original(exIncome.getOriginal()).integral(exIncome.getIntegral())
+                                           .todayIncome(income.getTodayIncome())
                                            .allIncome(income.getAllIncome()).balance(income.getBalance() + reviewMoney)
-                                           .incomeType(UmsIncome.IncomeType.FIVE.key()) // 5->审核退还
+                                           // 5->审核退还
+                                           .incomeType(UmsIncome.IncomeType.FIVE.key())
                                            .incomeNo("").orderTradeNo("").detailSource("用户手动取消提现:" + actualMoney + "元")
-                                           .payType(UmsIncome.PayType.THREE.key())// 退还到余额中
+                                           // 退还到余额中
+                                           .payType(UmsIncome.PayType.THREE.key())
                                            .build();
             boolean save = umsIncomeService.save(umsIncome);
             if (!save) throw new ApiException("添加流水异常");
