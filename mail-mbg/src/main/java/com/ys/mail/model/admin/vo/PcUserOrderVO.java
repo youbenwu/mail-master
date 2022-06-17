@@ -8,9 +8,11 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 /**
- * @Desc
- * @Author CRH
- * @Create 2022-02-23 15:12
+ * --
+ *
+ * @author CRH
+ * @date 2022-04-19 15:19
+ * @since 1.0
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

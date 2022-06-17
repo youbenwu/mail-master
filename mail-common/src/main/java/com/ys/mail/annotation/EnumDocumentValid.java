@@ -125,17 +125,18 @@ public @interface EnumDocumentValid {
                 return true;
             }
 
-            Integer tmpKey = (Integer) key;
+            Integer value = Integer.valueOf(String.valueOf(key));
+
             // 包含、排除模式
             if (null != include && include.length > 0) {
                 List<Integer> tempList = Arrays.stream(include).boxed().collect(Collectors.toList());
-                boolean contains = tempList.contains(tmpKey);
+                boolean contains = tempList.contains(value);
                 if (!contains) {
                     return false;
                 }
             } else if (null != exclude && exclude.length > 0) {
                 for (Integer s : exclude) {
-                    if (StringUtil.compareKey(s, tmpKey)) {
+                    if (StringUtil.compareKey(s, value)) {
                         return false;
                     }
                 }

@@ -154,7 +154,6 @@ public class EnumExpandedParameterPlugin implements ExpandedParameterBuilderPlug
 
         AllowableValues allowable = null;
         if (enumTypeDeterminer.isEnum(fieldType)) {
-            // allowable = ApiModelProperties.allowableValueFromString("0,1,2");
             allowable = new AllowableListValues(getEnumValues(fieldType), "LIST");
         } else if (optionalAllowable.isPresent()) {
             allowable = ApiModelProperties.allowableValueFromString(optionalAllowable.get());
@@ -163,11 +162,6 @@ public class EnumExpandedParameterPlugin implements ExpandedParameterBuilderPlug
     }
 
     private List<String> getEnumValues(final Class<?> subject) {
-        return transform(Arrays.asList(subject.getEnumConstants()), new Function<Object, String>() {
-            @Override
-            public String apply(final Object input) {
-                return input.toString();
-            }
-        });
+        return transform(Arrays.asList(subject.getEnumConstants()), (Function<Object, String>) Object::toString);
     }
 }

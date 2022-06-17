@@ -52,6 +52,17 @@
         <result column="expire_time" property="expireTime"/>
     </resultMap>
 
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        order_id, user_id, coupon_id, order_sn, total_amount, pay_amount, freight_amount, promotion_amount,
+        coupon_amount, discount_amount, pay_type, source_type, order_status, order_type, delivery_company,
+        delivery_sn, auto_confirm_day, integration, promotion_info, bill_type, bill_header, bill_content,
+        bill_phone, bill_email, receiver_name, receiver_phone, receiver_code, receiver_province, receiver_city,
+        receiver_region, receiver_address, order_note, is_confirm_status, delete_status, is_appraise,payment_time,
+        delivery_time,
+        receive_time, comment_time, create_time, update_time,order_select,trans_id,cpy_type,partner_price,expire_time
+    </sql>
+
     <resultMap id="BaseResultMapVO" type="com.ys.mail.model.vo.OmsOrderVO">
         <id column="orderId" property="orderId"/>
         <result column="order_sn" property="orderSn"/>
@@ -135,18 +146,6 @@
             <result column="is_appraise" property="appraise"/>
         </collection>
     </resultMap>
-
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        order_id, user_id, coupon_id, order_sn, total_amount, pay_amount, freight_amount, promotion_amount,
-        coupon_amount, discount_amount, pay_type, source_type, order_status, order_type, delivery_company,
-        delivery_sn, auto_confirm_day, integration, promotion_info, bill_type, bill_header, bill_content,
-        bill_phone, bill_email, receiver_name, receiver_phone, receiver_code, receiver_province, receiver_city,
-        receiver_region, receiver_address, order_note, is_confirm_status, delete_status, is_appraise,payment_time,
-        delivery_time,
-        receive_time, comment_time, create_time, update_time,order_select,trans_id,cpy_type,partner_price,expire_time
-    </sql>
 
     <select id="selectOrderList" resultMap="BaseResultMapVO">
         select pp.order_id orderId,a.order_id order_item_id,a.order_item_id orderItemId,pp.order_sn,

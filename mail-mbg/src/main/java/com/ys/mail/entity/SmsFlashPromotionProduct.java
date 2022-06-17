@@ -85,6 +85,24 @@ public class SmsFlashPromotionProduct implements Serializable {
     @ApiModelProperty(value = "秒杀商品状态：1->已卖出；2->秒杀中；3->上架；4->待卖出;5->已退款")
     private Integer flashProductStatus;
 
+    @Getter
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    public enum FlashProductStatus implements IPairs<Integer, String, FlashProductStatus> {
+        /**
+         * 状态
+         */
+        MINUS_ONE(-1, "已过期"),
+        ONE(1, "已卖出"),
+        TWO(2, "秒杀中"),
+        THREE(3, "上架"),
+        FOUR(4, "待卖出"),
+        FIVE(5, "已退款"),
+        ;
+        final Integer key;
+        final String value;
+    }
+
     @ApiModelProperty(value = "公司类型订单:0->大尾狐,1->呼啦兔")
     private Byte cpyType;
 
@@ -112,24 +130,6 @@ public class SmsFlashPromotionProduct implements Serializable {
 
     @ApiModelProperty(value = "截止时间，作用于合伙人商品，过期则不能上架、核销等")
     private Date expireTime;
-
-    @Getter
-    @AllArgsConstructor
-    @Accessors(fluent = true)
-    public enum FlashProductStatus implements IPairs<Integer, String, FlashProductStatus> {
-        /**
-         * 状态
-         */
-        MINUS_ONE(-1, "已过期"),
-        ONE(1, "已卖出"),
-        TWO(2, "秒杀中"),
-        THREE(3, "上架"),
-        FOUR(4, "待卖出"),
-        FIVE(5, "已退款"),
-        ;
-        final Integer key;
-        final String value;
-    }
 
     @ApiModelProperty(value = "未卖出的次数,默认值为0")
     private Integer num;
