@@ -1,7 +1,7 @@
 package com.ys.mail.model.admin.query;
 
 import com.ys.mail.annotation.BlankOrPattern;
-import com.ys.mail.annotation.EnumContains;
+import com.ys.mail.annotation.EnumDocumentValid;
 import com.ys.mail.entity.OmsOrder;
 import com.ys.mail.enums.RegularEnum;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,16 +42,16 @@ public class OmsOrderQuery extends Query {
     @BlankOrPattern(regEnum = RegularEnum.ZERO_ONE, message = "(订单来源)：不合法，请检查！")
     private String sourceType;
 
-    @ApiModelProperty(value = OmsOrder.PayType.DOCUMENT)
-    @EnumContains(enumClass = OmsOrder.PayType.class, message = "(支付方式)：不合法，请检查！", required = false)
+    @ApiModelProperty(value = "支付方式")
+    @EnumDocumentValid(enumClass = OmsOrder.PayType.class, required = false)
     private String payType;
 
-    @ApiModelProperty(value = OmsOrder.OrderStatus.DOCUMENT)
-    @EnumContains(enumClass = OmsOrder.OrderStatus.class, message = "(订单状态)：不合法，请检查！", required = false)
+    @ApiModelProperty(value = "订单状态")
+    @EnumDocumentValid(enumClass = OmsOrder.OrderStatus.class, required = false)
     private String orderStatus;
 
-    @ApiModelProperty(value = OmsOrder.OrderType.DOCUMENT)
-    @EnumContains(enumClass = OmsOrder.OrderType.class, message = "(订单类型)：不合法，请检查！", required = false)
+    @ApiModelProperty(value = "订单类型")
+    @EnumDocumentValid(enumClass = OmsOrder.OrderType.class, required = false)
     private String orderType;
 
     @ApiModelProperty(value = "昵称")

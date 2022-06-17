@@ -71,9 +71,6 @@ public class SmsProductStore implements Serializable {
     @ApiModelProperty(value = "审核状态：0->待审核，1->已通过，2->不通过")
     private Integer reviewState;
 
-    @ApiModelProperty(value = "审核描述")
-    private String reviewDesc;
-
     @Getter
     @AllArgsConstructor
     @Accessors(fluent = true)
@@ -88,5 +85,8 @@ public class SmsProductStore implements Serializable {
         final Integer key;
         final String value;
     }
+
+    @ApiModelProperty(value = "审核描述")
+    private String reviewDesc;
 
 }

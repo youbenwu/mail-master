@@ -13,7 +13,6 @@ import com.tencentcloudapi.cdn.v20180606.models.DescribePurgeQuotaResponse;
 import com.tencentcloudapi.cdn.v20180606.models.DescribePushQuotaResponse;
 import com.tencentcloudapi.cdn.v20180606.models.Quota;
 import com.ys.mail.component.CdnService;
-import com.ys.mail.config.CosConfig;
 import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.constant.StringConstant;
 import com.ys.mail.entity.AmsApp;
@@ -64,8 +63,6 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
 
     @Autowired
     private CosService cosService;
-    @Autowired
-    private CosConfig cosConfig;
     @Autowired
     private AmsAppMapper amsAppMapper;
     @Autowired
@@ -422,7 +419,7 @@ public class AmsAppServiceImpl extends ServiceImpl<AmsAppMapper, AmsApp> impleme
      * @return Logo文件
      */
     private File getAppLogo(Integer type) {
-        String fullPath = StrUtil.format("{}temp-logo-app{}.png", SystemUtil.getTmpDir(), type);
+        String fullPath = StrUtil.format("{}temp-{}-logo-app{}.png", SystemUtil.getTmpDir(), "qcy", type);
         File logo = new File(fullPath);
         cosService.download(CosFolderEnum.IMAGES_FOLDER, this.getAppLogoPath(type), logo);
         return logo;

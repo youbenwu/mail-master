@@ -67,11 +67,56 @@ public class UmsIncome implements Serializable {
     @ApiModelProperty(value = "收益类型")
     private Integer incomeType;
 
+    @Getter
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    public enum IncomeType implements IPairs<Integer, String, IncomeType> {
+        /**
+         * 状态
+         */
+        MINUS_TWO(-2, "系统补还"),
+        MINUS_ONE(-1, "系统扣除"),
+        ZERO(0, "邀请收益"),
+        ONE(1, "秒杀收益"),
+        TWO(2, "余额提现"),
+        THREE(3, "普通收益"),
+        FOUR(4, "审核资金"),
+        FIVE(5, "审核退还"),
+        SIX(6, "团长分佣"),
+        SEVEN(7, "商家收益"),
+        EIGHT(8, "创客收益"),
+        NINE(9, "余额支付"),
+        TEN(10, "扣除服务费"),
+        ELEVEN(11, "退还服务费"),
+        TWELVE(12, "邀请创客冻结收益"),
+        THIRTEEN(13, "解冻邀请创客冻结收益"),
+        FOURTEEN(14, "会员订单收益"),
+        FIFTEEN(15, "用户退款秒杀产品");
+        final Integer key;
+        final String value;
+    }
+
     /**
      * 使用枚举 {@link PayType}
      */
     @ApiModelProperty(value = "支付/收款方式：0->未支付，1->云闪付，2->支付宝，3->余额")
     private Integer payType;
+
+    @Getter
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    public enum PayType implements IPairs<Integer, String, PayType> {
+        /**
+         * 状态
+         */
+        ZERO(0, "未支付"),
+        ONE(1, "云闪付"),
+        TWO(2, "支付宝"),
+        THREE(3, "余额"),
+        ;
+        final Integer key;
+        final String value;
+    }
 
     @ApiModelProperty(value = "来源,支付成功回调后拼接字符串保存")
     private String detailSource;
@@ -106,50 +151,4 @@ public class UmsIncome implements Serializable {
     @ApiModelProperty(value = "秒杀商品主键id")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long flashPromotionPdtId;
-
-    @Getter
-    @AllArgsConstructor
-    @Accessors(fluent = true)
-    public enum IncomeType implements IPairs<Integer, String, IncomeType> {
-        /**
-         * 状态
-         */
-        MINUS_TWO(-2, "系统补还"),
-        MINUS_ONE(-1, "系统扣除"),
-        ZERO(0, "邀请收益"),
-        ONE(1, "秒杀收益"),
-        TWO(2, "余额提现"),
-        THREE(3, "普通收益"),
-        FOUR(4, "审核资金"),
-        FIVE(5, "审核退还"),
-        SIX(6, "团长分佣"),
-        SEVEN(7, "商家收益"),
-        EIGHT(8, "创客收益"),
-        NINE(9, "余额支付"),
-        TEN(10, "扣除服务费"),
-        ELEVEN(11, "退还服务费"),
-        TWELVE(12,"邀请创客冻结收益"),
-        THIRTEEN(13,"解冻邀请创客冻结收益"),
-        FOURTEEN(14,"会员订单收益"),
-        FIFTEEN(15,"用户退款秒杀产品")
-        ;
-        final Integer key;
-        final String value;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @Accessors(fluent = true)
-    public enum PayType implements IPairs<Integer, String, PayType> {
-        /**
-         * 状态
-         */
-        ZERO(0, "未支付"),
-        ONE(1, "云闪付"),
-        TWO(2, "支付宝"),
-        THREE(3, "余额"),
-        ;
-        final Integer key;
-        final String value;
-    }
 }

@@ -40,6 +40,33 @@ public class PcReview implements Serializable {
     @EnumDocumentValid(enumClass = ReviewState.class, isValid = false)
     private Integer reviewState;
 
+    @Getter
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    public enum ReviewState implements IPairs<Integer, String, ReviewState> {
+        /**
+         * 系统调度触发
+         */
+        MINUS_ONE(-1, "已失效"),
+        /**
+         * 默认，只有当数据为0时，方可做其他操作
+         */
+        ZERO(0, "待审核"),
+        /**
+         * 后天审核操作
+         */
+        ONE(1, "已通过"),
+        TWO(2, "不通过"),
+        THREE(3, "已关闭"),
+        /**
+         * 该状态由用户主动取消
+         */
+        FOUR(4, "已取消"),
+        ;
+        final Integer key;
+        final String value;
+    }
+
     @ApiModelProperty(value = "审核人")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long pcUserId;
@@ -88,32 +115,5 @@ public class PcReview implements Serializable {
     @TableField(fill = FieldFill.INSERT)
     @TableLogic
     private Integer deleted;
-
-    @Getter
-    @AllArgsConstructor
-    @Accessors(fluent = true)
-    public enum ReviewState implements IPairs<Integer, String, ReviewState> {
-        /**
-         * 系统调度触发
-         */
-        MINUS_ONE(-1, "已失效"),
-        /**
-         * 默认，只有当数据为0时，方可做其他操作
-         */
-        ZERO(0, "待审核"),
-        /**
-         * 后天审核操作
-         */
-        ONE(1, "已通过"),
-        TWO(2, "不通过"),
-        THREE(3, "已关闭"),
-        /**
-         * 该状态由用户主动取消
-         */
-        FOUR(4, "已取消"),
-        ;
-        final Integer key;
-        final String value;
-    }
 
 }

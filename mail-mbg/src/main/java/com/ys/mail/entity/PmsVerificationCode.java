@@ -50,6 +50,21 @@ public class PmsVerificationCode implements Serializable {
     @ApiModelProperty(value = "状态：0待使用 1已使用 2已失效")
     private Integer isStatus;
 
+    @Getter
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    public enum IsStatus implements IPairs<Integer, String, IsStatus> {
+        /**
+         * 状态
+         */
+        ZERO(0, "待使用"),
+        ONE(1, "已使用"),
+        TWO(2, "已失效"),
+        ;
+        final Integer key;
+        final String value;
+    }
+
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
@@ -65,20 +80,5 @@ public class PmsVerificationCode implements Serializable {
 
     @ApiModelProperty(value = "截止时间")
     private Date expireTime;
-
-    @Getter
-    @AllArgsConstructor
-    @Accessors(fluent = true)
-    public enum IsStatus implements IPairs<Integer, String, IsStatus> {
-        /**
-         * 状态
-         */
-        ZERO(0, "待使用"),
-        ONE(1, "已使用"),
-        TWO(2, "已失效"),
-        ;
-        final Integer key;
-        final String value;
-    }
 
 }

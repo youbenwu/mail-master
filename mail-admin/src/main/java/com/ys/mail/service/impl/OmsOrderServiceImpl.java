@@ -148,7 +148,7 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
             }
         });
         workbookMap.put(fileName, rows);
-        // 导出Excel（相同订单数据暂不能合并）
+        // 导出Excel（相同用户信息列暂不能合并）
         ExcelTool.writeExcel(workbookMap, fileName, response);
     }
 

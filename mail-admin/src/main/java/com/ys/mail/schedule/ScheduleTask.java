@@ -94,16 +94,31 @@ public class ScheduleTask {
                         // 两者需要相等
                         if (oldIncome.getUserId().equals(review.getUserId())) {
                             Long incomeId = incomeIds.get(i);
-                            umsIncome = UmsIncome.builder().incomeId(incomeId).userId(oldIncome.getUserId())
-                                                 .income(review.getReviewMoney()).expenditure(NumberUtils.LONG_ZERO)
-                                                 .balance(oldIncome.getBalance() + review.getReviewMoney())
-                                                 .todayIncome(oldIncome.getTodayIncome())
-                                                 .allIncome(oldIncome.getAllIncome()) // 不计算入总流水
-                                                 .incomeType(UmsIncome.IncomeType.FIVE.key()) // 5->审核退还
-                                                 .incomeNo("").orderTradeNo("")
-                                                 .detailSource("系统退还审核金额:" + DecimalUtil.longToStrForDivider(review.getReviewMoney()) + "元")
-                                                 .payType(UmsIncome.PayType.THREE.key())
-                                                 .remark("系统定时调度触发").build();
+                            // 查询之前冻结记录
+                            Long exIncomeId = review.getExIncomeId();
+                            UmsIncome exIncome = null;
+                            if (BlankUtil.isNotEmpty(exIncomeId)) {
+                                exIncome = umsIncomeService.getById(exIncomeId);
+                            }
+
+                            UmsIncome.UmsIncomeBuilder builder = UmsIncome.builder().incomeId(incomeId)
+                                                                          .userId(oldIncome.getUserId())
+                                                                          .income(review.getReviewMoney())
+                                                                          .expenditure(NumberUtils.LONG_ZERO)
+                                                                          .balance(oldIncome.getBalance() + review.getReviewMoney())
+                                                                          .todayIncome(oldIncome.getTodayIncome())
+                                                                          .allIncome(oldIncome.getAllIncome()) // 不计算入总流水
+                                                                          .incomeType(UmsIncome.IncomeType.FIVE.key()) // 5->审核退还
+                                                                          .incomeNo("").orderTradeNo("")
+                                                                          .detailSource("系统退还审核金额:" + DecimalUtil.longToStrForDivider(review.getReviewMoney()) + "元")
+                                                                          .payType(UmsIncome.PayType.THREE.key())
+                                                                          .remark("系统定时调度触发");
+                            // 退还本金和积分
+                            if (BlankUtil.isNotEmpty(exIncome)) {
+                                builder.original(exIncome.getOriginal()).integral(exIncome.getIntegral());
+                            }
+                            umsIncome = builder.build();
+
                             addIncomeList.add(umsIncome);
                             review.setReviewState(PcReview.ReviewState.MINUS_ONE.key());
                             review.setPcUserId(null);
@@ -126,7 +141,9 @@ public class ScheduleTask {
                 newIncomeList = umsIncomeService.selectLatestByUserIds(userIds);
                 List<Long> rateIncomeIds = new ArrayList<>();
                 todayReviewList.stream().map(PcReview::getRateIncomeId).forEach(rateIncomeId -> {
-                    if (BlankUtil.isNotEmpty(rateIncomeId)) rateIncomeIds.add(rateIncomeId);
+                    if (BlankUtil.isNotEmpty(rateIncomeId)) {
+                        rateIncomeIds.add(rateIncomeId);
+                    }
                 });
                 boolean result = incomeService.refundChargesBatch(newIncomeList, rateIncomeIds);
                 LOGGER.info("【{}-[系统后台审核退还用户提现服务费]-结果：{}】", taskName, result);
