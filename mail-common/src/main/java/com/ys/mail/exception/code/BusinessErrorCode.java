@@ -110,7 +110,7 @@ public enum BusinessErrorCode implements IErrorCode {
     ERR_CUSTOMER_NAME_FOUR(400603, "请输入寄件人/收件人手机号后四位!"),
     ERR_KD_BIRD_NULL(400604, "调用快递鸟api为空"),
     ERR_EX_ADDRESS_NULL(400605, "查询自提点为空"),
-    ERR_KD_CODE(400606, "没有此快递单号"),
+    ERR_KD_CODE(400606, "没有此快递公司"),
 
     ERR_SETTING_TYPE_NOT_EXIST(400700, "设置类型不存在，无法发布"),
 

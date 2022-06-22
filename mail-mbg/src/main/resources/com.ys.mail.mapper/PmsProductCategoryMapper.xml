@@ -236,7 +236,8 @@
             </if>
             <!-- 首页展示折扣价 -->
             <if test="!query.member">
-                IF(t1.promotion_type = 2, t1.meb_price, t1.price) AS price,
+<!--                IF(t1.promotion_type = 2, t1.meb_price, t1.price) AS price,-->
+                t1.price,
             </if>
             t1.sale
         FROM pms_product t1
