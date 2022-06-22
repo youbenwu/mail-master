@@ -1,10 +1,14 @@
 package com.ys.mail.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.GlobalConfig;
 import com.ys.mail.constant.NumberConstant;
 import com.ys.mail.entity.OmsOrder;
+import com.ys.mail.exception.BusinessException;
+import com.ys.mail.exception.code.BusinessErrorCode;
 import com.ys.mail.mapper.OmsOrderItemMapper;
 import com.ys.mail.mapper.OmsOrderMapper;
 import com.ys.mail.model.CommonResult;
@@ -12,19 +16,18 @@ import com.ys.mail.model.admin.query.OmsOrderQuery;
 import com.ys.mail.model.admin.vo.*;
 import com.ys.mail.model.vo.OmsOrderItemVO;
 import com.ys.mail.override.ChainLinkedHashMap;
+import com.ys.mail.service.KdService;
 import com.ys.mail.service.OmsOrderService;
 import com.ys.mail.util.*;
 import com.ys.mail.wrapper.SqlQueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -34,6 +37,7 @@ import java.util.Map;
  * @author 070
  * @since 2021-12-27
  */
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> implements OmsOrderService {
@@ -44,6 +48,8 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
     private OmsOrderItemMapper omsOrderItemMapper;
     @Autowired
     private GlobalConfig globalConfig;
+    @Autowired
+    private KdService kdService;
 
     @Override
     public CommonResult<Page<PcUserOrderVO>> getPage(OmsOrderQuery query) {
@@ -150,6 +156,44 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
         workbookMap.put(fileName, rows);
         // 导出Excel（相同用户信息列暂不能合并）
         ExcelTool.writeExcel(workbookMap, fileName, response);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean logistics(Long orderId, String deliverySn) {
+        // TODO 可以添加也修改,有可能是添加错误的信息,就给修改的机会,暂时就一家物流,后面再重构吧!
+        // 查询出快递单号是哪家,能后添加进去,快递鸟那边的 Shippers 为空
+        JSONArray shippers = kdService.getLogistics(deliverySn);
+        OmsOrder build = OmsOrder.builder()
+                                 .orderId(orderId)
+                                 .deliveryCompany(((JSONObject) shippers.get(NumberUtils.INTEGER_ZERO))
+                                         .get("ShipperName").toString())
+                                 .deliverySn(deliverySn)
+                                 .orderStatus(OmsOrder.OrderStatus.TWO.key())
+                                 .deliveryTime(new Date())
+                                 .build();
+        boolean response;
+        try {
+            response = omsOrderMapper.update(build);
+        } catch (Exception e) {
+            log.debug("订单id:{}物流单号添加失败", orderId);
+            throw new BusinessException(BusinessErrorCode.ERR_UNIQUE_LOGISTICS);
+        }
+        return response;
+    }
+
+    @Override
+    public String logistics(String deliverySn) {
+        JSONArray shippers = kdService.getLogistics(deliverySn);
+        return ((JSONObject) shippers.get(NumberUtils.INTEGER_ZERO)).get("ShipperName").toString();
+    }
+
+    @Override
+    public JSONObject logisticsTrack(String deliverySn, String customerName) {
+        // 此处可以单独抽出来..后台和app端都可以用
+        JSONArray shippers = kdService.getLogistics(deliverySn);
+        return kdService.logisticsTrack(deliverySn, ((JSONObject) shippers.get(NumberUtils.INTEGER_ZERO))
+                .get("ShipperCode").toString(), customerName);
     }
 
 }

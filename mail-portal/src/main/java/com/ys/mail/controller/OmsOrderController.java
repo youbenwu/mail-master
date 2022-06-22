@@ -1,6 +1,7 @@
 package com.ys.mail.controller;
 
 
+import com.ys.mail.annotation.LocalLockAnn;
 import com.ys.mail.entity.OmsOrder;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.bo.GenerateOrderBO;
@@ -114,5 +115,17 @@ public class OmsOrderController {
     public CommonResult<List<QuickOrderDTO>> getAllMakerOrder(@Validated @RequestBody QuickOrderQuery query) {
 
         return CommonResult.success(omsOrderService.getAllMakerOrder(query));
+    }
+
+    @ApiOperation("普通订单确认收货")
+    @PutMapping(value = "/{id:^\\d+$}/confirm")
+    @LocalLockAnn(key = "confirm:arg[0]")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "订单id", dataType = "Long", required = true)
+    })
+    public CommonResult<Boolean> confirm(@PathVariable("id") Long orderId){
+        //订单状态改成待评价,修改一个状态
+        boolean response = omsOrderService.confirm(orderId);
+        return response ? CommonResult.success(Boolean.TRUE) : CommonResult.failed(Boolean.FALSE);
     }
 }

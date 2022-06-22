@@ -125,4 +125,11 @@ public interface OmsOrderService extends IService<OmsOrder> {
      * @return 返回值
      */
     OrderInfoDTO getNewOrderInfo(String orderSn);
+
+    /**
+     * 普通订单确认收货
+     * @param orderId 订单id
+     * @return 返回值
+     */
+    boolean confirm(Long orderId);
 }

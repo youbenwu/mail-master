@@ -85,3 +85,10 @@ cos:
 #  mlb:
 #    wbAppId: TIDAh0o1
 #    secret: 2fzRslIeFRZKGlouLnqaPf5c1E7nzlYToyj9FMroCLEmbCXwO0VDxBDFIm90lGem
+
+
+kd:
+  bird:  #快递鸟基本参数,后面可以拓展其它第三方快递公司,此处用的是DT的快递鸟账号
+    appId: 1765095    #即用户ID，登录快递鸟官网会员中心获取 https://www.kdniao.com/UserCenter/v4/UserHome.aspx
+    appKey: bf859e96-b02e-4e06-9fa7-50809f363b18         #即API key，登录快递鸟官网会员中心获取 https://www.kdniao
+    reqUrl: https://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx       #请求url, 正式环境地址
