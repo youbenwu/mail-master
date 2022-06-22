@@ -1,6 +1,7 @@
 package com.ys.mail.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.query.OmsOrderQuery;
@@ -8,6 +9,8 @@ import com.ys.mail.model.admin.vo.PcUserOrderVO;
 import com.ys.mail.model.vo.OmsOrderItemVO;
 import com.ys.mail.service.OmsOrderService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -52,4 +55,40 @@ public class OmsOrderController {
         service.exportExcel(query, "平台订单数据", response);
     }
 
+
+    /**
+     * 后台管理人员添加物流单号,物流单号,物流编码,订单id
+     */
+    @ApiOperation("添加物流单号")
+    @PostMapping(value = "/{id}/logistics")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "订单id", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "deliverySn", value = "物流单号", dataType = "String", required = true)
+    })
+    public CommonResult<Boolean> logistics(@PathVariable("id") Long orderId,
+                                           @RequestParam("deliverySn") String deliverySn){
+        boolean rsp = service.logistics(orderId,deliverySn);
+        return rsp ? CommonResult.success(Boolean.TRUE) : CommonResult.failed(Boolean.FALSE);
+    }
+
+    @ApiOperation("查询物流单号的快递公司")
+    @GetMapping(value = "/{deliverySn}/logistics")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deliverySn", value = "物流单号", dataType = "String", required = true)
+    })
+    public CommonResult<String> logistics(@PathVariable String deliverySn){
+        return CommonResult.success(service.logistics(deliverySn));
+    }
+
+
+    @ApiOperation("根据快递单号查询物流轨迹")
+    @GetMapping(value = "/{deliverySn}/logisticsTrack")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deliverySn", value = "物流单号", dataType = "String", required = true),
+            @ApiImplicitParam(name = "customerName", value = "手机号后四位,为顺丰时必填,我其它的可不填", dataType = "String"),
+    })
+    public CommonResult<JSONObject> logisticsTrack(@PathVariable String deliverySn,
+                                                   @RequestParam(value = "customerName",required = false)  String customerName){
+        return CommonResult.success(service.logisticsTrack(deliverySn,customerName));
+    }
 }

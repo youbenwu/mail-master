@@ -588,4 +588,24 @@
                      LEFT JOIN pms_product_category t3 ON t2.pdt_cgy_id = t3.pdt_cgy_id
                      LEFT JOIN ums_user uu ON oo.user_id = uu.user_id ${ew.customSqlSegment}
     </select>
+
+    <update id="update">
+        update oms_order
+        set delivery_sn = #{build.deliverySn},
+            delivery_company = #{build.deliveryCompany},
+            order_status = #{build.orderStatus},
+            delivery_time = #{build.deliveryTime}
+        where (order_status = 1 or order_status = 2) and order_id = #{build.orderId} and trans_id <![CDATA[ > ]]> 0;
+    </update>
+
+    <update id="confirm">
+        update oms_order
+        set order_status = #{order.orderStatus},
+            is_confirm_status = #{order.isConfirmStatus},
+            receive_time = #{order.receiveTime}
+        where order_type != 1
+        and order_id = #{order.orderId}
+          and trans_id <![CDATA[ > ]]> 0
+          and order_status = 2;
+    </update>
 </mapper>

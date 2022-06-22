@@ -105,6 +105,12 @@ public enum BusinessErrorCode implements IErrorCode {
 
     UNFINISHED_APP_UPLOAD(400600, "APP未上传或未上传完成"),
     APP_NOT_GENERATE_QRCODE(400601, "APP未生成二维码，无法发布"),
+    ERR_UNIQUE_LOGISTICS(400602, "物流单号重复"),
+
+    ERR_CUSTOMER_NAME_FOUR(400603, "请输入寄件人/收件人手机号后四位!"),
+    ERR_KD_BIRD_NULL(400604, "调用快递鸟api为空"),
+    ERR_EX_ADDRESS_NULL(400605, "查询自提点为空"),
+    ERR_KD_CODE(400606, "没有此快递单号"),
 
     ERR_SETTING_TYPE_NOT_EXIST(400700, "设置类型不存在，无法发布"),
 

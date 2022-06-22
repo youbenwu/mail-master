@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -343,5 +344,18 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
             }
         });
         return orderInfoDTO;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean confirm(Long orderId) {
+        // 防止sql注入
+        OmsOrder build = OmsOrder.builder()
+                                 .orderId(orderId)
+                                 .receiveTime(new Date())
+                                 .orderStatus(OmsOrder.OrderStatus.SEVEN.key())
+                                 .isConfirmStatus(NumberUtils.INTEGER_ONE)
+                                 .build();
+        return omsOrderMapper.confirm(build);
     }
 }

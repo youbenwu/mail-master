@@ -1,5 +1,6 @@
 package com.ys.mail.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ys.mail.entity.OmsOrder;
@@ -70,4 +71,30 @@ public interface OmsOrderService extends IService<OmsOrder> {
      * @param response 响应
      */
     void exportExcel(OmsOrderQuery query, String fileName, HttpServletResponse response);
+
+    /**
+     * 添加物流单号
+     *
+     * @param orderId    订单id
+     * @param deliverySn 物流单号
+     * @return 返回值
+     */
+    boolean logistics(Long orderId, String deliverySn);
+
+    /**
+     * 查询物流公司名称
+     *
+     * @param deliverySn 物流单号
+     * @return 返回值
+     */
+    String logistics(String deliverySn);
+
+    /**
+     * 查看物流轨迹
+     *
+     * @param deliverySn   物流单号
+     * @param customerName 手机号后四位
+     * @return 返回值
+     */
+    JSONObject logisticsTrack(String deliverySn, String customerName);
 }

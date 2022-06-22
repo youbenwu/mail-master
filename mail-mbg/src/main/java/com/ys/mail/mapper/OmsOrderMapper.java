@@ -157,4 +157,18 @@ public interface OmsOrderMapper extends BaseMapper<OmsOrder> {
      * @return 列表
      */
     List<OrderDetailsVO> getOrderDetails(@Param(Constants.WRAPPER) Wrapper<PcUserOrderVO> wrapper);
+
+    /**
+     * 修改
+     * @param build 对象
+     * @return 返回值
+     */
+    boolean update(@Param("build") OmsOrder build);
+
+    /**
+     * 普通订单确认收货
+     * @param order 订单对象
+     * @return 返回值
+     */
+    boolean confirm(@Param("order") OmsOrder order);
 }
