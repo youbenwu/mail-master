@@ -22,6 +22,7 @@ import com.ys.mail.model.param.ConGenerateOrderParam;
 import com.ys.mail.model.param.ProductParam;
 import com.ys.mail.model.po.BuyProductPO;
 import com.ys.mail.model.po.MebSkuPO;
+import com.ys.mail.model.po.ProductAndBrandPO;
 import com.ys.mail.model.po.ProductPO;
 import com.ys.mail.service.*;
 import com.ys.mail.util.BlankUtil;
@@ -31,8 +32,6 @@ import com.ys.mail.util.UserUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,8 +53,6 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
     @Autowired
     private PmsProductMapper productMapper;
     @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
     private UmsAddressService addressService;
     @Autowired
     private PmsSkuStockService skuStockService;
@@ -69,19 +66,6 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
     private UmsProductCollectService productCollectService;
     @Autowired
     private UmsPartnerMapper partnerMapper;
-
-    @Autowired
-    private UmsRealNameService umsRealNameService;
-
-    @Autowired
-    private UmsUserInviteRuleService umsUserInviteRuleService;
-
-    @Value("${redis.database}")
-    private String redisDatabase;
-    @Value("${redis.key.homeProductType}")
-    private String redisKeyHomeProductType;
-    @Value("${redis.expire.homePage}")
-    private Long redisExpireHomePage;
 
     @Override
     public List<PmsProduct> getAllProduct(Long productId) {
@@ -424,5 +408,16 @@ public class PmsProductServiceImpl extends ServiceImpl<PmsProductMapper, PmsProd
     @Override
     public List<PmsProduct> selectMebs() {
         return productMapper.selectMebs();
+    }
+
+    @Override
+    public ProductAndBrandPO selectPmsBrandByProductId(Long productId) {
+        List<ProductAndBrandPO> list = productMapper.selectProductBrandInfoByIds(Collections.emptyList());
+        return Optional.ofNullable(list).map(po -> po.get(0)).orElse(null);
+    }
+
+    @Override
+    public List<ProductAndBrandPO> selectProductBrandInfoByIds(List<Long> ids) {
+        return productMapper.selectProductBrandInfoByIds(ids);
     }
 }

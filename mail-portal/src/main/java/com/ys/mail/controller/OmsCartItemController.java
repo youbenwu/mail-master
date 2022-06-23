@@ -92,11 +92,6 @@ public class OmsCartItemController {
         return CommonResult.success(cartItemService.createOrder(param));
     }
 
-
-
-
-
-
 //    @ApiOperation("获取购物车信息")
 //    @PostMapping(value = "/getCarItem")
 //    public CommonResult<List<OmsCartItemDTO>> getCarItem() {

@@ -134,6 +134,7 @@
             <result column="product_id" property="productId"/>
             <result column="pdt_cgy_name" property="pdtCgyName"/>
             <result column="order_sn" property="orderSn"/>
+            <result column="pdt_attribute_cgy_name" property="pdtAttributeCgyName" />
             <result column="product_pic" property="productPic"/>
             <result column="product_name" property="productName"/>
             <result column="product_brand" property="productBrand"/>

@@ -55,7 +55,6 @@ public class OmsOrderController {
         service.exportExcel(query, "平台订单数据", response);
     }
 
-
     /**
      * 后台管理人员添加物流单号,物流单号,物流编码,订单id
      */

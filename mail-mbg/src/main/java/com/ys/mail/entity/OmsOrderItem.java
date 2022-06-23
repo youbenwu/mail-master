@@ -59,6 +59,9 @@ public class OmsOrderItem implements Serializable {
     @ApiModelProperty(value = "商品货号")
     private String productSn;
 
+    @ApiModelProperty(value = "产品属性分类名称")
+    private String pdtAttributeCgyName;
+
     @ApiModelProperty(value = "存储的整数类型,1元就是100")
     private Long productPrice;
 

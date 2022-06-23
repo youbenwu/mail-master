@@ -8,6 +8,7 @@ import com.ys.mail.model.dto.ProductCollectDTO;
 import com.ys.mail.model.dto.ProductInfoDTO;
 import com.ys.mail.model.param.ProductParam;
 import com.ys.mail.model.po.BuyProductPO;
+import com.ys.mail.model.po.ProductAndBrandPO;
 import com.ys.mail.model.po.ProductPO;
 import com.ys.mail.model.vo.PmsProductVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -73,7 +74,6 @@ public interface PmsProductMapper extends BaseMapper<PmsProduct> {
      * 商品详情
      *
      * @param productId 商品id
-     * @param flag      参数值
      * @return 返回值
      */
     ProductInfoDTO selectProductInfo(@Param("productId") Long productId);
@@ -172,4 +172,12 @@ public interface PmsProductMapper extends BaseMapper<PmsProduct> {
      * @return
      */
     ProductInfoDTO selectPdtInfo(@Param("productId") Long productId, @Param("flag") Boolean flag);
+
+    /**
+     * 获取商品品牌属性等信息
+     *
+     * @param ids 商品ID列表
+     * @return 品牌信息列表
+     */
+    List<ProductAndBrandPO> selectProductBrandInfoByIds(@Param("ids") List<Long> ids);
 }
