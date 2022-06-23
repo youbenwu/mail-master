@@ -516,4 +516,22 @@
                partner_id
         from pms_product where product_id = #{productId} AND deleted = 0 and is_publish_status = 1
     </select>
+
+    <select id="selectProductBrandInfoByIds" resultType="com.ys.mail.model.po.ProductAndBrandPO">
+        SELECT
+            t1.product_id,
+            t1.product_sn,
+            t2.brand_name,
+            t3.`name`
+        FROM
+            pms_product t1
+        LEFT JOIN pms_brand t2 ON t1.brand_id = t2.brand_id
+        LEFT JOIN pms_product_attribute_category t3 ON t1.pdt_attribute_cgy_id = t3.pdt_attribute_cgy_id
+        WHERE
+            t1.product_id IN (
+                <foreach collection="ids" item="item" separator=",">
+                    #{item}
+                </foreach>
+            )
+    </select>
 </mapper>

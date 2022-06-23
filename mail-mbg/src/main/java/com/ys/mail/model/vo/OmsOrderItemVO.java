@@ -42,6 +42,9 @@ public class OmsOrderItemVO implements Serializable {
     @ApiModelProperty(value = "订单编号")
     private String orderSn;
 
+    @ApiModelProperty(value = "产品属性分类名称")
+    private String pdtAttributeCgyName;
+
     @ApiModelProperty(value = "商品主图")
     private String productPic;
 
