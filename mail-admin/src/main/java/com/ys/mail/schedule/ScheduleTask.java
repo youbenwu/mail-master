@@ -243,6 +243,7 @@ public class ScheduleTask {
                                               .divide(new BigDecimal(FigureConstant.INT_ONE_HUNDRED), BigDecimal.ROUND_CEILING, RoundingMode.DOWN);
                 incomes.add(UmsIncome.builder().incomeId(ids.get(num.get() - NumberUtils.INTEGER_ONE))
                                      .userId(vo.getUserId()).income(vo.getPeriodsPrice())
+                                     .original(vo.getPeriodsPrice())
                                      .expenditure(NumberUtils.LONG_ZERO).balance(balance).allIncome(allIncome)
                                      .todayIncome(todayIncome).incomeType(UmsIncome.IncomeType.EIGHT.key())
                                      .detailSource("用户:" + vo.getUserId() + "返还合伙人商品金额:" + price + "总计数量:" + vo.getReNum())
