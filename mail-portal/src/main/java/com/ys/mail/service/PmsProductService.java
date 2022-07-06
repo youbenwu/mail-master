@@ -10,6 +10,7 @@ import com.ys.mail.model.dto.ProductInfoDTO;
 import com.ys.mail.model.param.BathGenerateOrderParam;
 import com.ys.mail.model.param.ConGenerateOrderParam;
 import com.ys.mail.model.param.ProductParam;
+import com.ys.mail.model.po.ProductAndBrandPO;
 import com.ys.mail.model.po.ProductPO;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
  * @since 2021-11-10
  */
 public interface PmsProductService extends IService<PmsProduct> {
+
     /**
      * 大尾狐自营列表
      *
@@ -148,4 +150,20 @@ public interface PmsProductService extends IService<PmsProduct> {
     List<ProductPO> searchAllPdtType(ProductParam param);
 
     List<PmsProduct> selectMebs();
+
+    /**
+     * 根据商品ID获取品牌属性等信息（单条）
+     *
+     * @param productId 商品ID
+     * @return 品牌信息
+     */
+    ProductAndBrandPO selectPmsBrandByProductId(Long productId);
+
+    /**
+     * 获取商品品牌属性等信息
+     *
+     * @param ids 商品ID列表
+     * @return 品牌信息列表
+     */
+    List<ProductAndBrandPO> selectProductBrandInfoByIds(List<Long> ids);
 }

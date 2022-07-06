@@ -12,6 +12,7 @@
         <result column="product_name" property="productName"/>
         <result column="product_brand" property="productBrand"/>
         <result column="product_sn" property="productSn"/>
+        <result column="pdt_attribute_cgy_name" property="pdtAttributeCgyName" />
         <result column="product_price" property="productPrice"/>
         <result column="product_quantity" property="productQuantity"/>
         <result column="product_sku_id" property="productSkuId"/>
@@ -57,7 +58,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        order_item_id, order_id, product_id, pdt_cgy_id, order_sn, product_pic, product_name, product_brand,
+        order_item_id, order_id, product_id, pdt_cgy_id, order_sn, pdt_attribute_cgy_name, product_pic, product_name, product_brand,
         product_sn, product_price, product_quantity, product_sku_id, product_sku_code, promotion_name,
         promotion_amount, coupon_amount, integration_amount, real_amount, product_attr, create_time,is_appraise,partner_pdt_id
     </sql>

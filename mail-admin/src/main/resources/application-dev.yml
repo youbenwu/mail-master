@@ -52,7 +52,7 @@ logging:
         boot:
           autoconfigure: ERROR
   file:
-    path: D:/logs/qcy_mail/admin
+    path: D:/project/qcy_mail/admin/logs
 
 
 logstash:
@@ -71,7 +71,7 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 
 prop:
-  staticAccessPath: D:/com/        #存支付宝的相关证书
+  staticAccessPath: D:/project/qcy_mail/        #存支付宝的相关证书
 
 ## 融云IM相关配置（开发测试环境）
 rongcloud:

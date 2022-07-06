@@ -70,6 +70,12 @@ public class IncomeCalcu {
      */
     @Transactional(rollbackFor = Exception.class)
     public void parentIncome(List<Long> flashPromotionIds) throws IOException {
+        // 是否开启团长分佣,为null和true就都放心,默认是开启的
+        Boolean resp = settingService.getSettingValue(SettingTypeEnum.thirty_one);
+        if(BlankUtil.isNotEmpty(resp) && !resp){
+            LOGGER.info("团长分佣已关闭");
+            return;
+        }
         // 规则：团长当日参与至少一单   以及 下级有人参与秒杀  才会有团长分佣收益
         LOGGER.info("========团长每日结算 start========");
         List<SmsFlashPromotion> smsFlashPromotions = flashPromotionMapper.selectBatchIds(flashPromotionIds);

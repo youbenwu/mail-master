@@ -479,6 +479,7 @@ public class ScheduleTask {
                                              .userId(vo.getParentId())
                                              .income(reMoney)
                                              .expenditure(NumberUtils.LONG_ZERO)
+                                             .integral(reMoney)
                                              .balance(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO + reMoney : vo
                                                      .getUmsIncome().getBalance() + reMoney)
                                              .allIncome(BlankUtil.isEmpty(vo.getUmsIncome()) ? NumberUtils.LONG_ZERO + reMoney : vo

@@ -125,6 +125,7 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
                        .putObj("订单类型", EnumTool.getValue(OmsOrder.OrderType.class, e.getOrderType()))
                        .putObj("商品名称", item.getProductName())
                        .putObj("商品分类名称", item.getPdtCgyName())
+                       .putObj("商品属性分类名称", item.getPdtAttributeCgyName())
                        .putObj("商品品牌", item.getProductBrand())
                        .putObj("商品货号", item.getProductSn())
                        .putObj("商品SKU属性", StringUtil.parseJsonArray(item.getSpData()))
@@ -155,7 +156,7 @@ public class OmsOrderServiceImpl extends ServiceImpl<OmsOrderMapper, OmsOrder> i
         });
         workbookMap.put(fileName, rows);
         // 导出Excel（相同用户信息列暂不能合并）
-        ExcelTool.writeExcel(workbookMap, fileName, response);
+        ExcelTool.writeExcel(workbookMap, globalConfig.getProjectName() + "-" + fileName, response);
     }
 
     @Transactional(rollbackFor = Exception.class)
