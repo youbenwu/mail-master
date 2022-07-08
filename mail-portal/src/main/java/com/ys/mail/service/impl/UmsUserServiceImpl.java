@@ -902,4 +902,24 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
         return inviteInfoList;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public String touristLogin(String uuid) {
+        UmsUser user = this.getOne(new QueryWrapper<UmsUser>().eq("uuid", uuid));
+        if(BlankUtil.isEmpty(user)){
+            user = new UmsUser();
+            user.setRoleId(3);
+            user.setUserId(IdWorker.generateId());
+            user.setNickname("游客-"+NickNameUtil.getChineseName(true, 2));
+            user.setPhone(RandomPhoneNumber.createMobile(RandomPhoneNumber.getRandom()));
+            user.setUuid(uuid);
+            this.save(user);
+        }
+        UmsUserDetails userDetails = new UmsUserDetails(user);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        String token = jwtTokenUtil.generateToken(userDetails);
+        return tokenHead + token;
+    }
+
 }

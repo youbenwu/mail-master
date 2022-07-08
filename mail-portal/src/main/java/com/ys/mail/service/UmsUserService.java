@@ -176,4 +176,11 @@ public interface UmsUserService extends IService<UmsUser> {
      * @return 结果
      */
     UserInviteDataVO getUserInviteDataList(String userId, Integer pageSize);
+
+    /**
+     * 游客登录
+     * @param uuid 唯一uuid
+     * @return 返回值
+     */
+    String touristLogin(String uuid);
 }

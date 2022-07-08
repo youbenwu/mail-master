@@ -215,4 +215,14 @@ public class UmsUserController {
         UserInviteDataVO inviteDataVo = userService.getUserInviteDataList(userId, pageSize);
         return CommonResult.success(inviteDataVo);
     }
+
+    /**
+     * 游客登录-生成手机号,如果是同一ip就还是,前端生成一个uuid唯一,
+     */
+    @ApiOperation("游客登录")
+    @PostMapping("/touristLogin")
+    public CommonResult<String> touristLogin(@RequestParam("uuid") String uuid){
+        String token = userService.touristLogin(uuid);
+        return CommonResult.success(token);
+    }
 }

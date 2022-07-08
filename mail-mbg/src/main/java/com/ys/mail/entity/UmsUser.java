@@ -102,6 +102,9 @@ public class UmsUser implements Serializable {
     @ApiModelProperty(value = "邀请时间（暂不用）", notes = "注意：只能在邀请时主动更新一次，之后不能再更新")
     private Date inviteTime;
 
+    @ApiModelProperty(value = "游客登录的唯一uuid")
+    private String uuid;
+
     /**
      * 设置支付密码构造器
      *

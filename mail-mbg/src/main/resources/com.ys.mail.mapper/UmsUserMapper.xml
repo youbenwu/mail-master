@@ -24,6 +24,7 @@
         <result column="update_time" property="updateTime"/>
         <result column="parent_id" property="parentId"/>
         <result column="invite_time" property="inviteTime"/>
+        <result column="uuid" property="uuid"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -31,7 +32,7 @@
         user_id, phone, password, nickname, head_portrait, openid,
         role_id, user_status ,integral_sum,alipay_name,alipay_account,
         pay_password,payment_type,user_image_string,is_exchange_gift,
-        is_active,deleted,create_time, update_time,parent_id, invite_time
+        is_active,deleted,create_time, update_time,parent_id, invite_time,uuid
     </sql>
 
     <!-- 根据团长ID查询团长消费日期列表-->
