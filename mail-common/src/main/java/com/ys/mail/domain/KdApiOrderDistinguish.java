@@ -96,7 +96,7 @@ public class KdApiOrderDistinguish {
         params.put("RequestData", urlEncoder(requestData, "UTF-8"));
         params.put("EBusinessID", kdBirdConfig.getAppId());
         //免费即时查询接口指令1002/在途监控即时查询接口指令8001/地图版即时查询接口指令8003
-        params.put("RequestType", "1002");
+        params.put("RequestType", "8001");
         String dataSign = encrypt(requestData, kdBirdConfig.getAppKey(), "UTF-8");
         params.put("DataSign", urlEncoder(dataSign, "UTF-8"));
         params.put("DataType", "2");
