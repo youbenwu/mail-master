@@ -12,8 +12,10 @@ import com.ys.mail.model.param.*;
 import com.ys.mail.model.vo.UmsUserVo;
 import com.ys.mail.model.vo.UserInviteDataVO;
 import com.ys.mail.service.SysSettingService;
+import com.ys.mail.service.UmsUserBlacklistService;
 import com.ys.mail.service.UmsUserService;
 import com.ys.mail.util.DecimalUtil;
+import com.ys.mail.util.UserUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -46,6 +48,8 @@ public class UmsUserController {
     private UmsUserService userService;
     @Autowired
     private SysSettingService sysSettingService;
+    @Autowired
+    private UmsUserBlacklistService userBlacklistService;
 
     @ApiOperation("发送验证码-DT")
     @GetMapping(value = "/getAuthCode")
@@ -214,6 +218,14 @@ public class UmsUserController {
                                                                 @RequestParam(value = "pageSize", required = false, defaultValue = "5") @Min(value = 1) @Max(value = 50) Integer pageSize) {
         UserInviteDataVO inviteDataVo = userService.getUserInviteDataList(userId, pageSize);
         return CommonResult.success(inviteDataVo);
+    }
+
+    @ApiOperation("用户注销")
+    @DeleteMapping("/cancelAccount")
+    public CommonResult<Boolean> cancelAccount(){
+        // 注销账号,用户注销账号后就不让这个账号给登录了,
+        boolean response = userBlacklistService.cancelAccount(UserUtil.getCurrentUser());
+        return response ? CommonResult.success(Boolean.TRUE) : CommonResult.failed(Boolean.FALSE);
     }
 
     /**

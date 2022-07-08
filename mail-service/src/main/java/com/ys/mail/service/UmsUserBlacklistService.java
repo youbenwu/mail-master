@@ -2,6 +2,7 @@ package com.ys.mail.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ys.mail.entity.UmsUser;
 import com.ys.mail.entity.UmsUserBlacklist;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.UmsUserBlackListParam;
@@ -36,4 +37,11 @@ public interface UmsUserBlacklistService extends IService<UmsUserBlacklist> {
 
     // 删除单条
     CommonResult<Boolean> deleteOne(Long blId);
+
+    /**
+     * 注销账号
+     * @param user 用户对象
+     * @return 返回值
+     */
+    boolean cancelAccount(UmsUser user);
 }

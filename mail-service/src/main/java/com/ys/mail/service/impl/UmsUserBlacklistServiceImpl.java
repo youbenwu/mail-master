@@ -1,9 +1,12 @@
 package com.ys.mail.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RedisConfig;
+import com.ys.mail.entity.UmsUser;
 import com.ys.mail.entity.UmsUserBlacklist;
 import com.ys.mail.mapper.UmsUserBlacklistMapper;
 import com.ys.mail.model.CommonResult;
@@ -116,5 +119,29 @@ public class UmsUserBlacklistServiceImpl extends ServiceImpl<UmsUserBlacklistMap
 
     public String getRedisKey() {
         return redisConfig.fullKey(redisConfig.getKey().getUserBlackList());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean cancelAccount(UmsUser user) {
+        // 手机号加入到黑名单,加入到黑名单,已经是黑名单了,和需要删除redis中key的缓存,可能存在手机号,但是is_enable为false
+        // 存在,不存在,null
+        LambdaQueryWrapper<UmsUserBlacklist> wrapper = Wrappers.<UmsUserBlacklist>lambdaQuery().eq(UmsUserBlacklist::getBlPhone,user.getPhone());
+        UmsUserBlacklist one = this.getOne(wrapper);
+        UmsUserBlacklist blacklist = new UmsUserBlacklist();
+        if(BlankUtil.isEmpty(one)){
+            blacklist.setBlId(IdWorker.generateId());
+            blacklist.setBlPhone(user.getPhone());
+            blacklist.setBlName(BlankUtil.isEmpty(user.getAlipayName()) ? user.getNickname() : user.getAlipayName());
+        }else{
+            if(!one.getEnable()){
+                BeanUtils.copyProperties(one, blacklist);
+                blacklist.setEnable(Boolean.TRUE);
+            }
+        }
+        blacklist.setRemark("用户注销账号");
+        boolean response = this.saveOrUpdate(blacklist);
+        redisService.del(this.getRedisKey());
+        return response;
     }
 }
