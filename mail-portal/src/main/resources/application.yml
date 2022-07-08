@@ -68,6 +68,7 @@ secure:
       - /flash/promotion/product/getAllNewestSecond
       - /flash/promotion/product/getAllNewestSecondPage
       - /flash/promotion/product/info
+      - /user/touristLogin
 
 #自定义一键登录参数
 oauth:
