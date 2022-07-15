@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
@@ -62,7 +61,12 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
         // 打印简洁的业务异常
         String title = String.format("%s业务异常::%s", StringConstant.LEFT_ARROWS, message);
-        String link = String.format("\n%s异常位置::%s", StringConstant.LEFT_ARROWS, e.getStackTrace()[1]);
+        StackTraceElement stackTraceElement = e.getStackTrace()[1];
+        // 判断是否为代理类
+        if (stackTraceElement.getClassName().contains(StringConstant.PROXY_SIGN)) {
+            stackTraceElement = e.getStackTrace()[0];
+        }
+        String link = String.format("\n%s异常位置::%s", StringConstant.LEFT_ARROWS, stackTraceElement);
         String content;
         if (active.contains(StringConstant.ENV_DEV)) {
             content = StringUtil.getColorContent(AnsiColorEnum.RED_BOLD, title + link);

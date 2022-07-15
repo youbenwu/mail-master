@@ -68,4 +68,11 @@ public interface UmsUserMapper extends BaseMapper<UmsUser> {
      */
     List<UserInviteItemDataVO> getUserInviteInfo(@Param("parentId") Long parentId);
 
+    /**
+     * 硬删除(谨慎使用)
+     *
+     * @param ids id列表
+     */
+    void deleteByIds(@Param("ids") List<Long> ids);
+
 }

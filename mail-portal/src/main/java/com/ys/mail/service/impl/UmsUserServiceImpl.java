@@ -192,11 +192,7 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
      */
     private String createToken(String phone, Long parentId) {
         // 黑名单检测
-        Boolean onBlackList = blacklistService.isOnBlackList(phone);
-        if (onBlackList) {
-            LOGGER.warn("【创建token拦截】- 黑名单手机号：{}", phone);
-            throw new ApiException("请求失败");
-        }
+        blacklistService.checkPhone(phone);
 
         //查询是否存在该用户,存在就直接登录,不存在就直接注册
         UmsUser user = getOne(new QueryWrapper<UmsUser>().eq("phone", phone));
@@ -906,17 +902,17 @@ public class UmsUserServiceImpl extends ServiceImpl<UmsUserMapper, UmsUser> impl
     @Override
     public String touristLogin(String uuid) {
         UmsUser user = this.getOne(new QueryWrapper<UmsUser>().eq("uuid", uuid));
-        if(BlankUtil.isEmpty(user)){
+        if (BlankUtil.isEmpty(user)) {
             user = new UmsUser();
             user.setRoleId(3);
             user.setUserId(IdWorker.generateId());
-            user.setNickname("游客-"+NickNameUtil.getChineseName(true, 2));
+            user.setNickname("游客-" + NickNameUtil.getChineseName(true, 2));
             user.setPhone(RandomPhoneNumber.createMobile(RandomPhoneNumber.getRandom()));
             user.setUuid(uuid);
             this.save(user);
         }
         UmsUserDetails userDetails = new UmsUserDetails(user);
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         String token = jwtTokenUtil.generateToken(userDetails);
         return tokenHead + token;

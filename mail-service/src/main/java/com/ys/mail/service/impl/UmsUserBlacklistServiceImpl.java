@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ys.mail.config.RedisConfig;
 import com.ys.mail.entity.UmsUser;
 import com.ys.mail.entity.UmsUserBlacklist;
+import com.ys.mail.exception.BusinessException;
 import com.ys.mail.mapper.UmsUserBlacklistMapper;
 import com.ys.mail.model.CommonResult;
 import com.ys.mail.model.admin.param.UmsUserBlackListParam;
@@ -16,6 +17,7 @@ import com.ys.mail.service.RedisService;
 import com.ys.mail.service.UmsUserBlacklistService;
 import com.ys.mail.util.BlankUtil;
 import com.ys.mail.util.IdWorker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import java.util.List;
  * @author 070
  * @since 2022-01-30
  */
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class UmsUserBlacklistServiceImpl extends ServiceImpl<UmsUserBlacklistMapper, UmsUserBlacklist> implements UmsUserBlacklistService {
@@ -126,15 +129,16 @@ public class UmsUserBlacklistServiceImpl extends ServiceImpl<UmsUserBlacklistMap
     public boolean cancelAccount(UmsUser user) {
         // 手机号加入到黑名单,加入到黑名单,已经是黑名单了,和需要删除redis中key的缓存,可能存在手机号,但是is_enable为false
         // 存在,不存在,null
-        LambdaQueryWrapper<UmsUserBlacklist> wrapper = Wrappers.<UmsUserBlacklist>lambdaQuery().eq(UmsUserBlacklist::getBlPhone,user.getPhone());
+        LambdaQueryWrapper<UmsUserBlacklist> wrapper = Wrappers.<UmsUserBlacklist>lambdaQuery()
+                                                               .eq(UmsUserBlacklist::getBlPhone, user.getPhone());
         UmsUserBlacklist one = this.getOne(wrapper);
         UmsUserBlacklist blacklist = new UmsUserBlacklist();
-        if(BlankUtil.isEmpty(one)){
+        if (BlankUtil.isEmpty(one)) {
             blacklist.setBlId(IdWorker.generateId());
             blacklist.setBlPhone(user.getPhone());
             blacklist.setBlName(BlankUtil.isEmpty(user.getAlipayName()) ? user.getNickname() : user.getAlipayName());
-        }else{
-            if(!one.getEnable()){
+        } else {
+            if (!one.getEnable()) {
                 BeanUtils.copyProperties(one, blacklist);
                 blacklist.setEnable(Boolean.TRUE);
             }
@@ -143,5 +147,16 @@ public class UmsUserBlacklistServiceImpl extends ServiceImpl<UmsUserBlacklistMap
         boolean response = this.saveOrUpdate(blacklist);
         redisService.del(this.getRedisKey());
         return response;
+    }
+
+    @Override
+    public void checkPhone(String phone) {
+        if (BlankUtil.isNotEmpty(phone)) {
+            Boolean onBlackList = this.isOnBlackList(phone);
+            if (onBlackList) {
+                log.warn("【黑名单手机号】- {}", phone);
+                throw new BusinessException("请求失败");
+            }
+        }
     }
 }

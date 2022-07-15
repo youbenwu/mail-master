@@ -1,6 +1,5 @@
 package com.ys.mail.aop;
 
-import com.ys.mail.model.CommonResult;
 import com.ys.mail.service.UmsUserBlacklistService;
 import com.ys.mail.util.BlankUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -44,11 +43,7 @@ public class BlackListPhoneAspect {
         LOGGER.info("【APO拦截】- 校验手机号：{}", blPhone);
         // 黑名单手机号拦截
         if (BlankUtil.isNotEmpty(blPhone)) {
-            Boolean onBlackList = blacklistService.isOnBlackList(blPhone);
-            if (onBlackList) {
-                LOGGER.warn("【APO拦截】- 黑名单中手机号：{}", blPhone);
-                return CommonResult.failed("请求失败", Boolean.FALSE);
-            }
+            blacklistService.checkPhone(blPhone);
         }
         return point.proceed();
     }

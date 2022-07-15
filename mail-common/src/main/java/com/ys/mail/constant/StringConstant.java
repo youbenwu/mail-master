@@ -38,6 +38,7 @@ public class StringConstant {
     public static final String BLANK = "";
     public static final String EQUAL_SIGN = " = ";
     public static final String PLACEHOLDER_S = "%s";
+    public static final String PROXY_SIGN = "$$";
 
     /**
      * 中文符号

@@ -3,7 +3,6 @@ package com.ys.mail.security.component;
 import cn.hutool.core.util.EnumUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.ys.mail.constant.RequestMethod;
-import com.ys.mail.exception.ApiException;
 import com.ys.mail.security.util.JwtTokenUtil;
 import com.ys.mail.service.UmsUserBlacklistService;
 import org.slf4j.Logger;
@@ -60,11 +59,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             LOGGER.info("checking username:{}", username);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // 黑名单检测
-                Boolean onBlackList = blacklistService.isOnBlackList(username);
-                if (onBlackList) {
-                    LOGGER.warn("【jwt拦截】- 黑名单手机号：{}", username);
-                    throw new ApiException("请求失败");
-                }
+                blacklistService.checkPhone(username);
 
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if (jwtTokenUtil.validateToken(authToken, userDetails)) {

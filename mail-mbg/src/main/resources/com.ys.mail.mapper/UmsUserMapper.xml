@@ -124,4 +124,12 @@
         FROM ums_user uu
                      LEFT JOIN ums_user_blacklist ubl ON uu.phone = ubl.bl_phone ${ew.customSqlSegment}
     </select>
+
+    <delete id="deleteByIds">
+        DELETE FROM ums_user WHERE user_id IN (
+            <foreach collection="ids" item="item" separator=",">
+                #{item}
+            </foreach>
+        )
+    </delete>
 </mapper>
