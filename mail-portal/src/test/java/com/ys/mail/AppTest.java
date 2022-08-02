@@ -313,6 +313,7 @@ public class AppTest {
 //                "1.0.0",
 //                "apiTicket",
 //                TencentFaceIdClient.getRandomNumByLength(32));
+        // 重启1
     }
 
 }
