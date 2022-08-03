@@ -305,11 +305,11 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         long nowTimeL = nowDate.getTime();
         long overdueL = endTimeL - nowTimeL;
         // 查询手底下人有多少交了99元数量  payment_type
-        Integer anUserNumber = umsUserMapper.findAdvancedUsersNumber(userId);
+        // Integer anUserNumber = umsUserMapper.findAdvancedUsersNumber(userId);
 
         // 读取设置中的【每场秒杀购买基础数次】值
-        Integer baseNumber = sysSettingService.getSettingValue(SettingTypeEnum.twenty_five);
-        Integer purchasesNumber = baseNumber + (anUserNumber / 2);
+        Integer purchasesNumber = sysSettingService.getSettingValue(SettingTypeEnum.twenty_five);
+        // Integer purchasesNumber = baseNumber + (anUserNumber / 2);
         // 获取 已下单次数
         Integer countRedis = (Integer) redisTemplate.opsForValue().get(key);
         // 获取场次下 该用户下单次数
@@ -465,29 +465,29 @@ public class SmsFlashPromotionProductServiceImpl extends ServiceImpl<SmsFlashPro
         Long userId = orderInfo.getUserId();
         LOGGER.info("通过订单得到用户id:{}", userId);
         LOGGER.info("当前调用接口的用户id:{}", UserUtil.getCurrentUser().getUserId());
-        GetRequest getRequest = new GetRequest("game_record").id(String.valueOf(userId));
-        GetResponse response = client.get(getRequest, RequestOptions.DEFAULT);
-        String sourceAsString = response.getSourceAsString();
-        // 默认  1 + 0.005+0.038 = 1.043  ----> 2022.02.14 修改为:  1+0.005 = 1.005
+        // GetRequest getRequest = new GetRequest("game_record").id(String.valueOf(userId));
+        // GetResponse response = client.get(getRequest, RequestOptions.DEFAULT);
+        // String sourceAsString = response.getSourceAsString();
+        // // 默认  1 + 0.005+0.038 = 1.043  ----> 2022.02.14 修改为:  1+0.005 = 1.005
         BigDecimal bigDecimal = BigDecimal.valueOf(1.005);
-        if (StringUtils.isNotBlank(sourceAsString)) {
-            ESGameRecord esGameRecord = JSON.parseObject(sourceAsString, ESGameRecord.class);
-            List<GameRecord> gameRecords = esGameRecord.getEarnings();
-            if (ObjectUtils.isNotEmpty(gameRecords)) {
-                // 此处使用了 订单的支付时间作为查询依据
-                Date paymentTime = orderInfo.getPaymentTime();
-                Integer ym = Integer.valueOf(new SimpleDateFormat("yyyyMM").format(paymentTime));
-                List<GameRecord> collect = gameRecords.stream().filter(ym::equals).collect(Collectors.toList());
-                // 若ym年月为找到则说明用默认的来进行增幅
-                if (BlankUtil.isNotEmpty(collect)) {
-                    GameRecord gameRecord = collect.get(0);
-                    Double ratio = gameRecord.getRatio();
-                    LOGGER.info("查询到ES用户比例为:{}", ratio);
-                    // 使用es 比例           用户比例          +               本金      // 2022.2.14移除平台   +     平台固定涨幅
-                    bigDecimal = BigDecimal.valueOf(ratio).add(BigDecimal.valueOf(1));//.add(BigDecimal.valueOf(0.038));
-                }
-            }
-        }
+        // if (StringUtils.isNotBlank(sourceAsString)) {
+        //     ESGameRecord esGameRecord = JSON.parseObject(sourceAsString, ESGameRecord.class);
+        //     List<GameRecord> gameRecords = esGameRecord.getEarnings();
+        //     if (ObjectUtils.isNotEmpty(gameRecords)) {
+        //         // 此处使用了 订单的支付时间作为查询依据
+        //         Date paymentTime = orderInfo.getPaymentTime();
+        //         Integer ym = Integer.valueOf(new SimpleDateFormat("yyyyMM").format(paymentTime));
+        //         List<GameRecord> collect = gameRecords.stream().filter(ym::equals).collect(Collectors.toList());
+        //         // 若ym年月为找到则说明用默认的来进行增幅
+        //         if (BlankUtil.isNotEmpty(collect)) {
+        //             GameRecord gameRecord = collect.get(0);
+        //             Double ratio = gameRecord.getRatio();
+        //             LOGGER.info("查询到ES用户比例为:{}", ratio);
+        //             // 使用es 比例           用户比例          +               本金      // 2022.2.14移除平台   +     平台固定涨幅
+        //             bigDecimal = BigDecimal.valueOf(ratio).add(BigDecimal.valueOf(1));//.add(BigDecimal.valueOf(0.038));
+        //         }
+        //     }
+        // }
         LOGGER.info("此次涨幅比例为:{}", bigDecimal.doubleValue());
         // 订单总金额  ps:支撑条件为->购买产品数量为 1  否则需要进行计算 总金额/数量
         Long totalAmount = orderInfo.getTotalAmount();
