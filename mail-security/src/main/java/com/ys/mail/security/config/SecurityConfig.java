@@ -30,6 +30,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired(required = false)
     private DynamicSecurityService dynamicSecurityService;
 
+   // @Autowired
+   // private PasswordEncoder passwordEncoder;
+
     /**
      * 用于配置需要拦截的url路径、jwt过滤器及出异常后的处理器；
      * @param httpSecurity
@@ -37,6 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+        //System.out.println("=============================================");
+        //System.out.println(passwordEncoder.encode("123456"));
+        //System.out.println("=============================================");
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity
                 .authorizeRequests();
         //不需要保护的资源路径允许访问

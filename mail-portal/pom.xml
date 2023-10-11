@@ -91,9 +91,16 @@
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>com.alipay.api</groupId>
             <artifactId>alipay.api</artifactId>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.9.79.ALL</version>
         </dependency>
 
         <dependency>

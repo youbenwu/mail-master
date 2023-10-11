@@ -77,12 +77,13 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
         </dependency>
-        <!--本地短信-->
+        <!--本地短信
         <dependency>
             <groupId>org.item.sms-sdk</groupId>
             <artifactId>sms-sdk</artifactId>
             <version>1.2</version>
         </dependency>
+        -->
 
         <!-- 阿里巴巴 json 解析 -->
         <dependency>
@@ -110,10 +111,18 @@
             <systemPath>${project.basedir}/../mail-common/src/main/resources/lib/alipay-sdk-java-4.9.79.ALL.jar</systemPath>
         </dependency>-->
 
+        <!--
         <dependency>
             <groupId>com.alipay.api</groupId>
             <artifactId>alipay.api</artifactId>
         </dependency>
+        -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.9.79.ALL</version>
+        </dependency>
+
 
         <!--AMQP rabbitmq-->
         <dependency>

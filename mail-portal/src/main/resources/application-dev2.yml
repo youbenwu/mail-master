@@ -1,0 +1,80 @@
+server:
+  port: 8019
+
+spring:
+  datasource: #159.75.212.173  localhost
+    url: jdbc:mysql://localhost:3306/qcy_mail?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: ybw108000
+    druid:
+      initial-size: 5 #连接池初始化大小
+      min-idle: 10 #最小空闲连接数
+      max-active: 20 #最大连接数
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
+      stat-view-servlet: #访问监控网页的登录用户名和密码
+        login-username: druid
+        login-password: druid
+  devtools:
+    restart:
+      enabled: true #设置开启热部署
+      additional-paths: src/main/java #重启目录
+      exclude: resources/**
+  freemarker:
+    cache: true   #页面不加载缓存，修改即时生效
+  redis:
+    host: localhost # Redis服务器地址
+    database: 1 # Redis数据库索引（默认为0）
+    port: 6379 # Redis服务器连接端口
+    #password: 123456 #Redis服务器连接密码（默认为空）
+    timeout: 600000ms # 连接超时时间（毫秒）
+  elasticsearch:
+    rest:
+      uris:
+        - http://127.0.0.1:9200
+  rabbitmq:
+    port: 5672
+    virtual-host: /
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual
+
+logging:
+  level:
+    root: info
+    com.ys.mail: debug
+  file:
+    path: D:/project/qcy_mail/portal/logs/    #打印日志
+
+logstash:
+  host: localhost
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql语句打印
+    cache-enabled: true    #开启mybatis缓存
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+
+prop:
+  staticAccessPath: D:/project/qcy_mail/        #存支付宝的相关证书
+  inviteUrl: http://reg.huwing.cn
+
+# 消息队列定义
+#rabbitmq:
+  #queue:
+    #name:
+      #cancelOrder: cancelOrderQueue
+
+## 融云IM相关配置（开发测试环境）
+rongcloud:
+  app_key: bmdehs6pbe7fs # 测试环境的 App Key
+  app_secret: J0MejaLE3JU # 测试环境的的 App Secret
+  api_url: api-cn.ronghub.com # 此处填写融云 Api Url
+  default_portrait_url: /headPortrait/ums_user_default.png # 此处填写默认头像地址

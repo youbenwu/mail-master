@@ -69,6 +69,7 @@ public class PcUserServiceImpl extends ServiceImpl<PcUserMapper, PcUser> impleme
 
     @Override
     public CommonResult<Boolean> register(PcUserRegisterParam param) {
+
         if (BlankUtil.isNotEmpty(param.getPcUserId())) return CommonResult.failed("非法请求", Boolean.FALSE);
         PcUserParam pcUserParam = new PcUserParam();
         BeanUtils.copyProperties(param, pcUserParam);

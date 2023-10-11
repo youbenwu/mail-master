@@ -1,7 +1,7 @@
 package com.ys.mail.component;
 
-import com.shuyuanwl.sms.api.bean.DownRes;
-import com.shuyuanwl.sms.api.core.ApiSender;
+//import com.shuyuanwl.sms.api.bean.DownRes;
+//import com.shuyuanwl.sms.api.core.ApiSender;
 import com.ys.mail.constant.FigureConstant;
 import com.ys.mail.exception.ApiAssert;
 import com.ys.mail.exception.code.BusinessErrorCode;
@@ -54,7 +54,7 @@ public class SmsClient {
 
     public void sendRegisterVerify(String phone, String verifyCode, Byte type) {
         String key = type == 0 ? JIH_ACCOUNT : JUH_ACCOUNT;
-        DownRes send = ApiSender.send(URL, key, PASSWORD, phone, CONTENT + verifyCode, EXT_NO, BATCH_NO);
-        ApiAssert.noEq(BlankUtil.isEmpty(send) ? null : send.getCode(), FigureConstant.SUCCESS, BusinessErrorCode.ERR_SMS_MISTAKE);
+        //DownRes send = ApiSender.send(URL, key, PASSWORD, phone, CONTENT + verifyCode, EXT_NO, BATCH_NO);
+        //ApiAssert.noEq(BlankUtil.isEmpty(send) ? null : send.getCode(), FigureConstant.SUCCESS, BusinessErrorCode.ERR_SMS_MISTAKE);
     }
 }
